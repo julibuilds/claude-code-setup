@@ -47,6 +47,7 @@
 		"**/.turbo/**": true,
 		"**/dist/**": true,
 		"**/build/**": true,
-		"**/out/**": true
+		"**/out/**": true,
+		"**/target/**": true
 	}
 }
