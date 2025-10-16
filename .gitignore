@@ -38,3 +38,9 @@ yarn-error.log*
 *.pem
 
 _examples
+
+.dev.vars
+config.json
+.credentials
+*.key
+*.secret

@@ -9,15 +9,20 @@
 		".": {
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
+		},
+		"./browser": {
+			"import": "./dist/browser.js",
+			"types": "./dist/browser.d.ts"
 		}
 	},
 	"scripts": {
-		"build": "bun build src/index.ts --outdir dist --target node --format esm && bun run build:types",
+		"build": "bun build src/index.ts --outdir dist --target node --format esm && bun build src/browser.ts --outdir dist --target browser --format esm && bun run build:types",
 		"build:types": "tsc --emitDeclarationOnly --declaration --declarationMap",
 		"dev": "bun --watch src/index.ts",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
+		"js-tiktoken": "^1.0.21",
 		"tiktoken": "^1.0.22",
 		"zod": "^4.1.12"
 	},

@@ -4,7 +4,7 @@
  * Creates and configures the Hono server with middleware and routes.
  */
 
-import type { AppConfig, ClaudeRequest, ProviderConfig } from "@repo/core";
+import type { AppConfig, ClaudeRequest, ProviderConfig } from "@repo/core/browser";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger as honoLogger } from "hono/logger";

@@ -5,8 +5,8 @@
  * Supports chaining multiple transformers for complex transformations.
  */
 
-import type { AppConfig } from "@repo/core";
-import { TransformerRegistry } from "@repo/core";
+import type { AppConfig } from "@repo/core/browser";
+import { TransformerRegistry } from "@repo/core/browser";
 import type { MiddlewareHandler } from "hono";
 
 /**

@@ -158,31 +158,31 @@
     - Return list of available transformers
     - _Requirements: 1.5, 1.6_
 
-- [ ] 10. Implement Docker deployment configuration
+- [x] 10. Implement Docker deployment configuration
 
-  - [ ] 10.1 Create Dockerfile
+  - [x] 10.1 Create Dockerfile
 
     - Write multi-stage Dockerfile in `apps/router/Dockerfile`
     - Use Bun base image
     - Optimize for production deployment
     - _Requirements: 1.2_
 
-  - [ ] 10.2 Create docker-compose configuration
+  - [x] 10.2 Create docker-compose configuration
     - Write docker-compose.yml for local development
     - Configure environment variables
     - Set up volume mounts for configuration
     - _Requirements: 1.2_
 
-- [ ] 11. Implement Cloudflare Workers deployment configuration
+- [x] 11. Implement Cloudflare Workers deployment configuration
 
-  - [ ] 11.1 Create wrangler configuration
+  - [x] 11.1 Create wrangler configuration
 
     - Write wrangler.toml in `apps/router/wrangler.toml`
     - Configure build command and compatibility date
     - Set up environment variables
     - _Requirements: 1.2_
 
-  - [ ] 11.2 Create Workers entry point
+  - [x] 11.2 Create Workers entry point
     - Adapt server.ts for Cloudflare Workers runtime
     - Handle Workers-specific request/response objects
     - _Requirements: 1.2_

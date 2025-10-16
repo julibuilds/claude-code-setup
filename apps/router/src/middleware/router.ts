@@ -9,8 +9,8 @@
  * - Explicit model override via comma syntax
  */
 
-import type { AppConfig, ClaudeRequest } from "@repo/core";
-import { calculateTokenCount } from "@repo/core";
+import type { AppConfig, ClaudeRequest } from "@repo/core/browser";
+import { calculateTokenCount } from "@repo/core/browser";
 import type { MiddlewareHandler } from "hono";
 
 /**

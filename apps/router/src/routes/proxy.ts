@@ -3,8 +3,8 @@
  * Main Claude API proxy endpoints
  */
 
-import type { AppConfig } from "@repo/core";
-import { calculateTokenCount } from "@repo/core";
+import type { AppConfig } from "@repo/core/browser";
+import { calculateTokenCount } from "@repo/core/browser";
 import type { Context } from "hono";
 import { stream } from "hono/streaming";
 import type { Logger } from "pino";

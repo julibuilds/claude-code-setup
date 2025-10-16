@@ -2,7 +2,7 @@
  * Configuration Management Routes
  */
 
-import type { AppConfig } from "@repo/core";
+import type { AppConfig } from "@repo/core/browser";
 import type { Context } from "hono";
 import type { Logger } from "pino";
 import { ConfigManager } from "../utils/config-manager";

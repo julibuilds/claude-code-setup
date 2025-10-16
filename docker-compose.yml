@@ -1,0 +1,76 @@
+services:
+  router:
+    build:
+      context: .
+      dockerfile: apps/router/Dockerfile
+    container_name: claude-code-router
+    ports:
+      - "${PORT:-3456}:3456"
+    environment:
+      # Server configuration
+      - HOST=0.0.0.0
+      - PORT=3456
+      
+      # API configuration
+      - APIKEY=${APIKEY:-}
+      - API_TIMEOUT_MS=${API_TIMEOUT_MS:-600000}
+      
+      # Logging configuration
+      - LOG=${LOG:-true}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      
+      # Provider API keys (loaded from .env file)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-}
+      
+      # Optional proxy configuration
+      - PROXY_URL=${PROXY_URL:-}
+      
+      # Custom router script path
+      - CUSTOM_ROUTER_PATH=${CUSTOM_ROUTER_PATH:-}
+      
+      # Non-interactive mode
+      - NON_INTERACTIVE_MODE=${NON_INTERACTIVE_MODE:-false}
+    
+    volumes:
+      # Mount configuration file
+      - ./config.json:/app/apps/router/config.json:ro
+      
+      # Mount logs directory (optional)
+      - ./logs:/app/apps/router/logs
+      
+      # Mount custom transformers directory (optional)
+      - ./transformers:/app/transformers:ro
+    
+    restart: unless-stopped
+    
+    # Resource limits (optional, adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "bun", "run", "-e", "fetch('http://localhost:3456/').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    name: claude-code-router-network

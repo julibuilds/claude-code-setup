@@ -2,8 +2,8 @@
  * Transformer Management Routes
  */
 
-import type { AppConfig } from "@repo/core";
-import { TransformerRegistry } from "@repo/core";
+import type { AppConfig } from "@repo/core/browser";
+import { TransformerRegistry } from "@repo/core/browser";
 import type { Context } from "hono";
 import type { Logger } from "pino";
 
