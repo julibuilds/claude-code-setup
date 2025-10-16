@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import type { Config } from "../types/config";
 import { loadConfig, saveConfig } from "../utils/config";
 
@@ -17,7 +17,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const reloadConfig = async () => {
+	const reloadConfig = useCallback(async () => {
 		setLoading(true);
 		setError(null);
 		try {
@@ -28,20 +28,20 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 
-	const updateConfig = async (newConfig: Config) => {
+	const updateConfig = useCallback(async (newConfig: Config) => {
 		try {
 			await saveConfig(newConfig);
 			setConfig(newConfig);
 		} catch (err) {
 			throw new Error(err instanceof Error ? err.message : "Failed to save config");
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		reloadConfig();
-	}, []);
+	}, [reloadConfig]);
 
 	return (
 		<ConfigContext.Provider value={{ config, loading, error, reloadConfig, updateConfig }}>

@@ -15,7 +15,7 @@ export function SecretsManager(_props: SecretsManagerProps) {
 	const [action, setAction] = useState<"menu" | "set" | "list">("menu");
 	const [secretKey, setSecretKey] = useState("");
 	const [secretValue, setSecretValue] = useState("");
-	const [output, setOutput] = useState<string[]>([]);
+	const [output, setOutput] = useState<Array<{ id: string; text: string }>>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [processing, setProcessing] = useState(false);
 
@@ -49,12 +49,19 @@ export function SecretsManager(_props: SecretsManagerProps) {
 		setError(null);
 
 		try {
-			setOutput((prev) => [...prev, `Setting secret: ${secretKey}...`]);
+			setOutput((prev) => [
+				...prev,
+				{ id: `${Date.now()}-0`, text: `Setting secret: ${secretKey}...` },
+			]);
 
 			const result = await setWorkerSecret(secretKey, secretValue);
 
 			if (result.success) {
-				setOutput((prev) => [...prev, "", "✓ Secret set successfully!"]);
+				setOutput((prev) => [
+					...prev,
+					{ id: `${Date.now()}-empty`, text: "" },
+					{ id: `${Date.now()}-success`, text: "✓ Secret set successfully!" },
+				]);
 				setSecretKey("");
 				setSecretValue("");
 			} else {
@@ -73,10 +80,15 @@ export function SecretsManager(_props: SecretsManagerProps) {
 		setError(null);
 
 		try {
-			setOutput((prev) => [...prev, "Fetching secrets..."]);
+			setOutput((prev) => [...prev, { id: `${Date.now()}-fetch`, text: "Fetching secrets..." }]);
 
 			const secrets = await listWorkerSecrets();
-			setOutput((prev) => [...prev, "", "Configured secrets:", ...secrets]);
+			const secretItems = [
+				{ id: `${Date.now()}-empty`, text: "" },
+				{ id: `${Date.now()}-header`, text: "Configured secrets:" },
+				...secrets.map((s, i) => ({ id: `${Date.now()}-secret-${i}`, text: s })),
+			];
+			setOutput((prev) => [...prev, ...secretItems]);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to list secrets");
 		} finally {
@@ -115,9 +127,9 @@ export function SecretsManager(_props: SecretsManagerProps) {
 					focused
 				>
 					<box style={{ flexDirection: "column", padding: 1 }}>
-						{output.map((line, idx) => (
-							<text key={`secret-${idx}`} fg={line.startsWith("✓") ? "#9ece6a" : "#888"}>
-								{line}
+						{output.map((item) => (
+							<text key={item.id} fg={item.text.startsWith("✓") ? "#9ece6a" : "#888"}>
+								{item.text}
 							</text>
 						))}
 						{error && <text fg="red">Error: {error}</text>}
