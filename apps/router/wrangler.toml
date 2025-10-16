@@ -26,6 +26,12 @@ vars = { LOG_LEVEL = "info" }
 name = "claude-code-router-1016-staging"
 vars = { LOG_LEVEL = "debug" }
 
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+
 # Secrets (set via: wrangler secret put <KEY>)
 # - APIKEY: Optional API key for authentication
 # - OPENROUTER_API_KEY: API key for OpenRouter provider

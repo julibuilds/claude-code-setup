@@ -14,7 +14,16 @@ import type { MiddlewareHandler } from "hono";
  */
 export function authMiddleware(apiKey: string): MiddlewareHandler {
 	return async (c, next) => {
-		// Extract API key from request headers
+		const path = c.req.path;
+
+		// Skip auth for proxy endpoints - they handle their own provider authentication
+		// Only protect management/config endpoints
+		if (path.startsWith("/v1/")) {
+			await next();
+			return;
+		}
+
+		// Extract API key from request headers for management endpoints
 		// Support both Authorization: Bearer <token> and x-api-key: <token>
 		const authHeader = c.req.header("Authorization");
 		const apiKeyHeader = c.req.header("x-api-key");

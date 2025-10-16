@@ -77,14 +77,31 @@ function parseConfig(env: Env): AppConfig {
 	// Interpolate API keys in provider configurations
 	if (config.Providers) {
 		for (const provider of config.Providers) {
-			if (provider.api_key === "$OPENROUTER_API_KEY" && env.OPENROUTER_API_KEY) {
-				provider.api_key = env.OPENROUTER_API_KEY;
+			console.log(`Provider ${provider.name}: api_key=${provider.api_key?.substring(0, 10)}...`);
+
+			if (provider.api_key === "$OPENROUTER_API_KEY") {
+				if (env.OPENROUTER_API_KEY) {
+					provider.api_key = env.OPENROUTER_API_KEY;
+					console.log(`✓ Interpolated OPENROUTER_API_KEY for ${provider.name}`);
+				} else {
+					console.error(`✗ OPENROUTER_API_KEY not found in env for ${provider.name}`);
+				}
 			}
-			if (provider.api_key === "$DEEPSEEK_API_KEY" && env.DEEPSEEK_API_KEY) {
-				provider.api_key = env.DEEPSEEK_API_KEY;
+			if (provider.api_key === "$DEEPSEEK_API_KEY") {
+				if (env.DEEPSEEK_API_KEY) {
+					provider.api_key = env.DEEPSEEK_API_KEY;
+					console.log(`✓ Interpolated DEEPSEEK_API_KEY for ${provider.name}`);
+				} else {
+					console.error(`✗ DEEPSEEK_API_KEY not found in env for ${provider.name}`);
+				}
 			}
-			if (provider.api_key === "$GEMINI_API_KEY" && env.GEMINI_API_KEY) {
-				provider.api_key = env.GEMINI_API_KEY;
+			if (provider.api_key === "$GEMINI_API_KEY") {
+				if (env.GEMINI_API_KEY) {
+					provider.api_key = env.GEMINI_API_KEY;
+					console.log(`✓ Interpolated GEMINI_API_KEY for ${provider.name}`);
+				} else {
+					console.error(`✗ GEMINI_API_KEY not found in env for ${provider.name}`);
+				}
 			}
 		}
 	}

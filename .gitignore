@@ -40,7 +40,6 @@ yarn-error.log*
 _examples
 
 .dev.vars
-config.json
 .credentials
 *.key
 *.secret
