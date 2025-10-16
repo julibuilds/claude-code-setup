@@ -86,7 +86,7 @@ export function SecretsManager(_props: SecretsManagerProps) {
 
 	if (action === "list" || (action === "set" && (processing || output.length > 0))) {
 		return (
-<box
+			<box
 				style={{
 					flexDirection: "column",
 					width: Math.min(100, width - 4),
@@ -116,7 +116,7 @@ export function SecretsManager(_props: SecretsManagerProps) {
 				>
 					<box style={{ flexDirection: "column", padding: 1 }}>
 						{output.map((line, idx) => (
-<text key={`secret-${idx}`} fg={line.startsWith("✓") ? "#9ece6a" : "#888"}>
+							<text key={`secret-${idx}`} fg={line.startsWith("✓") ? "#9ece6a" : "#888"}>
 								{line}
 							</text>
 						))}
@@ -133,7 +133,7 @@ export function SecretsManager(_props: SecretsManagerProps) {
 
 	if (action === "set") {
 		return (
-<box
+			<box
 				style={{
 					flexDirection: "column",
 					width: Math.min(80, width - 4),
@@ -200,7 +200,7 @@ export function SecretsManager(_props: SecretsManagerProps) {
 	];
 
 	return (
-<box
+		<box
 			style={{
 				flexDirection: "column",
 				width: Math.min(80, width - 4),

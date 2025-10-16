@@ -19,8 +19,8 @@ export async function fetchOpenRouterModels(): Promise<OpenRouterModel[]> {
 		throw new Error(`Failed to fetch models: ${response.statusText}`);
 	}
 
-	const data = await response.json();
-	return data.data as OpenRouterModel[];
+	const data = (await response.json()) as { data: OpenRouterModel[] };
+	return data.data;
 }
 
 export function filterAnthropicModels(models: OpenRouterModel[]): OpenRouterModel[] {
