@@ -13,8 +13,8 @@
             "models": [
                 "anthropic/claude-haiku-4.5",
                 "anthropic/claude-sonnet-4.5",
-                "z-ai/glm-4.6",
-                "openai/gpt-5-codex"
+                "openai/gpt-5-codex",
+                "z-ai/glm-4.6"
             ],
             "transformer": {
                 "use": [
@@ -24,11 +24,10 @@
         }
     ],
     "Router": {
-        "default": "openrouter,anthropic/claude-haiku-4.5",
-        "background": "openrouter,z-ai/glm-4.6",
-        "think": "openrouter,anthropic/claude-sonnet-4.5",
-        "longContext": "openrouter,anthropic/claude-sonnet-4.5",
-        "longContextThreshold": 60000,
-        "webSearch": "openrouter,anthropic/claude-sonnet-4.5"
+        "default": "openrouter,anthropic/claude-sonnet-4.5",
+        "background": "openrouter,anthropic/claude-haiku-4.5",
+        "think": "openrouter,openai/gpt-5-codex",
+        "longContext": "openrouter,z-ai/glm-4.6",
+        "longContextThreshold": 60000
     }
 }

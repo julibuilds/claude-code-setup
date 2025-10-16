@@ -182,9 +182,16 @@ export class OpenRouterTransformer implements Transformer {
 	}
 
 	transformResponse(response: any, context: TransformerContext): ClaudeResponse {
+		// Check if response is an error
+		if (response.error) {
+			throw new Error(`OpenRouter API error: ${JSON.stringify(response.error)}`);
+		}
+
 		const choice = response.choices?.[0];
 		if (!choice) {
-			throw new Error("Invalid response format: missing choices");
+			throw new Error(
+				`Invalid response format: missing choices. Response: ${JSON.stringify(response)}`
+			);
 		}
 
 		const content: ContentBlock[] = [];

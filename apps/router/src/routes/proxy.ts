@@ -88,6 +88,19 @@ export function setupProxyRoutes(
 
 				const { provider, model, request, transformedRequest, tokenCount } = routingContext;
 
+				// Log the incoming request details
+				logger.info(
+					{
+						sessionId,
+						originalModel: request.model,
+						routedModel: model,
+						provider: provider.name,
+						hasMessages: !!request.messages,
+						messageCount: request.messages?.length,
+					},
+					"Processing request"
+				);
+
 				// Log routing decision
 				logger.info(
 					{
@@ -122,11 +135,17 @@ export function setupProxyRoutes(
 					"Request transformed"
 				);
 
+				// Update the model in the transformed request to match the routed model
+				const finalRequest = {
+					...transformedRequest,
+					model,
+				};
+
 				// Forward request to provider
 				const response = await fetch(providerUrl, {
 					method: "POST",
 					headers,
-					body: JSON.stringify(transformedRequest),
+					body: JSON.stringify(finalRequest),
 				});
 
 				// Handle streaming responses
@@ -187,12 +206,65 @@ export function setupProxyRoutes(
 
 				const data = (await response.json()) as Record<string, unknown>;
 
-				// Store response for transformer middleware to process
-				c.set("transformedResponse", data);
+				// Log the raw response for debugging
+				logger.debug(
+					{
+						sessionId,
+						provider: provider.name,
+						model,
+						responseKeys: Object.keys(data),
+						hasChoices: "choices" in data,
+						hasError: "error" in data,
+					},
+					"Raw provider response"
+				);
 
-				// The transformer middleware will have already processed this
-				// Get the final transformed response
-				const transformedResponse = c.get("transformedResponse");
+				// Transform the response using the transformer from routing context
+				let transformedResponse = data;
+
+				// Get transformers for this provider
+				const transformers = provider.transformer?.use || [];
+				if (transformers.length > 0) {
+					// Import and apply the openrouter transformer
+					const { OpenRouterTransformer } = await import("@repo/core/browser");
+					const transformer = new OpenRouterTransformer();
+
+					try {
+						transformedResponse = transformer.transformResponse(data, {
+							config,
+							provider,
+							model,
+						});
+
+						logger.debug(
+							{
+								sessionId,
+								provider: provider.name,
+								transformedKeys: Object.keys(transformedResponse),
+							},
+							"Response transformed"
+						);
+					} catch (error) {
+						logger.error(
+							{
+								sessionId,
+								provider: provider.name,
+								error: error instanceof Error ? error.message : "Unknown error",
+							},
+							"Response transformation failed"
+						);
+						// Return the error to the client
+						return c.json(
+							{
+								error: {
+									type: "transformation_error",
+									message: error instanceof Error ? error.message : "Failed to transform response",
+								},
+							},
+							500
+						);
+					}
+				}
 
 				// Track usage if response contains usage data
 				if (transformedResponse && typeof transformedResponse === "object") {
