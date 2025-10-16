@@ -1,0 +1,39 @@
+{
+	"APIKEY": "your-secret-api-key",
+	"HOST": "0.0.0.0",
+	"PORT": 3456,
+	"LOG": true,
+	"LOG_LEVEL": "info",
+	"API_TIMEOUT_MS": 600000,
+	"Providers": [
+		{
+			"name": "openrouter",
+			"api_base_url": "https://openrouter.ai/api/v1/chat/completions",
+			"api_key": "$OPENROUTER_API_KEY",
+			"models": [
+				"anthropic/claude-3.5-sonnet",
+				"google/gemini-2.0-flash",
+				"deepseek/deepseek-chat"
+			],
+			"transformer": {
+				"use": ["openrouter"]
+			}
+		},
+		{
+			"name": "deepseek",
+			"api_base_url": "https://api.deepseek.com/chat/completions",
+			"api_key": "$DEEPSEEK_API_KEY",
+			"models": ["deepseek-chat", "deepseek-reasoner"],
+			"transformer": {
+				"use": ["deepseek"]
+			}
+		}
+	],
+	"Router": {
+		"default": "openrouter,anthropic/claude-3.5-sonnet",
+		"background": "openrouter,google/gemini-2.0-flash",
+		"think": "deepseek,deepseek-reasoner",
+		"longContext": "openrouter,google/gemini-2.0-flash",
+		"longContextThreshold": 60000
+	}
+}
