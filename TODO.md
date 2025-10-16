@@ -12,25 +12,6 @@ Refer to example implementations in the `_examples/*` directory. Keep in mind th
 - Local (Docker) and Cloudflare Workers deployment options
 - Bun, TypeScript, Hono
 
-### Tech stack
-
-#### Router
-
-Core:
-- Bun/TypeScript for runtime, package manager in all apps/packages
-- Hono
-- Wrangler/`@cloudflare/workers-types`
-
-As needed:
-- Zod
-- undici
-- uuid
-- etc.
-
-The router supports 2 deployment options:
-- local (Docker)
-- Cloudflare Workers
-
 ### Ideas
 
 - Web app (in `apps/web`) using Next.js 15+ (App Router), React 19, Tailwind CSS v4+, etc. that's a custom version/port of `_examples/claude-code-router/claude-code-router/ui`.

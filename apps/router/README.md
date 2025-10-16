@@ -1,94 +1,110 @@
-# Claude Code Router Service
+# Claude Code Router - Cloudflare Workers
 
-A flexible proxy service that routes Claude Code API requests to multiple LLM providers with intelligent routing rules and request/response transformation.
+A lightweight, edge-deployed proxy service that routes Claude Code API requests to multiple LLM providers with intelligent routing rules and request/response transformation. Runs on Cloudflare Workers for global low-latency access.
 
 ## Features
 
-- **Multi-Provider Support**: Route requests to OpenRouter, DeepSeek, Gemini, and other providers
+- **Edge Deployment**: Runs on Cloudflare's global network for minimal latency
+- **Multi-Provider Support**: Route requests to OpenRouter and other providers
 - **Intelligent Routing**: Automatic routing based on context length, task type, and model selection
-- **Request Transformation**: Convert between Claude API format and provider-specific formats
-- **Configuration Management**: REST API for reading and updating configuration with automatic backups
+- **Request Transformation**: Convert between Claude API format and provider-specific formats (OpenRouter/OpenAI)
 - **Usage Tracking**: Monitor token usage per session and provider
 - **Streaming Support**: Full support for Server-Sent Events (SSE) streaming responses
+- **Zero Infrastructure**: No servers to manage, scales automatically
 
 ## Quick Start
 
-### 1. Create Configuration File
+### 1. Configure Your Router
 
-Copy the example configuration:
-
-```bash
-cp config.example.json config.json
-```
-
-Edit `config.json` and add your API keys:
+Edit `config.json` with your provider settings:
 
 ```json
 {
-  "APIKEY": "your-router-api-key",
+  "APIKEY": "your-secret-api-key",
+  "HOST": "0.0.0.0",
+  "PORT": 3456,
+  "LOG": true,
+  "LOG_LEVEL": "info",
+  "API_TIMEOUT_MS": 600000,
   "Providers": [
     {
       "name": "openrouter",
-      "api_key": "sk-or-v1-your-key-here",
-      ...
+      "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
+      "api_key": "$OPENROUTER_API_KEY",
+      "models": [
+        "anthropic/claude-haiku-4.5",
+        "anthropic/claude-sonnet-4.5",
+        "openai/gpt-5-codex",
+        "z-ai/glm-4.6"
+      ],
+      "transformer": {
+        "use": ["openrouter"]
+      }
     }
   ],
-  ...
+  "Router": {
+    "default": "openrouter,anthropic/claude-sonnet-4.5",
+    "background": "openrouter,anthropic/claude-haiku-4.5",
+    "think": "openrouter,openai/gpt-5-codex",
+    "longContext": "openrouter,z-ai/glm-4.6",
+    "longContextThreshold": 60000
+  }
 }
 ```
 
-You can use environment variables in the config:
+### 2. Set Secrets
 
-```json
-{
-  "api_key": "$OPENROUTER_API_KEY"
-}
-```
-
-### 2. Set Environment Variables
-
-Create a `.env` file:
+Store your API keys as Wrangler secrets:
 
 ```bash
-OPENROUTER_API_KEY=sk-or-v1-your-key
-DEEPSEEK_API_KEY=sk-your-key
-CONFIG_PATH=./config.json
-PORT=3456
-HOST=0.0.0.0
+# Set OpenRouter API key
+bunx wrangler secret put OPENROUTER_API_KEY
+# Enter: sk-or-v1-your-key-here
+
+# Optional: Set router authentication key
+bunx wrangler secret put APIKEY
+# Enter: your-secret-key
 ```
 
-### 3. Start the Server
-
-Development mode with auto-reload:
+For local development, create `.dev.vars`:
 
 ```bash
-bun run dev
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+APIKEY=your-secret-key
 ```
 
-Production mode:
+### 3. Deploy to Cloudflare Workers
 
 ```bash
-bun run build
-bun run start
+# Deploy to production
+bun run deploy
+
+# Or deploy to a specific environment
+bunx wrangler deploy --env production
 ```
 
-### 4. Test the Server
-
-Health check:
+### 4. Test Your Deployment
 
 ```bash
-curl http://localhost:3456/
-```
+# Health check
+curl https://your-worker.workers.dev/
 
-Count tokens:
-
-```bash
-curl -X POST http://localhost:3456/v1/messages/count_tokens \
+# Count tokens
+curl -X POST https://your-worker.workers.dev/v1/messages/count_tokens \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [
       {"role": "user", "content": "Hello, world!"}
     ]
+  }'
+
+# Send a message
+curl -X POST https://your-worker.workers.dev/v1/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4-5",
+    "messages": [{"role": "user", "content": "Write a haiku"}],
+    "max_tokens": 100
   }'
 ```
 
@@ -100,9 +116,9 @@ Each provider requires:
 
 - `name`: Unique identifier
 - `api_base_url`: Provider API endpoint
-- `api_key`: Authentication key (supports env vars with `$VAR` syntax)
-- `models`: Array of available model names
-- `transformer`: Optional transformer configuration
+- `api_key`: Authentication key (use `$VAR_NAME` to reference Wrangler secrets)
+- `models`: Array of available model IDs from the provider
+- `transformer`: Transformer configuration for request/response conversion
 
 Example:
 
@@ -118,234 +134,227 @@ Example:
 }
 ```
 
+**Finding Model IDs**: Use the OpenRouter API to get exact model IDs:
+
+```bash
+curl https://openrouter.ai/api/v1/models | jq '.data[] | {id, name}'
+```
+
 ### Routing Rules
 
-Configure routing based on task type:
+The router automatically selects providers and models based on request characteristics:
 
 ```json
 {
   "Router": {
-    "default": "openrouter,anthropic/claude-3.5-sonnet",
-    "background": "openrouter,google/gemini-2.0-flash",
-    "think": "deepseek,deepseek-reasoner",
-    "longContext": "openrouter,google/gemini-2.0-flash",
-    "longContextThreshold": 60000,
-    "webSearch": "openrouter,google/gemini-2.0-flash"
+    "default": "openrouter,anthropic/claude-sonnet-4.5",
+    "background": "openrouter,anthropic/claude-haiku-4.5",
+    "think": "openrouter,openai/gpt-5-codex",
+    "longContext": "openrouter,z-ai/glm-4.6",
+    "longContextThreshold": 60000
   }
 }
 ```
 
-Routing rules:
+**Routing Logic**:
 
-- `default`: Default provider and model
-- `background`: For background/haiku tasks
-- `think`: For reasoning tasks
-- `longContext`: For requests exceeding token threshold
-- `longContextThreshold`: Token count threshold (default: 60000)
-- `webSearch`: For web search tool requests
+1. **Explicit Override**: Use `provider,model` format in request: `"model": "openrouter,anthropic/claude-sonnet-4.5"`
+2. **Long Context**: Requests exceeding `longContextThreshold` tokens use `longContext` route
+3. **Background Tasks**: Requests with "haiku" in model name use `background` route
+4. **Thinking Mode**: Requests with `thinking` field use `think` route
+5. **Web Search**: Requests with `web_search` tools use `webSearch` route (if configured)
+6. **Default**: All other requests use `default` route
 
 ### Transformers
 
-Built-in transformers:
+The router includes an OpenRouter transformer that:
 
-- `openrouter`: OpenAI-compatible format (works with OpenRouter, Groq, etc.)
-- `deepseek`: DeepSeek API format
-- `gemini`: Google Gemini API format
+- Converts Claude API format to OpenAI-compatible format for requests
+- Converts OpenRouter/OpenAI responses back to Claude API format
+- Handles streaming responses with proper SSE formatting
+- Manages tool calls and content blocks
 
-Custom transformers can be loaded from file paths.
+Built-in transformer: `openrouter` (works with OpenRouter, Groq, and other OpenAI-compatible APIs)
 
 ## API Endpoints
 
 ### Proxy Endpoints
 
-- `POST /v1/messages` - Main Claude API proxy endpoint
+- `POST /v1/messages` - Main Claude API proxy endpoint (supports streaming)
 - `POST /v1/messages/count_tokens` - Count tokens without sending request
 
-### Configuration Management
+### Health Check
 
-- `GET /api/config` - Read current configuration (API keys masked)
-- `POST /api/config` - Update configuration (creates backup automatically)
-- `POST /api/config/backup` - Create manual backup
-
-### Transformer Management
-
-- `GET /api/transformers` - List available transformers and their usage
-
-### Usage Statistics
-
-- `GET /api/usage` - Get total usage statistics
-- `GET /api/usage/sessions` - Get all session statistics
-- `GET /api/usage/sessions/:id` - Get specific session statistics
-- `DELETE /api/usage/sessions/:id` - Delete session statistics
-
-See [API.md](./API.md) for detailed API documentation.
-
-## Configuration Management
-
-### Automatic Backups
-
-When updating configuration via the API, a backup is automatically created:
-
-```bash
-curl -X POST http://localhost:3456/api/config \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-api-key" \
-  -d @new-config.json
-```
-
-Response includes backup location:
-
-```json
-{
-  "success": true,
-  "message": "Configuration updated successfully. Server restart required to apply changes.",
-  "backup": "/path/to/.backups/config.2025-10-16T12-00-00-000Z.json"
-}
-```
-
-### Manual Backups
-
-Create a backup without modifying configuration:
-
-```bash
-curl -X POST http://localhost:3456/api/config/backup \
-  -H "Authorization: Bearer your-api-key"
-```
-
-### Backup Location
-
-Backups are stored in `.backups/` directory relative to the config file:
-
-```
-config.json
-.backups/
-  ├── config.2025-10-16T12-00-00-000Z.json
-  ├── config.2025-10-16T13-30-00-000Z.json
-  └── config.2025-10-16T14-15-00-000Z.json
-```
-
-## Authentication
-
-### API Key Authentication
-
-If `APIKEY` is set in configuration, all `/v1/*` and `/api/*` endpoints require authentication:
-
-```bash
-# Using Authorization header
-curl -H "Authorization: Bearer your-api-key" http://localhost:3456/api/config
-
-# Using x-api-key header
-curl -H "x-api-key: your-api-key" http://localhost:3456/api/config
-```
-
-### Localhost-Only Mode
-
-If no API key is configured, the server binds to `127.0.0.1` for security.
+- `GET /` - Returns router status and configuration summary
 
 ## Usage Tracking
 
-Track token usage per session:
+The router tracks token usage per session using an in-memory LRU cache:
 
 ```bash
 # Send request with session ID
-curl -X POST http://localhost:3456/v1/messages \
+curl -X POST https://your-worker.workers.dev/v1/messages \
   -H "x-session-id: my-session" \
   -H "Content-Type: application/json" \
-  -d '{...}'
-
-# Get session usage
-curl http://localhost:3456/api/usage/sessions/my-session
+  -d '{
+    "model": "claude-sonnet-4-5",
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 100
+  }'
 ```
 
-Response:
+Usage data is tracked per session and includes:
 
-```json
-{
-  "sessionId": "my-session",
-  "providers": {
-    "openrouter": {
-      "inputTokens": 1500,
-      "outputTokens": 800,
-      "requests": 5
-    }
-  },
-  "totalInputTokens": 1500,
-  "totalOutputTokens": 800,
-  "totalRequests": 5
-}
-```
+- Input tokens
+- Output tokens
+- Request count per provider
 
-## Logging
-
-Configure logging in `config.json`:
-
-```json
-{
-  "LOG": true,
-  "LOG_LEVEL": "info"
-}
-```
-
-Log levels: `fatal`, `error`, `warn`, `info`, `debug`, `trace`
-
-Logs are written to `logs/` directory with automatic rotation.
-
-## Examples
-
-See [examples/](./examples/) directory for:
-
-- Configuration management scripts
-- Usage tracking examples
-- Integration examples
+**Note**: Usage data is stored in memory and resets when the Worker restarts.
 
 ## Development
+
+### Local Development
+
+Run the router locally with Wrangler:
 
 ```bash
 # Install dependencies
 bun install
 
-# Run in development mode
+# Start local dev server (uses .dev.vars for secrets)
 bun run dev
 
-# Type checking
-bun run typecheck
+# The router will be available at http://localhost:8787
+```
 
-# Build for production
-bun run build
+### Building
+
+```bash
+# Build the worker bundle
+bun run build:workers
+
+# Output: dist/workers.js
+```
+
+### Project Structure
+
+```
+apps/router/
+├── src/
+│   ├── server.ts          # Hono server setup
+│   ├── workers.ts         # Cloudflare Workers entry point
+│   ├── middleware/
+│   │   ├── auth.ts        # Authentication middleware
+│   │   ├── router.ts      # Intelligent routing logic
+│   │   └── transformer.ts # Request/response transformation
+│   ├── routes/
+│   │   └── proxy.ts       # Proxy endpoints
+│   └── utils/
+│       └── cache.ts       # LRU cache for usage tracking
+├── config.json            # Router configuration
+├── wrangler.toml          # Cloudflare Workers config
+└── package.json
 ```
 
 ## Deployment
 
-### Docker
+### Deploy to Cloudflare Workers
 
 ```bash
-docker build -t claude-router .
-docker run -p 3456:3456 -v $(pwd)/config.json:/app/config.json claude-router
+# Deploy to production
+bun run deploy
+
+# Deploy to specific environment
+bunx wrangler deploy --env production
+
+# View deployment logs
+bunx wrangler tail
 ```
 
-### Cloudflare Workers
+### Environment Variables
 
-See deployment documentation for Cloudflare Workers setup.
+Set via Wrangler secrets (production) or `.dev.vars` (local):
+
+- `OPENROUTER_API_KEY` - Your OpenRouter API key
+- `APIKEY` - Optional authentication key for the router
+- `CONFIG_JSON` - Full configuration as JSON (auto-generated from config.json)
+- `LOG_LEVEL` - Logging level (info, debug, error)
+
+### Updating Configuration
+
+To update the router configuration:
+
+1. Edit `config.json`
+2. Redeploy: `bun run deploy`
+
+The `CONFIG_JSON` secret is automatically updated from `config.json` during deployment.
 
 ## Troubleshooting
 
-### Configuration not loading
+### "Invalid or missing API key" errors
 
-- Check `CONFIG_PATH` environment variable
-- Verify config file exists and is valid JSON
-- Check file permissions
+Check that your secrets are set correctly:
+
+```bash
+# List secrets
+bunx wrangler secret list
+
+# Update secret
+bunx wrangler secret put OPENROUTER_API_KEY
+```
+
+For local development, verify `.dev.vars` exists and contains your keys.
 
 ### Provider requests failing
 
-- Verify API keys are correct
-- Check provider API base URL
-- Review logs for detailed error messages
+1. **Verify API key**: Test directly with the provider's API
+2. **Check model ID**: Use `curl https://openrouter.ai/api/v1/models` to verify model names
+3. **Review logs**: Use `bunx wrangler tail` to see real-time logs
 
-### Transformer not found
+### "undefined is not an object" errors
 
-- Verify transformer name in provider configuration
-- Check custom transformer file path
-- Review available transformers: `GET /api/transformers`
+This usually means the response format doesn't match expectations:
+
+1. Verify the model ID exists in your provider's model list
+2. Check that the transformer is configured correctly
+3. Review logs to see the actual API response
+
+### Configuration not updating
+
+After editing `config.json`, you must redeploy:
+
+```bash
+bun run deploy
+```
+
+The configuration is baked into the Worker at deployment time.
+
+### Local development not working
+
+1. Ensure `.dev.vars` exists with your API keys
+2. Check that `config.json` is valid JSON
+3. Run `bun run dev` and check for errors
+
+## Claude Code Integration
+
+To use this router with Claude Code, configure your API endpoint:
+
+```bash
+# Set custom API endpoint
+claude config set api.baseUrl https://your-worker.workers.dev
+
+# Optional: Set API key if you configured APIKEY
+claude config set api.key your-router-api-key
+```
+
+The router will automatically handle model routing based on your configuration.
+
+## Performance
+
+- **Cold Start**: ~15-20ms on Cloudflare Workers
+- **Request Latency**: Adds ~5-10ms overhead for routing and transformation
+- **Global Edge**: Deployed to 300+ Cloudflare locations worldwide
+- **Scalability**: Automatically scales to handle any request volume
 
 ## License
 
