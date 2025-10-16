@@ -14,7 +14,11 @@
                 "anthropic/claude-haiku-4.5",
                 "anthropic/claude-sonnet-4.5",
                 "openai/gpt-5-codex",
-                "z-ai/glm-4.6"
+                "z-ai/glm-4.6",
+                "openai/gpt-5-image-mini",
+                "qwen/qwen3-vl-8b-thinking",
+                "openai/gpt-5-image",
+                "qwen/qwen3-vl-8b-instruct"
             ],
             "transformer": {
                 "use": [
@@ -24,10 +28,10 @@
         }
     ],
     "Router": {
-        "default": "openrouter,anthropic/claude-sonnet-4.5",
-        "background": "openrouter,anthropic/claude-haiku-4.5",
-        "think": "openrouter,openai/gpt-5-codex",
-        "longContext": "openrouter,z-ai/glm-4.6",
+        "default": "openrouter,openai/gpt-5-image-mini",
+        "background": "openrouter,qwen/qwen3-vl-8b-thinking",
+        "think": "openrouter,anthropic/claude-haiku-4.5",
+        "longContext": "openrouter,openai/gpt-5-image",
         "longContextThreshold": 60000
     }
 }

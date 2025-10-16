@@ -39,11 +39,18 @@ bun run setup
 
 ## Usage
 
+**Important**: Run the CLI from either the project root or the `apps/cli` directory.
+
 ```bash
-# Run the CLI
+# From project root
+ccr
+
+# Or from apps/cli
+cd apps/cli
 ccr
 
 # Or run directly without building
+cd apps/cli
 bun run dev
 ```
 

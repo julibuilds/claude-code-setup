@@ -29,9 +29,15 @@
 
 ## Usage
 
-Run the CLI from anywhere:
+**Important**: Run the CLI from either the project root or `apps/cli` directory.
 
 ```bash
+# From project root
+cd /path/to/claude-code-setup
+ccr
+
+# Or from apps/cli
+cd /path/to/claude-code-setup/apps/cli
 ccr
 ```
 

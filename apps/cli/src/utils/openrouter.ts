@@ -6,7 +6,16 @@ export async function fetchOpenRouterModels(): Promise<OpenRouterModel[]> {
 	const apiKey = process.env.OPENROUTER_API_KEY;
 
 	if (!apiKey) {
-		throw new Error("OPENROUTER_API_KEY not found in environment");
+		const cwd = process.cwd();
+		throw new Error(
+			`OPENROUTER_API_KEY not found in environment\n\n` +
+				`Current directory: ${cwd}\n\n` +
+				`Please create a .env file in one of these locations:\n` +
+				`  - apps/cli/.env\n` +
+				`  - apps/router/.dev.vars\n\n` +
+				`Example:\n` +
+				`  OPENROUTER_API_KEY=sk-or-v1-your-key-here`
+		);
 	}
 
 	const response = await fetch(`${OPENROUTER_API_BASE}/models`, {

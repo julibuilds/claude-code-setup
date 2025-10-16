@@ -1,4 +1,4 @@
-import { $ } from "zx";
+import { execa } from "execa";
 import { getRouterPath } from "./config";
 
 export interface SecretResult {
@@ -11,7 +11,10 @@ export async function setWorkerSecret(key: string, value: string): Promise<Secre
 		const routerPath = getRouterPath();
 
 		// Use wrangler to set the secret
-		await $`cd ${routerPath} && echo ${value} | bunx wrangler secret put ${key}`.quiet();
+		await execa("bunx", ["wrangler", "secret", "put", key], {
+			cwd: routerPath,
+			input: value,
+		});
 
 		return { success: true };
 	} catch (err) {
@@ -26,9 +29,11 @@ export async function listWorkerSecrets(): Promise<string[]> {
 	try {
 		const routerPath = getRouterPath();
 
-		const result = await $`cd ${routerPath} && bunx wrangler secret list`.quiet();
+		const result = await execa("bunx", ["wrangler", "secret", "list"], {
+			cwd: routerPath,
+		});
 
-		const output = result.stdout.toString();
+		const output = result.stdout;
 		const lines = output.split("\n").filter((line) => line.trim());
 
 		return lines;

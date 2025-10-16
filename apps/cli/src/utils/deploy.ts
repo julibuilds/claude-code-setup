@@ -1,4 +1,4 @@
-import { $ } from "zx";
+import { execa } from "execa";
 import { getRouterPath } from "./config";
 
 export interface DeployResult {
@@ -13,18 +13,22 @@ export async function deployToWorkers(
 	try {
 		const routerPath = getRouterPath();
 
-		// Change to router directory and deploy
-		const command =
-			env === "production"
-				? "bunx wrangler deploy --env production"
-				: "bunx wrangler deploy --env staging";
+		const args = ["wrangler", "deploy"];
+		if (env === "production") {
+			args.push("--env", "production");
+		} else {
+			args.push("--env", "staging");
+		}
 
-		onOutput?.(`Running: ${command}`);
+		onOutput?.(`Running: bunx ${args.join(" ")}`);
 		onOutput?.("");
 
-		const result = await $`cd ${routerPath} && ${command}`.quiet();
+		const result = await execa("bunx", args, {
+			cwd: routerPath,
+			all: true,
+		});
 
-		const output = result.stdout.toString();
+		const output = result.all || result.stdout;
 		const lines = output.split("\n");
 
 		for (const line of lines) {
@@ -46,9 +50,11 @@ export async function getDeploymentStatus(): Promise<string> {
 	try {
 		const routerPath = getRouterPath();
 
-		const result = await $`cd ${routerPath} && bunx wrangler deployments list`.quiet();
+		const result = await execa("bunx", ["wrangler", "deployments", "list"], {
+			cwd: routerPath,
+		});
 
-		return result.stdout.toString();
+		return result.stdout;
 	} catch (err) {
 		throw new Error(err instanceof Error ? err.message : "Failed to get status");
 	}
