@@ -1,0 +1,94 @@
+{
+	"name": "@repo/tui",
+	"version": "0.1.0",
+	"type": "module",
+	"private": true,
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./components/*": {
+			"types": "./dist/components/*.d.ts",
+			"import": "./dist/components/*.js",
+			"default": "./dist/components/*.js"
+		},
+		"./hooks/*": {
+			"types": "./dist/hooks/*.d.ts",
+			"import": "./dist/hooks/*.js",
+			"default": "./dist/hooks/*.js"
+		},
+		"./utils/*": {
+			"types": "./dist/utils/*.d.ts",
+			"import": "./dist/utils/*.js",
+			"default": "./dist/utils/*.js"
+		},
+		"./styles/*": {
+			"types": "./dist/styles/*.d.ts",
+			"import": "./dist/styles/*.js",
+			"default": "./dist/styles/*.js"
+		},
+		"./types": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/types/index.js",
+			"default": "./dist/types/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"src",
+		"README.md"
+	],
+	"scripts": {
+		"build": "bun run clean:dist && bun run build:lib && bun run build:types",
+		"build:lib": "bun build src/index.tsx --target=bun --outdir=dist --external=react --external=@opentui/core --external=@opentui/react --external=@react-three/fiber --external=@react-three/drei --external=three --external=zustand --external=@tanstack/react-query --external=@tanstack/react-query-persist-client --external=shiki --external=diff --external=nanoid --external=uuid --external=@paper-design/shaders-react --format=esm",
+		"build:types": "tsc --project tsconfig.build.json",
+		"clean:dist": "rm -rf dist",
+		"lint": "biome check --write .",
+		"check-types": "tsc --noEmit",
+		"ci": "biome ci .",
+		"prepublishOnly": "bun run build"
+	},
+	"devDependencies": {
+		"@repo/eslint-config": "*",
+		"@repo/typescript-config": "*",
+		"@types/bun": "^1.3.0",
+		"@types/react": "^19.2.2",
+		"@types/three": "^0.180.0",
+		"eslint": "^9.37.0",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@dnd-kit/core": "^6.3.1",
+		"@dnd-kit/modifiers": "^9.0.0",
+		"@dnd-kit/sortable": "^10.0.0",
+		"@dnd-kit/utilities": "^3.2.2",
+		"@opentui/core": "^0.1.27",
+		"@opentui/react": "^0.1.27",
+		"@paper-design/shaders-react": "^0.0.60",
+		"@react-three/drei": "^10.7.6",
+		"@react-three/fiber": "^9.4.0",
+		"@react-three/postprocessing": "^3.0.4",
+		"@tanstack/react-query": "^5.90.3",
+		"@tanstack/react-query-persist-client": "^5.90.5",
+		"clipboardy": "^5.0.0",
+		"diff": "^8.0.2",
+		"jotai": "^2.15.0",
+		"maath": "^0.10.8",
+		"nanoid": "^5.1.6",
+		"ogl": "^1.0.11",
+		"postprocessing": "^6.37.8",
+		"react": "^19.1.1",
+		"react-hook-form": "^7.65.0",
+		"shiki": "^3.13.0",
+		"three": "^0.180.0",
+		"uuid": "^13.0.0",
+		"zod": "^4.1.12",
+		"zustand": "^5.0.8"
+	}
+}
