@@ -1,9 +1,12 @@
 import { execa } from "execa";
 import { getRouterPath } from "./config";
+import { verifyLocalFiles } from "./sync";
 
 export interface DeployResult {
 	success: boolean;
 	error?: string;
+	filesVerified?: boolean;
+	verificationWarnings?: string[];
 }
 
 export async function deployToWorkers(onOutput?: (line: string) => void): Promise<DeployResult> {
@@ -13,6 +16,21 @@ export async function deployToWorkers(onOutput?: (line: string) => void): Promis
 		onOutput?.("Deploying to Cloudflare Workers...");
 		onOutput?.(`Router path: ${routerPath}`);
 		onOutput?.("");
+
+		// Verify local files before deployment
+		onOutput?.("Verifying local configuration files...");
+		const verification = await verifyLocalFiles();
+
+		if (!verification.success) {
+			onOutput?.("⚠ Warning: Some configuration files are missing:");
+			for (const error of verification.errors) {
+				onOutput?.(`  - ${error}`);
+			}
+			onOutput?.("");
+		} else {
+			onOutput?.("✓ Local configuration files verified");
+			onOutput?.("");
+		}
 
 		const args = ["wrangler", "deploy"];
 
@@ -34,7 +52,17 @@ export async function deployToWorkers(onOutput?: (line: string) => void): Promis
 			}
 		}
 
-		return { success: true };
+		// Post-deployment verification
+		onOutput?.("");
+		onOutput?.("Verifying deployment configuration...");
+		const postVerification = await verifyLocalFiles();
+
+		return {
+			success: true,
+			filesVerified: postVerification.success,
+			verificationWarnings:
+				postVerification.errors.length > 0 ? postVerification.errors : undefined,
+		};
 	} catch (err: unknown) {
 		const error = err as { message?: string; stderr?: string; stdout?: string };
 		const errorMessage = error.stderr || error.stdout || error.message || "Deployment failed";

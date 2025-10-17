@@ -29,11 +29,36 @@ export function DeployManager(_props: DeployManagerProps) {
 			});
 
 			if (result.success) {
-				setOutput((prev) => [
-					...prev,
+				const messages = [
 					{ id: `${Date.now()}-empty`, text: "" },
 					{ id: `${Date.now()}-success`, text: "✓ Deployment successful!" },
-				]);
+				];
+
+				if (result.filesVerified) {
+					messages.push({
+						id: `${Date.now()}-verified`,
+						text: "✓ Local configuration files verified",
+					});
+				}
+
+				if (result.verificationWarnings && result.verificationWarnings.length > 0) {
+					messages.push({
+						id: `${Date.now()}-warning-header`,
+						text: "",
+					});
+					messages.push({
+						id: `${Date.now()}-warning-title`,
+						text: "⚠ Configuration warnings:",
+					});
+					result.verificationWarnings.forEach((warning, i) => {
+						messages.push({
+							id: `${Date.now()}-warning-${i}`,
+							text: `  - ${warning}`,
+						});
+					});
+				}
+
+				setOutput((prev) => [...prev, ...messages]);
 			} else {
 				setError(result.error || "Deployment failed");
 			}

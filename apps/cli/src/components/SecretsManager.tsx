@@ -57,11 +57,26 @@ export function SecretsManager(_props: SecretsManagerProps) {
 			const result = await setWorkerSecret(secretKey, secretValue);
 
 			if (result.success) {
-				setOutput((prev) => [
-					...prev,
+				const messages = [
 					{ id: `${Date.now()}-empty`, text: "" },
-					{ id: `${Date.now()}-success`, text: "✓ Secret set successfully!" },
-				]);
+					{ id: `${Date.now()}-success`, text: "✓ Secret set successfully in Cloudflare Workers!" },
+				];
+
+				if (result.localFileUpdated) {
+					messages.push({
+						id: `${Date.now()}-local`,
+						text: "✓ Local .dev.vars file updated",
+					});
+				}
+
+				if (result.error) {
+					messages.push({
+						id: `${Date.now()}-warning`,
+						text: `⚠ Warning: ${result.error}`,
+					});
+				}
+
+				setOutput((prev) => [...prev, ...messages]);
 				setSecretKey("");
 				setSecretValue("");
 			} else {
