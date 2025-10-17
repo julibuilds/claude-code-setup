@@ -36,6 +36,14 @@ export const darkTheme: Theme = {
 			muted: "#1A1A1A",
 			bright: "#555555",
 		},
+		panelState: {
+			active: "#0080FF",
+			inactive: "#333333",
+			disabled: "#1A1A1A",
+			error: "#FF0000",
+			success: "#00FF80",
+			warning: "#FF8000",
+		},
 		special: {
 			transparent: "transparent",
 			selection: "#0080FF",

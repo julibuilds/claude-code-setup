@@ -36,6 +36,14 @@ export const lightTheme: Theme = {
 			muted: "#E0E0E0",
 			bright: "#999999",
 		},
+		panelState: {
+			active: "#0066CC",
+			inactive: "#CCCCCC",
+			disabled: "#E0E0E0",
+			error: "#CC0000",
+			success: "#00AA44",
+			warning: "#CC6600",
+		},
 		special: {
 			transparent: "transparent",
 			selection: "#0066CC",

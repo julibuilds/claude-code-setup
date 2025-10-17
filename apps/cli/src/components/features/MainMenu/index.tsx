@@ -1,10 +1,11 @@
 import type { SelectOption } from "@opentui/core";
 import { TextAttributes } from "@opentui/core";
-import { useKeyboard, useTerminalDimensions } from "@opentui/react";
+import { useKeyboard } from "@opentui/react";
 import { useComponentStyles, useThemeColors } from "@repo/tui";
 import { useState } from "react";
 import { KEYS, SCREENS, type Screen } from "../../../constants";
 import { useConfig } from "../../../context/ConfigContext";
+import { useResponsiveLayout } from "../../../hooks/useResponsiveLayout";
 import { Footer } from "../../layout/Footer";
 import { Header } from "../../layout/Header";
 
@@ -17,7 +18,7 @@ interface MainMenuProps {
  * Shows current config status and navigation options
  */
 export function MainMenu({ onNavigate }: MainMenuProps) {
-  const { width, height } = useTerminalDimensions();
+  const { width, height, isNarrow, padding, gap } = useResponsiveLayout();
   const { config } = useConfig();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const colors = useThemeColors();
@@ -58,6 +59,8 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
   });
 
   const contentHeight = Math.max(8, height - 16);
+  const containerPadding = Math.max(2, padding);
+  const containerWidth = Math.min(isNarrow ? width - 2 : 90, width - 4);
 
   return (
     <box
@@ -66,33 +69,38 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
         borderStyle: componentStyles.panel.borderStyle,
         borderColor: colors.border.default,
         backgroundColor: componentStyles.panel.backgroundColor,
-        padding: 3,
+        padding: containerPadding,
         flexDirection: "column",
         alignItems: "center",
-        width: Math.min(90, width - 4),
+        width: containerWidth,
         height: height - 4,
       }}
     >
       {/* Header */}
       <Header
         icon="⚡"
-        title="Claude Code Router CLI"
-        subtitle="Manage your router configuration and deployments"
+        title={isNarrow ? "CCR CLI" : "Claude Code Router CLI"}
+        subtitle={
+          isNarrow
+            ? "Manage router config"
+            : "Manage your router configuration and deployments"
+        }
         status={config ? "success" : "warning"}
         statusText={config ? "Configuration loaded" : "No configuration found"}
+        compact={isNarrow}
       />
 
       {/* Current Config Preview */}
       {config && (
         <box
           style={{
-            padding: 2,
+            padding: isNarrow ? 1 : 2,
             border: true,
             borderStyle: componentStyles.panel.borderStyle,
-            borderColor: colors.status.success,
+            borderColor: colors.panelState?.success || colors.status.success,
             backgroundColor: componentStyles.messageBox.success.backgroundColor,
             flexDirection: "column",
-            marginBottom: 2,
+            marginBottom: gap,
             width: "100%",
           }}
         >
@@ -170,12 +178,21 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 
       {/* Footer */}
       <Footer
-        shortcuts={[
-          { keys: "↑↓", description: "Navigate", category: "Navigation" },
-          { keys: "Enter", description: "Select", category: "Navigation" },
-          { keys: "ESC", description: "Exit", category: "General" },
-        ]}
-        groupByCategory={true}
+        shortcuts={
+          isNarrow
+            ? [
+                { keys: "↑↓", description: "Nav", category: "Nav" },
+                { keys: "Enter", description: "Select", category: "Nav" },
+                { keys: "ESC", description: "Exit", category: "General" },
+              ]
+            : [
+                { keys: "↑↓", description: "Navigate", category: "Navigation" },
+                { keys: "Enter", description: "Select", category: "Navigation" },
+                { keys: "ESC", description: "Exit", category: "General" },
+              ]
+        }
+        groupByCategory={!isNarrow}
+        compact={isNarrow}
       />
     </box>
   );

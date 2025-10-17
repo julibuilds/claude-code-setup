@@ -8,7 +8,8 @@
     "check-types": "turbo run check-types",
     "ci": "turbo run ci",
     "cln": "bash dev/scripts/cleanup.sh",
-    "cli:up": "bash dev/scripts/cli-setup.sh"
+    "cli:up": "bash dev/scripts/cli-setup.sh",
+	  "fix:ascii": "bun run dev/scripts/fix-ascii-boxes.ts --dir dev/scripts/test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.6",

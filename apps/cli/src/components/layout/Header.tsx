@@ -12,13 +12,22 @@ interface HeaderProps {
 	status?: "success" | "warning" | "error" | "info";
 	/** Optional status text */
 	statusText?: string;
+	/** Compact mode for narrow terminals */
+	compact?: boolean;
 }
 
 /**
  * Enhanced header component with better visual hierarchy and status indicators
  * Provides consistent branding and context with improved styling
  */
-export function Header({ icon = "", title, subtitle, status, statusText }: HeaderProps) {
+export function Header({
+	icon = "",
+	title,
+	subtitle,
+	status,
+	statusText,
+	compact = false,
+}: HeaderProps) {
 	const colors = useThemeColors();
 	const componentStyles = useComponentStyles();
 
@@ -55,8 +64,8 @@ export function Header({ icon = "", title, subtitle, status, statusText }: Heade
 	return (
 		<box
 			style={{
-				marginBottom: 2,
-				padding: 2,
+				marginBottom: compact ? 1 : 2,
+				padding: compact ? 1 : 2,
 				border: true,
 				borderStyle: componentStyles.panel.borderStyle,
 				borderColor: colors.accent.secondary,

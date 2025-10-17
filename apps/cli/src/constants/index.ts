@@ -3,6 +3,9 @@
  * Centralizes magic numbers, strings, and configuration values
  */
 
+// Re-export layout constants
+export * from "./layout";
+
 // Keyboard keys
 export const KEYS = {
 	TAB: "tab",

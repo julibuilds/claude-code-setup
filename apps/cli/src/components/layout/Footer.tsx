@@ -15,6 +15,8 @@ interface FooterProps {
 	backgroundColor?: string;
 	/** Whether to group shortcuts by category */
 	groupByCategory?: boolean;
+	/** Compact mode for narrow terminals */
+	compact?: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export function Footer({
 	shortcuts,
 	backgroundColor,
 	groupByCategory = false,
+	compact = false,
 }: FooterProps) {
 	const colors = useThemeColors();
 	const componentStyles = useComponentStyles();
@@ -54,9 +57,9 @@ export function Footer({
 					{category}
 				</text>
 			)}
-			{shortcuts.map((shortcut, i) => (
+			{shortcuts.map((shortcut) => (
 				<text
-					key={i}
+					key={`${category}-${shortcut.keys}-${shortcut.description}`}
 					style={{
 						fg: colors.text.primary,
 						marginLeft: category !== "General" ? 2 : 0,
@@ -79,8 +82,8 @@ export function Footer({
 			);
 		}
 
-		return shortcuts.map((shortcut, i) => (
-			<text key={i} style={{ fg: colors.text.primary }}>
+		return shortcuts.map((shortcut) => (
+			<text key={`${shortcut.keys}-${shortcut.description}`} style={{ fg: colors.text.primary }}>
 				<span style={{ fg: colors.accent.primary, attributes: TextAttributes.BOLD }}>
 					{shortcut.keys}
 				</span>{" "}
@@ -92,8 +95,8 @@ export function Footer({
 	return (
 		<box
 			style={{
-				marginTop: 2,
-				padding: 2,
+				marginTop: compact ? 1 : 2,
+				padding: compact ? 1 : 2,
 				border: true,
 				borderStyle: componentStyles.panel.borderStyle,
 				borderColor: colors.border.muted,
@@ -101,15 +104,17 @@ export function Footer({
 				flexDirection: "column",
 			}}
 		>
-			<text
-				style={{
-					attributes: TextAttributes.BOLD,
-					fg: colors.accent.secondary,
-					marginBottom: 1,
-				}}
-			>
-				⌨️ Keyboard Shortcuts
-			</text>
+			{!compact && (
+				<text
+					style={{
+						attributes: TextAttributes.BOLD,
+						fg: colors.accent.secondary,
+						marginBottom: 1,
+					}}
+				>
+					⌨️ Keyboard Shortcuts
+				</text>
+			)}
 			{renderShortcuts()}
 		</box>
 	);

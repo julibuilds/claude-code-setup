@@ -1,33 +1,22 @@
 import { useTerminalDimensions } from "@opentui/react";
-
-export type LayoutMode = "wide" | "medium" | "narrow";
-
-export interface ResponsiveBreakpoints {
-	wide: number;
-	medium: number;
-}
-
-const DEFAULT_BREAKPOINTS: ResponsiveBreakpoints = {
-	wide: 80,
-	medium: 60,
-};
+import {
+	getLayoutMode as getMode,
+	getResponsivePadding,
+	getResponsiveGap,
+	type LayoutMode,
+	type ResponsiveBreakpoints,
+	DEFAULT_BREAKPOINTS,
+} from "@repo/tui";
 
 /**
  * Hook for responsive layout based on terminal width
- * Returns layout mode and dimensions
+ * Returns layout mode, dimensions, and responsive values
  */
 export function useResponsiveLayout(
 	breakpoints: ResponsiveBreakpoints = DEFAULT_BREAKPOINTS
 ) {
 	const { width, height } = useTerminalDimensions();
-
-	const getLayoutMode = (): LayoutMode => {
-		if (width >= breakpoints.wide) return "wide";
-		if (width >= breakpoints.medium) return "medium";
-		return "narrow";
-	};
-
-	const layoutMode = getLayoutMode();
+	const layoutMode = getMode(width, breakpoints);
 
 	return {
 		width,
@@ -36,5 +25,7 @@ export function useResponsiveLayout(
 		isWide: layoutMode === "wide",
 		isMedium: layoutMode === "medium",
 		isNarrow: layoutMode === "narrow",
+		padding: getResponsivePadding(layoutMode),
+		gap: getResponsiveGap(layoutMode),
 	};
 }

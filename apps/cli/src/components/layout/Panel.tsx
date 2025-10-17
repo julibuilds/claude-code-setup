@@ -51,14 +51,16 @@ export function Panel({
 			flexDirection: "column" as const,
 		};
 
+		// Focused state takes priority
 		if (focused) {
 			return {
 				...baseStyle,
-				borderColor: colors.border.focus,
+				borderColor: colors.panelState?.active || colors.border.focus,
 				backgroundColor: componentStyles.elevated.backgroundColor,
 			};
 		}
 
+		// Variant-based styling
 		switch (variant) {
 			case "accent":
 				return {
@@ -69,25 +71,25 @@ export function Panel({
 			case "success":
 				return {
 					...baseStyle,
-					borderColor: colors.status.success,
+					borderColor: colors.panelState?.success || colors.status.success,
 					backgroundColor: componentStyles.panel.backgroundColor,
 				};
 			case "warning":
 				return {
 					...baseStyle,
-					borderColor: colors.status.warning,
+					borderColor: colors.panelState?.warning || colors.status.warning,
 					backgroundColor: componentStyles.panel.backgroundColor,
 				};
 			case "error":
 				return {
 					...baseStyle,
-					borderColor: colors.status.error,
+					borderColor: colors.panelState?.error || colors.status.error,
 					backgroundColor: componentStyles.panel.backgroundColor,
 				};
 			default:
 				return {
 					...baseStyle,
-					borderColor: colors.border.default,
+					borderColor: colors.panelState?.inactive || colors.border.default,
 					backgroundColor: componentStyles.panel.backgroundColor,
 				};
 		}

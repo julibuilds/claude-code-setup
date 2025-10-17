@@ -1,0 +1,843 @@
+# Claude Code Router CLI v2 - Revolutionary UI/UX
+
+## Vision: Conversational Agent Interface
+A modern CLI that feels like collaborating with an intelligent assistant rather than navigating menus. Features real-time model recommendations, predictive actions, inline editing, adaptive layouts, and progressive disclosure.
+
+---
+
+## Onboarding Flow - Guided Setup Wizard
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Welcome to Claude Code Router                                                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Hi! 👋 I'm your router configuration assistant.
+
+  Let me help you get started in 3 quick steps:
+
+  [ 1️⃣  Check Setup ] ─→ [ 2️⃣  Configure Routes ] ─→ [ 3️⃣  Deploy ]
+
+  First, let me verify your project setup...
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│ ✓ Found wrangler.toml          Project root detected: /Users/dev/claude      │
+│ ✓ Valid TypeScript config       tsconfig.json is compatible                  │
+│ ✓ Dependencies installed        bun: v1.x.x                                  │
+│ ! OpenRouter key needed         Let's set that up first                      │
+│                                                                              │
+│ Ready to configure your first router? Press ↵                                │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  ↵ Continue  │  ? More Info  │  ESC Skip Setup
+```
+
+---
+
+## Home Dashboard - Intelligent Workspace
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Claude Code Router  v2.0                                                     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  💡 Quick Insights
+  ├─ Your default router is running claude-sonnet-4.5 ($3K/month estimated)
+  ├─ 2 secrets expire in 45 days (DATABASE_URL, CLOUDFLARE_API_TOKEN)
+  └─ Last deployment: 4 days ago ✓ All healthy
+
+  ┌─────────────────────────────  Recent Activity  ──────────────────────────────┐
+  │ 2025-10-17 14:22  ✓ Deploy successful                                        │
+  │ 2025-10-16 09:45  ⚙ Updated background router to claude-haiku-4.5            │
+  │ 2025-10-15 11:30  🔑 Updated OPENROUTER_API_KEY                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────────  Recommended Actions  ────────────────────────────┐
+  │ → Optimize costs: Consider using claude-haiku-4.5 for background tasks       │
+  │ → Upgrade model: claude-opus-4-1 is 18% faster for default router            │
+  │ → Renew secrets: DATABASE_URL expires 2025-11-02                             │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  📊 Router Performance Snapshot
+
+  ┌────────────────────────────────────  default  ────────────────────────────────────┐
+  │ Model: sonnet-4.5           │  │ Model: haiku-4.5                                 │
+  │ Status: ✓ Healthy           │  │ Status: ✓ Healthy                                │
+  │ Requests (24h): 1.2K        │  │ Requests (24h): 892                              │
+  │ Avg Response: 245ms         │  │ Avg Response: 112ms                              │
+  │ Error Rate: 0.1%            │  │ Error Rate: 0.0%                                 │
+  │ └────────────────────────────┘  └──────────────────────────────┘                  │
+  │                                                                                   │
+  │ ┌─ think ─────────────────────┐  ┌─ longContext ─────────────────┐                │
+  │ Model: opus-4-1             │  │ Model: haiku-4.5                                 │
+  │ Status: ✓ Healthy           │  │ Status: ✓ Healthy                                │
+  │ Requests (24h): 234         │  │ Requests (24h): 156                              │
+  │ Avg Response: 1.2s          │  │ Avg Response: 89ms                               │
+  │ Error Rate: 0.0%            │  │ Error Rate: 0.0%                                 │
+  │ └────────────────────────────┘  └──────────────────────────────┘                  │
+  │                                                                                   │
+  │ ▶ ⚡ Quick Config  │  📤 Deploy  │  🔑 Secrets  │  ⚙ Settings  │  ? Help           │
+  │ ```                                                                               │
+  │                                                                                   │
+  │ ---                                                                               │
+  │                                                                                   │
+  │ ## Quick Config - Intelligent Assistant Mode                                      │
+  │                                                                                   │
+  │ ```                                                                               │
+  │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓    │
+  │ ┃  🤖 Router Configuration Assistant                                            ┃ │
+  └───────────────────────────────────────────────────────────────────────────────────┘
+
+  I see you have 2 routers using expensive models. Would you like me to optimize?
+
+  ┌────────────────────────  What are you trying to do?  ────────────────────────┐
+  │                                                                              │
+  │ ▶ 💰 Reduce costs      I'll suggest cheaper alternatives (-40% est.)         │
+  │ • ⚡ Improve speed      I'll recommend faster models (+30% throughput)        │
+  │ • 🎯 Better accuracy   I'll upgrade to best-performing models                │
+  │ • ⚙ Manual config      Let me manually select each router                    │
+  │ • 📊 Compare models    Show me a detailed comparison view                    │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ↵ Select  │  ? Why  │  ESC Cancel
+```
+
+---
+
+## Smart Model Selection - Context-Aware
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ 🎯 Select Model for: default Router                                          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Current: claude-sonnet-4.5 ($3/M input, $15/M output)
+
+  What's your priority?  ▶ Balanced  │  Speed  │  Cost  │  Quality  │  Custom
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│ 💎 claude-opus-4-1  ⭐⭐⭐⭐⭐  HIGHEST QUALITY                                   │
+│ Input $18/M  Output $60/M                                                    │
+│ ├─ Best for: Complex reasoning, analysis, creative tasks                     │
+│ ├─ Context: 200K tokens  │  Speed: ~1.2s per request                         │
+│ ├─ Estimated monthly (1B tokens): $78,000                                    │
+│ └─ Impact: +400% cost, +18% speed improvement over current                   │
+│                                                                              │
+│                                                                              │
+│ ▶ claude-sonnet-4.5  ⭐⭐⭐⭐ CURRENT - RECOMMENDED                              │
+│ Input $3/M  Output $15/M                                                     │
+│ ├─ Best for: Most general-purpose tasks, production workloads                │
+│ ├─ Context: 200K tokens  │  Speed: ~245ms per request                        │
+│ ├─ Estimated monthly (1B tokens): $18,000                                    │
+│ └─ Impact: No change (current model)                                         │
+│                                                                              │
+│                                                                              │
+│ ⚡ claude-haiku-4.5  ⭐⭐⭐ BEST VALUE                                           │
+│ Input $0.80/M  Output $4/M                                                   │
+│ ├─ Best for: Speed-critical, high-volume tasks, cost optimization            │
+│ ├─ Context: 200K tokens  │  Speed: ~89ms per request                         │
+│ ├─ Estimated monthly (1B tokens): $4,800                                     │
+│ └─ Impact: -73% cost, +63% speed improvement                                 │
+│                                                                              │
+│                                                                              │
+│ 🔷 gpt-4o  ⭐⭐⭐⭐ CROSS-PLATFORM                                               │
+│ Input $5/M  Output $15/M                                                     │
+│ ├─ Best for: Comparison deployments, OpenAI specific tasks                   │
+│ ├─ Context: 128K tokens  │  Speed: ~320ms per request                        │
+│ ├─ Estimated monthly (1B tokens): $20,000                                    │
+│ └─ Impact: +11% cost, -30% speed vs Sonnet                                   │
+│                                                                              │
+│                                                                              │
+│ 🔍 View Details  │  📊 Compare  │  ℹ More Info                               │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  ↑↓ Browse  │  ↵ Select  │  > Details  │  ESC Back
+```
+
+---
+
+## Inline Editing - Direct Modification
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ✏️ Edit Configuration                                                        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  📋 Router Models (Click to edit, or use arrow keys)
+
+  ┌──────────────────────────────────────────────────────────────────────────────┐
+  │                                                                              │
+  │ default         ─→  [claude-sonnet-4.5_____] │ 💡 Sonnet is ideal here       │
+  │ ↓ Hit ↵ to select different model                                            │
+  │                                                                              │
+  │ background      ─→  [claude-haiku-4.5______] │ ✓ Good choice (fast)          │
+  │ ↓ Hit ↵ to select different model                                            │
+  │                                                                              │
+  │ think           ─→  [claude-opus-4-1_______] │ ⭐ Best for reasoning          │
+  │ ↓ Hit ↵ to select different model                                            │
+  │                                                                              │
+  │ longContext     ─→  [claude-haiku-4.5______] │ ⚡ Fastest option              │
+  │ ↓ Hit ↵ to select different model                                            │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  Cost Summary
+  ├─ Current monthly estimate:  $18,000
+  ├─ Proposed estimate:         $18,000  (No change)
+  └─ Savings:                   $0/month
+
+  ▶ ✓ Save & Review
+  • ⟲ Reset to Defaults
+  • 🤖 Get AI Suggestions
+  • 📊 Compare All
+
+  ↑↓ Navigate  │  ↵ Edit  │  Ctrl+S Save  │  ESC Cancel
+```
+
+---
+
+## Smart Diff & Review - Visual Delta
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ 📊 Review Changes Before Deploy                                              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  You're about to modify 2 routers. Impact analysis below:
+
+  ┌─────────────────────────────  router: default  ──────────────────────────────┐
+  │                                                                              │
+  │ Before  claude-sonnet-4.5    Input: $3/M      Output: $15/M                  │
+  │ After   claude-opus-4-1      Input: $18/M     Output: $60/M                  │
+  │ Change  ⬆️  +400% COST       🚀 +18% SPEED                                   │
+  │                                                                              │
+  │ Monthly impact:  +$60,000                                                    │
+  │ Use case fit:    ✓ Excellent (better for complex reasoning)                  │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────────  router: longContext  ────────────────────────────┐
+  │                                                                              │
+  │ Before  claude-opus-4-1      Input: $18/M     Output: $60/M                  │
+  │ After   claude-haiku-4.5     Input: $0.80/M   Output: $4/M                   │
+  │ Change  ⬇️  -95% COST        ⚡ +63% SPEED                                    │
+  │                                                                              │
+  │ Monthly impact:  -$73,200                                                    │
+  │ Use case fit:    ✓ Excellent (haiku is sufficient for retrieval)             │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  Summary:  2 changes  │  Net cost: -$13,200/month  │  Deployment safety: ✓ LOW RISK
+
+  ▶ ✓ Deploy Now
+  • ⬅ Edit Changes
+  • 🔍 Show Detailed Comparison
+  • ⚠ Advanced Options (rollback policy, canary deploy)
+
+  ↵ Deploy  │  ← Edit  │  ? Help  │  ESC Cancel
+```
+
+---
+
+## Deploy with Real-Time Streaming
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ 🚀 Deploying to Cloudflare Workers                                           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Target: claude-code-router.example.workers.dev
+  Deployment ID: dep_87f4c9a2-1e3b-4d8f-9a2c
+
+  ◐ Deploying...  [████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 37%  Elapsed: 8s
+
+  📋 Deployment Pipeline
+
+  ✓ Pre-flight checks              (1.2s)
+    └─ Config valid, permissions OK, dependencies resolved
+
+  ⟳ Compiling bundle              (2.1s)
+    └─ TypeScript → JavaScript, tree-shaking, minification
+
+  ⟳ Uploading to Workers          (in progress...)
+    └─ Multipart upload (1/2 chunks completed)
+
+  ◐ Post-deployment verification  (waiting for upload...)
+    └─ Health checks, model endpoint tests, rollback ready
+
+  ┌─────────────────────────  Latest Logs (tail mode)  ──────────────────────────┐
+  │ [14:25:45.234] Building worker bundle (src/index.ts → dist/index.js)         │
+  │ [14:25:45.567] ✓ Bundle compiled: 2.4 KB (compression: 45%)                  │
+  │ [14:25:45.890] Creating multipart upload...                                  │
+  │ [14:25:46.123] ⟳ Uploading chunk 1/2 (1.2 KB)...                             │
+  │ [14:25:46.456] ✓ Chunk 1 uploaded successfully                               │
+  │ [14:25:46.789] ⟳ Uploading chunk 2/2 (1.2 KB)...                             │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  Ctrl+V Verbose  │  P Pause  │  ESC Cancel
+```
+
+---
+
+## Deployment Success with Rollback Ready
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ✨ Deployment Successful                                                      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  🎉 All systems go! Your configuration is live.
+
+  ┌────────────────────────────  Deployment Summary  ────────────────────────────┐
+  │                                                                              │
+  │ Worker URL        https://claude-code-router.example.workers.dev             │
+  │ Deployment ID     dep_87f4c9a2-1e3b-4d8f-9a2c-5e1b3c4d8f9a                   │
+  │ Deployed At       2025-10-17 14:25:46 UTC                                    │
+  │ Duration          18.2 seconds                                               │
+  │ Bundle Size       2.4 KB (cached globally in ~180ms)                         │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────────  Verification Results  ───────────────────────────┐
+  │                                                                              │
+  │ ✓ Health Check              200 OK (6ms)                                     │
+  │ ✓ Model Endpoints           4/4 responding                                   │
+  │ ├─ claude-opus-4-1        Responding ✓                                       │
+  │ ├─ claude-sonnet-4.5      Responding ✓                                       │
+  │ ├─ claude-haiku-4.5       Responding ✓                                       │
+  │ └─ gpt-4o                 Responding ✓                                       │
+  │ ✓ Rate Limiting             Configured (1000 req/min)                        │
+  │ ✓ Error Fallbacks           Active                                           │
+  │ ✓ Secrets Synchronized      3/3 in place                                     │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────  What's Live Now  ──────────────────────────────┐
+  │                                                                              │
+  │ 🔴 default         → claude-opus-4-1    (upgraded from sonnet-4.5)           │
+  │ 🟢 background      → claude-haiku-4.5   (unchanged)                          │
+  │ 🟡 think           → claude-opus-4-1    (unchanged)                          │
+  │ 🔵 longContext     → claude-haiku-4.5   (downgraded from opus-4-1)           │
+  │                                                                              │
+  │ Estimated New Monthly Cost: $34,800  (-$13,200 vs previous)                  │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────  Rollback Options (if needed)  ───────────────────────┐
+  │                                                                              │
+  │ ⬅ Quick Rollback    Revert to previous deployment in 10s                     │
+  │ 📊 View Previous     See last 5 deployments                                  │
+  │ 🔍 Compare          Show diff with previous version                          │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ▶ 🏠 Back to Dashboard
+  • 📋 View Worker Logs
+  • 🔗 Copy Worker URL
+  • ⬅ Rollback
+  • ⚙ Advanced Options
+
+  ↵ Dashboard  │  R Rollback  │  L Logs  │  ESC Menu
+```
+
+---
+
+## Secrets Manager - Visual Registry
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ 🔑 Secrets Manager - Your Environment Registry                               ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  3 secrets total  │  ✓ All synced with Cloudflare  │  Last sync: 15s ago
+
+  ┌─────────────────────────────  Secret Registry  ──────────────────────────────┐
+  │                                                                              │
+  │ ▶ OPENROUTER_API_KEY                                                         │
+  │ Type: API Token                                                              │
+  │ Scope: Cloudflare Workers + Local .dev.vars                                  │
+  │ Value: sk-or-v1-••••••••••••••••••••••••••••••••••••••••••••••  (View)       │
+  │ Created: 2025-09-15 | Updated: 2025-10-17 14:20 | Expires: Never             │
+  │ Status: ✓ Active & Synced                                                    │
+  │ Actions: [✎ Edit] [🔄 Rotate] [📋 Copy Name] [🗑 Delete]                     │
+  │                                                                              │
+  │ • CLOUDFLARE_API_TOKEN                                                       │
+  │ Type: API Token                                                              │
+  │ Scope: Cloudflare Workers + Local .dev.vars                                  │
+  │ Value: ••••••••••••••••••••••••••••••••••••••••••••••••••  (View)            │
+  │ Created: 2025-10-01 | Updated: 2025-10-15 14:22 | Expires: 45 days           │
+  │ Status: ⚠ Expires soon - renew by 2025-11-02                                 │
+  │ Actions: [✎ Edit] [🔄 Rotate] [📋 Copy Name] [🗑 Delete]                     │
+  │                                                                              │
+  │ • DATABASE_URL                                                               │
+  │ Type: Connection String                                                      │
+  │ Scope: Cloudflare Workers + Local .dev.vars                                  │
+  │ Value: postgres://••••••••••••••••••••••••••••••••••••  (View)               │
+  │ Created: 2025-09-20 | Updated: 2025-10-17 14:20 | Expires: 45 days           │
+  │ Status: ⚠ Expires soon - renew by 2025-11-02                                 │
+  │ Actions: [✎ Edit] [🔄 Rotate] [📋 Copy Name] [🗑 Delete]                     │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ▶ ➕ Add New Secret
+  • 🔄 Batch Rotate Expired
+  • 📥 Import from .env
+  • 📊 View Audit Log
+
+  ↑↓ Select  │  ↵ Edit  │  V View Value (Ctrl+H)  │  ESC Back
+```
+
+---
+
+## Secrets - Add/Edit with Validation
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ➕ Add New Secret                                                             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  ┌──────────────────────────────  Secret Details  ──────────────────────────────┐
+  │                                                                              │
+  │ Secret Name *                                                                │
+  │ [MY_NEW_SECRET_________________________________________] ✓ Valid             │
+  │ └─ Requirements: 2-50 chars, alphanumeric + underscore only                  │
+  │                                                                              │
+  │ Secret Value *                                                               │
+  │ [••••••••••••••••••••••••••••••••••••••••••••••••••••••••] (View)            │
+  │ └─ Minimum 8 characters, stays hidden for security                           │
+  │                                                                              │
+  │ Secret Type                                                                  │
+  │ ▶ API Key  │  Connection String  │  Token  │  Other                          │
+  │ └─ Helps with UI hints and validation                                        │
+  │                                                                              │
+  │ Sync to *                                                                    │
+  │ ☑ Cloudflare Workers (production)                                            │
+  │ ☑ .dev.vars (local development)                                              │
+  │ └─ Both enabled for consistency                                              │
+  │                                                                              │
+  │ Auto-Rotation                                                                │
+  │ ☐ Enable auto-rotation (45 days)                                             │
+  │ └─ Optional: Automatically rotate this secret every N days                   │
+  │                                                                              │
+  │ Description (Optional)                                                       │
+  │ [Used for connecting to production PostgreSQL database_______]               │
+  │ └─ Personal notes to remember what this secret is for                        │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ▶ ✓ Save Secret
+  • ⬅ Cancel
+
+  TAB Navigate  │  V View/Hide  │  ↵ Save  │  ESC Cancel
+```
+
+---
+
+## AI-Powered Recommendations Engine
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ 💡 Smart Recommendations                                                     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Based on your usage patterns and cost targets, here are my suggestions:
+
+  ┌────────────────  Optimization Opportunity #1 - High Impact  ─────────────────┐
+  │                                                                              │
+  │ 💰 Reduce Background Task Costs                                              │
+  │                                                                              │
+  │ Current setup: background router uses claude-sonnet-4.5                      │
+  │ Recommendation: Switch to claude-haiku-4.5                                   │
+  │                                                                              │
+  │ Impact Analysis:                                                             │
+  │ ├─ Monthly savings: $12,000 (65% reduction)                                  │
+  │ ├─ Speed impact: +200ms per request (still <1s total)                        │
+  │ ├─ Quality impact: Minimal (haiku 98% as capable for background tasks)       │
+  │ ├─ Risk level: ✓ LOW - We analyzed 1000s of your requests                    │
+  │ └─ Confidence: 94%                                                           │
+  │                                                                              │
+  │ [✓ Apply Recommendation] [? More Info] [→ Custom Tuning]                     │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────  Optimization Opportunity #2 - Medium Impact  ────────────────┐
+  │                                                                              │
+  │ ⚡ Improve Latency on Default Router                                          │
+  │                                                                              │
+  │ Current setup: default router uses claude-sonnet-4.5                         │
+  │ Alternative: Use claude-opus-4-1 for 18% faster responses                    │
+  │                                                                              │
+  │ Trade-off Analysis:                                                          │
+  │ ├─ Speed gain: -227ms per request (245ms → 18ms faster)                      │
+  │ ├─ Cost increase: +$60K/month (due to high volume)                           │
+  │ ├─ Quality gain: +15% on complex queries (94th to 96th percentile)           │
+  │ ├─ Use case fit: ✓ EXCELLENT for your critical path tasks                    │
+  │ └─ Confidence: 87%                                                           │
+  │                                                                              │
+  │ [✓ Apply Recommendation] [? More Info] [→ Custom Tuning]                     │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────  Optimization Opportunity #3 - Security Alert  ───────────────┐
+  │                                                                              │
+  │ 🔒 Renew Expiring Secrets                                                    │
+  │                                                                              │
+  │ Current status: 2 secrets expire in 45 days                                  │
+  │ Action recommended: Rotate now to avoid service interruption                 │
+  │                                                                              │
+  │ Affected secrets:                                                            │
+  │ ├─ CLOUDFLARE_API_TOKEN - Expires 2025-11-02                                 │
+  │ └─ DATABASE_URL - Expires 2025-11-02                                         │
+  │                                                                              │
+  │ [↻ Rotate Now] [? More Info] [→ Set Up Auto-Rotation]                        │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────  Experiment Suggestion #1 - Optional A/B Test  ───────────────┐
+  │                                                                              │
+  │ 🧪 Test Claude vs GPT-4o on Your Workload                                    │
+  │                                                                              │
+  │ Setup: Create a canary deployment routing 10% of requests to gpt-4o          │
+  │ Duration: 7 days (collect statistical significance)                          │
+  │ Metrics tracked: Latency, errors, user satisfaction, cost                    │
+  │                                                                              │
+  │ [🚀 Start A/B Test] [? Details] [⚙ Customize]                                │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  📊 Summary
+
+  Applying all high-confidence recommendations would:
+  └─ Save: $12,000/month  |  Risk: Low  |  Setup time: 5 minutes
+
+  ▶ Apply All Recommended Changes
+  • 🔍 View Detailed Analysis
+  • 📈 Historical Performance Data
+  • ⚙ Recommendation Settings (tune sensitivity)
+
+  ↑↓ Browse  │  ↵ Apply  │  D Details  │  ESC Back
+```
+
+---
+
+## Model Analytics & Usage Dashboard
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ 📊 Analytics & Usage Insights                                                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Time Range: [Last 7 Days ▼]  │  Precision: Real-time  │  Updated: 2 seconds ago
+
+  ┌─────────────────────────  Request Volume by Router  ─────────────────────────┐
+  │                                                                              │
+  │ default              ████████████████░░░░  48.2K requests  (42%)             │
+  │ background           ██████████░░░░░░░░░░  22.1K requests  (19%)             │
+  │ longContext          █████████░░░░░░░░░░░  18.9K requests  (16%)             │
+  │ think                ███████░░░░░░░░░░░░░  15.3K requests  (13%)             │
+  │ Other                ██░░░░░░░░░░░░░░░░░░   2.8K requests  (2%)              │
+  │                                                                              │
+  │ Total: 107.3K requests (↑ 12% vs last week)                                  │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────  Cost Distribution by Router  ────────────────────────┐
+  │                                                                              │
+  │ default              ████████████████████  $8,400 (47%)                      │
+  │ think                ███████████░░░░░░░░░  $6,200 (34%)                      │
+  │ longContext          ████░░░░░░░░░░░░░░░░  $2,100 (12%)                      │
+  │ background           ██░░░░░░░░░░░░░░░░░░  $1,340 (8%)                       │
+  │ Other                ░░░░░░░░░░░░░░░░░░░░    $120 (1%)                       │
+  │                                                                              │
+  │ Total 7-day cost: $18,160  (↑ 8% vs last week, on pace for $78K/month)       │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────────  Latency Performance  ────────────────────────────┐
+  │                                                                              │
+  │ P95: 342ms                                                                   │
+  │ P90: 289ms                                                                   │
+  │ Median: 198ms                                                                │
+  │ P10: 89ms                                                                    │
+  │ ▁▂▃▅▇█████████▇▅▃▂▁                                                          │
+  │ ├─────────┼─────────┼─────────┼─────────┤                                    │
+  │ 50ms      150ms     250ms     350ms                                          │
+  │                                                                              │
+  │ Best performing: background (haiku) - avg 112ms  ✓                           │
+  │ Slowest: think (opus) - avg 1.2s  (expected for complex reasoning)           │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────────  Error Rates & Health  ───────────────────────────┐
+  │                                                                              │
+  │ default        0.08%  ✓  (90 errors / 104.2K requests)                       │
+  │ background     0.00%  ✓  (0 errors / 22.1K requests)                         │
+  │ think          0.15%  ✓  (23 errors / 15.3K requests)                        │
+  │ longContext    0.10%  ✓  (19 errors / 18.9K requests)                        │
+  │                                                                              │
+  │ Overall error rate: 0.09%  ✓ HEALTHY                                         │
+  │ SLA compliance: 99.91%  ✓ (exceeds 99.9% target)                             │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────  Model Comparison (7-day average)  ─────────────────────┐
+  │                                                                              │
+  │ Model                 Requests  Avg Latency  Error %  Cost      Status       │
+  │ claude-sonnet-4.5     68.3K     245ms        0.08%    $8,200    ✓            │
+  │ claude-opus-4-1       15.3K     1.2s         0.15%    $6,200    ✓            │
+  │ claude-haiku-4.5      22.1K     89ms         0.00%    $1,340    ✓            │
+  │ gpt-4o                1.6K      320ms        0.22%    $1,420    ⚠            │
+  │                                                                              │
+  │ Note: gpt-4o shows higher error rate (likely API-side throttling)            │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ▶ Export Report (CSV)
+  • 📈 Advanced Analytics (Grafana)
+  • 🔍 Drill Down by Time/Router
+  • 🔔 Set Alerts (cost, latency, errors)
+  • ⚙ Filter & Customize View
+
+  D Download  │  G Grafana  │  → Details  │  ESC Back
+```
+
+---
+
+## Error Logs & Troubleshooting
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ 🐛 Error Logs & Troubleshooting                                              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  Filter: [All Errors ▼]  |  Time Range: [Last 24h ▼]  |  Verbosity: [Normal ▼]
+
+  ┌──────────────────────────────  Recent Errors  ───────────────────────────────┐
+  │                                                                              │
+  │ ▶ [2025-10-17 14:12:23] ⚠ Rate Limit Exceeded (5 errors, last 1m)            │
+  │ Router: default  │  Model: claude-sonnet-4.5                                 │
+  │ Error: 429 Too Many Requests - Exceeded 1000 req/min quota                   │
+  │ Context: Bulk processing job triggered spike                                 │
+  │ Impact: 5 requests failed, auto-retry successful for 4 of 5                  │
+  │ [→ View Request] [🔧 Adjust Rate Limit] [📊 Traffic Analysis]                │
+  │                                                                              │
+  │ • [2025-10-17 13:45:07] ⚠ Timeout Error (1 error, 2h 27m ago)                │
+  │ Router: think  │  Model: claude-opus-4-1                                     │
+  │ Error: Request timeout after 30s - Long reasoning task                       │
+  │ Context: Complex multi-step analysis query                                   │
+  │ Impact: 1 request failed, client was able to retry manually                  │
+  │ [→ View Request] [⚙ Increase Timeout] [🧠 Optimize Query]                    │
+  │                                                                              │
+  │ • [2025-10-17 12:33:44] ⚠ Invalid Secret (23 errors, last 20h)               │
+  │ Router: background  │  Error context: DATABASE_URL                           │
+  │ Error: Authentication failed - DATABASE_URL secret expired                   │
+  │ Context: Batch background jobs unable to connect to DB                       │
+  │ Impact: 23 requests failed (now recovered after secret rotation)             │
+  │ [→ View Request] [🔑 Manage Secrets] [📜 View Rotation Log]                  │
+  │                                                                              │
+  │ • [2025-10-16 18:20:15] ℹ Model Degraded (0 failures, monitoring)            │
+  │ Router: longContext  │  Model: claude-haiku-4.5                              │
+  │ Alert: Model response times elevated +45% (89ms → 130ms)                     │
+  │ Context: Possible upstream API maintenance window                            │
+  │ Duration: 12 minutes (resolved)  │  Status: ✓ Back to normal                 │
+  │ [→ View Timeline] [📊 Performance Chart]                                     │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────────────  Quick Stats  ────────────────────────────────┐
+  │                                                                              │
+  │ Total errors (24h):  29   |  Resolved: 28  |  Active: 1  |  False pos: 0     │
+  │ Most affected router: default (21 errors)                                    │
+  │ Most common error: Rate limiting (18 errors)                                 │
+  │ MTTR (Mean Time to Recovery): 8 minutes                                      │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌───────────────────────────  Recommended Actions  ────────────────────────────┐
+  │                                                                              │
+  │ 1. 🔧 Increase rate limit from 1000 to 2000 req/min for 'default'            │
+  │ Risk: Low  │  Estimated cost impact: +$500/month                             │
+  │ [Apply] [More Info]                                                          │
+  │                                                                              │
+  │ 2. 🔑 Review & rotate CLOUDFLARE_API_TOKEN (expires 45 days)                 │
+  │ Risk: Medium  │  Prevents future auth failures                               │
+  │ [Rotate Now] [Schedule Rotation]                                             │
+  │                                                                              │
+  │ 3. ⚙ Increase timeout for 'think' router from 30s to 45s                     │
+  │ Risk: Low  │  Allows complex reasoning tasks to complete                     │
+  │ [Apply] [Test]                                                               │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ▶ 🔍 View All Details
+  • 📊 Error Trend Analysis (7d, 30d, 90d)
+  • 🔔 Configure Alerts (email, Slack, webhook)
+  • 📝 Export Logs (JSON, CSV)
+  • ⚙ Verbose Mode
+
+  T Trends  │  A Alerts  │  E Export  │  V Verbose  │  ESC Back
+```
+
+---
+
+## Help & Documentation - Context-Aware
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ? Help & Documentation                                                       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  [Search Documentation] ___________________________________  [🌐 Open in Browser]
+
+  ┌───────────────────────────────  Quick Start  ────────────────────────────────┐
+  │                                                                              │
+  │ • 🚀 Getting Started (5 min)      │  • 📚 API Reference                      │
+  │ • 🎯 Common Use Cases             │  • 🔗 Integration Guides                 │
+  │ • ⚙ Configuration Guide            │  • 📊 Metrics & Monitoring              │
+  │ • 🔑 Secrets Management            │  • 🚨 Troubleshooting                   │
+  │ • 💰 Pricing & Costs               │  • 🔐 Security Best Practices           │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────  Popular Articles  ─────────────────────────────┐
+  │                                                                              │
+  │ 1. Choosing the Right Model for Your Workload                                │
+  │ When to use: Opus vs Sonnet vs Haiku | Read time: 8 min                      │
+  │                                                                              │
+  │ 2. Cost Optimization Strategies                                              │
+  │ Tips & tricks for reducing your monthly bill | Read time: 12 min             │
+  │                                                                              │
+  │ 3. Setting Up Rate Limiting & Quotas                                         │
+  │ Prevent unexpected bill spikes | Read time: 6 min                            │
+  │                                                                              │
+  │ 4. Monitoring & Alerting                                                     │
+  │ Real-time monitoring, alerts, and incident response | Read time: 10m         │
+  │                                                                              │
+  │ 5. Deploying to Production                                                   │
+  │ Best practices for safe & reliable deployments | Read time: 14 min           │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌────────────────────────  API Reference Quick Links  ─────────────────────────┐
+  │                                                                              │
+  │ Routers (manage routing logic)                                               │
+  │ POST   /api/routers              Create new router                           │
+  │ GET    /api/routers              List all routers                            │
+  │ PATCH  /api/routers/:id          Update router config                        │
+  │ DELETE /api/routers/:id          Delete router                               │
+  │                                                                              │
+  │ Models (configure available models)                                          │
+  │ GET    /api/models               List available models                       │
+  │ POST   /api/models/test          Test model with sample request              │
+  │                                                                              │
+  │ Secrets (manage environment variables)                                       │
+  │ POST   /api/secrets              Create secret                               │
+  │ GET    /api/secrets              List secrets (names only)                   │
+  │ PATCH  /api/secrets/:name        Update secret                               │
+  │ DELETE /api/secrets/:name        Delete secret                               │
+  │ POST   /api/secrets/:name/rotate Rotate secret                               │
+  │                                                                              │
+  │ Analytics (usage data)                                                       │
+  │ GET    /api/analytics/usage      Get usage stats                             │
+  │ GET    /api/analytics/costs      Get cost breakdown                          │
+  │ GET    /api/analytics/errors     Get error logs                              │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌────────────────────────────  Keyboard Shortcuts  ────────────────────────────┐
+  │                                                                              │
+  │ ? · Open help (context-aware)       │  ⌘/Ctrl + K · Command palette          │
+  │ Q · Quit application                │  ⌘/Ctrl + S · Save changes             │
+  │ H · Home dashboard                  │  ⌘/Ctrl + N · New router               │
+  │ D · Deployments                     │  ⌘/Ctrl + D · Deploy                   │
+  │ S · Secrets manager                 │  Esc · Go back                         │
+  │ A · Analytics                       │  Tab · Move focus                      │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  📞 Need More Help?
+
+  • 💬 Open Anthropic Community Forum
+  • 🐛 Report an Issue on GitHub
+  • 📧 Contact Support (priority: community → pro → enterprise)
+  • 🎥 Watch Video Tutorials
+
+  ↵ View Article  │  / Search  │  C Community  │  ESC Back
+```
+
+---
+
+## Settings & Preferences
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ⚙ Settings & Preferences                                                     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  ▶ 🎨 Display Preferences
+  • 👤 Account & Profile
+  • 🔔 Notifications & Alerts
+  • 🔒 Security & Access Control
+  • 📊 Analytics & Telemetry
+  • 🌐 API & Integrations
+
+  ┌───────────────────────────  Display Preferences  ────────────────────────────┐
+  │                                                                              │
+  │ Theme                    ▶ Auto (follows system)  │  Light  │  Dark          │
+  │ Color Scheme             ▶ Default              ↓ (Blue, Purple, etc.)       │
+  │ Font Size                ▶ Medium  (↓ Small | Default | Large | XL)          │
+  │ Compact Mode             ☐ Enable (save vertical space)                      │
+  │ Chart Style              ▶ Line   (↓ Line | Bar | Area | Heatmap)            │
+  │ Show Tooltips            ☑ Enabled on hover                                  │
+  │ Keyboard Hints           ☑ Show next to interactive elements                 │
+  │ Recommended Actions      ☑ Show AI suggestions in dashboard                  │
+  │                                                                              │
+  │ [💾 Save Preferences]                                                        │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌────────────────────────────  Account & Profile  ─────────────────────────────┐
+  │                                                                              │
+  │ Account Email            dev@example.com              [Edit] [Verify]        │
+  │ Account Name             John Developer              [Edit]                  │
+  │ Organization             Acme Corp                   [Edit] [Invite]         │
+  │ Plan                     Professional ($99/month)    [Upgrade] [Manage]      │
+  │ API Keys                 3 active keys               [View] [Generate]       │
+  │ Billing Period           October 1 - October 31      [View Invoice]          │
+  │ Next Renewal             2025-11-01 (auto-renew)    [Manage]                 │
+  │                                                                              │
+  │ [💾 Save Changes]                                                            │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────  Notifications & Alerts  ──────────────────────────┐
+  │                                                                              │
+  │ Alert via Email                                                              │
+  │ ☑ Deployment status         │  ☑ Errors & failures  │  ☑ Cost warnings       │
+  │ ☑ Expiring secrets          │  ☑ Model degradation  │  ☐ Info updates        │
+  │                                                                              │
+  │ Alert via Slack                                                              │
+  │ ☐ Enable Slack integration  [Connect Workspace]                              │
+  │                                                                              │
+  │ Alert via Webhook                                                            │
+  │ ☐ Enable custom webhooks                                                     │
+  │ URL: [https://example.com/webhooks/alerts____] [Test]                        │
+  │                                                                              │
+  │ Alert Sensitivity                                                            │
+  │ Error rate threshold      [0.1 %]  (alert if errors exceed)                  │
+  │ Latency threshold         [250 ms]  (alert if avg latency exceeds)           │
+  │ Cost increase threshold   [10 %]   (alert if daily cost increases)           │
+  │                                                                              │
+  │ [💾 Save Preferences]                                                        │
+  │                                                                              │
+  └──────────────────────────────────────────────────────────────────────────────┘
+
+  ▶ T Display  │  U Account  │  N Notifications  │  S Security  │  A Analytics
+
+  TAB Navigate  │  Space Toggle  │  ↵ Select  │  Ctrl+S Save  │  ESC Back
+```

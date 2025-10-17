@@ -48,8 +48,10 @@ export {
 export { Kbd, type KbdProps } from "./components/kbd";
 export { List } from "./components/list";
 export { LoadingBar, Progress, type ProgressProps } from "./components/loading-bar";
+export { MinimumSizeWarning, type MinimumSizeWarningProps } from "./components/minimum-size-warning";
 export { Modal, type ModalProps, type ModalSize } from "./components/modal";
 export { ProgressBar, type ProgressBarProps } from "./components/progress-bar";
+export { ResponsiveBox, type ResponsiveBoxProps } from "./components/responsive-box";
 export { Select, type SelectOption, type SelectProps } from "./components/select";
 export { Separator, type SeparatorProps } from "./components/separator";
 export { Slider, type SliderProps } from "./components/slider";
@@ -123,6 +125,17 @@ export {
 	Timeline,
 } from "./utils/animation";
 export { debounce } from "./utils/debounce";
+export {
+	calculatePanelHeights,
+	DEFAULT_BREAKPOINTS,
+	getLayoutMode,
+	getResponsiveGap,
+	getResponsivePadding,
+	type LayoutMode,
+	type PanelHeightConfig,
+	type ResponsiveBreakpoints,
+	truncateText as truncateTextResponsive,
+} from "./utils/responsive";
 export { createDescendants, type DescendantContextType } from "./utils/descendants";
 export {
 	ErrorBoundary,

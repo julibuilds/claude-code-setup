@@ -45,6 +45,16 @@ export interface ColorPalette {
 		bright: string;
 	};
 
+	// Panel state colors
+	panelState: {
+		active: string;
+		inactive: string;
+		disabled: string;
+		error: string;
+		success: string;
+		warning: string;
+	};
+
 	// Special colors
 	special: {
 		transparent: string;

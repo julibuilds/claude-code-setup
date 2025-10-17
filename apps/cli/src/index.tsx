@@ -1,5 +1,5 @@
 import { render, useKeyboard } from "@opentui/react";
-import { neonTheme, ThemeProvider } from "@repo/tui";
+import { neonTheme, ThemeProvider, MinimumSizeWarning } from "@repo/tui";
 import { useCallback, useState } from "react";
 import { DeployManager } from "./components/features/DeployManager";
 import { MainMenu } from "./components/features/MainMenu";
@@ -31,19 +31,21 @@ function App() {
 	}, []);
 
 	return (
-		<box
-			style={{
-				flexDirection: "column",
-				width: "100%",
-				height: "100%",
-				padding: 1,
-			}}
-		>
-			{screen === SCREENS.MENU && <MainMenu onNavigate={handleNavigate} />}
-			{screen === SCREENS.QUICK_CONFIG && <QuickConfig onBack={handleBack} />}
-			{screen === SCREENS.DEPLOY && <DeployManager onBack={handleBack} />}
-			{screen === SCREENS.SECRETS && <SecretsManager onBack={handleBack} />}
-		</box>
+		<MinimumSizeWarning minWidth={50} minHeight={20}>
+			<box
+				style={{
+					flexDirection: "column",
+					width: "100%",
+					height: "100%",
+					padding: 1,
+				}}
+			>
+				{screen === SCREENS.MENU && <MainMenu onNavigate={handleNavigate} />}
+				{screen === SCREENS.QUICK_CONFIG && <QuickConfig onBack={handleBack} />}
+				{screen === SCREENS.DEPLOY && <DeployManager onBack={handleBack} />}
+				{screen === SCREENS.SECRETS && <SecretsManager onBack={handleBack} />}
+			</box>
+		</MinimumSizeWarning>
 	);
 }
 

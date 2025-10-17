@@ -235,27 +235,29 @@ export function QuickConfig(_props: QuickConfigProps) {
   
   // Calculate panel heights based on layout mode
   const getPanelHeights = () => {
-    const availableHeight = height - 16; // Account for header, footer, padding
+    const headerFooterSpace = isNarrow ? 12 : 16;
+    const availableHeight = Math.max(20, height - headerFooterSpace);
     
     if (isNarrow) {
-      // Narrow: stack vertically with equal heights
+      // Narrow: compact layout with minimal heights
       return {
-        routerType: Math.floor(availableHeight * 0.25),
-        filter: Math.floor(availableHeight * 0.25),
-        modelList: Math.floor(availableHeight * 0.5),
+        routerType: Math.max(6, Math.floor(availableHeight * 0.2)),
+        filter: Math.max(6, Math.floor(availableHeight * 0.2)),
+        modelList: Math.max(10, Math.floor(availableHeight * 0.6)),
       };
     }
     
-    // Wide/Medium: more space for model list
+    // Wide/Medium: more breathing room
     return {
-      routerType: Math.floor(availableHeight * 0.3),
-      filter: Math.floor(availableHeight * 0.3),
-      modelList: Math.floor(availableHeight * 0.4),
+      routerType: Math.max(8, Math.floor(availableHeight * 0.25)),
+      filter: Math.max(8, Math.floor(availableHeight * 0.25)),
+      modelList: Math.max(12, Math.floor(availableHeight * 0.5)),
     };
   };
 
   const panelHeights = getPanelHeights();
   const containerPadding = isNarrow ? 1 : 2;
+  const containerWidth = Math.min(isNarrow ? width - 2 : 120, width - 4);
 
   return (
     <box
@@ -266,7 +268,7 @@ export function QuickConfig(_props: QuickConfigProps) {
         backgroundColor: componentStyles.panel.backgroundColor,
         padding: containerPadding,
         flexDirection: "column",
-        width: Math.min(120, width - 4),
+        width: containerWidth,
         height: height - 4,
       }}
     >
@@ -280,6 +282,7 @@ export function QuickConfig(_props: QuickConfigProps) {
             ? `✓ ${Object.keys(pendingChanges).length} pending change${Object.keys(pendingChanges).length > 1 ? 's' : ''}`
             : "✓ All changes saved"
         }
+        compact={isNarrow}
       />
 
       {/* Vertical stacked layout for all screen sizes */}
@@ -391,6 +394,7 @@ export function QuickConfig(_props: QuickConfigProps) {
                 ]
           }
           groupByCategory={!isNarrow}
+          compact={isNarrow}
         />
       </box>
     </box>

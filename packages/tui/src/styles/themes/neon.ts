@@ -36,6 +36,14 @@ export const neonTheme: Theme = {
 			muted: "#1A1A1A",
 			bright: "#404040",
 		},
+		panelState: {
+			active: "#00D9FF",
+			inactive: "#252525",
+			disabled: "#1A1A1A",
+			error: "#FF3B5C",
+			success: "#00FF88",
+			warning: "#FFB800",
+		},
 		special: {
 			transparent: "transparent",
 			selection: "#00D9FF",
