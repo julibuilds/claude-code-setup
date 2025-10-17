@@ -8,10 +8,12 @@ Interactive TUI (Terminal User Interface) for managing Claude Code Router config
 - **Pending Changes**: Review and batch-save multiple configuration changes
 - **Smart Filtering**: Browse by Popular, Anthropic, OpenAI, or All models
 - **Live Preview**: See current and pending configurations side-by-side
-- **Deploy Management**: Deploy to production or staging environments
-- **Secrets Management**: Set and list Cloudflare Workers secrets
+- **Deploy Management**: Deploy with pre/post verification of local files
+- **Secrets Management**: Set secrets with automatic `.dev.vars` sync
+- **File Synchronization**: Automatically keeps local files in sync with Cloudflare Workers
 - **Smart Caching**: Models list is cached for 24 hours to reduce API calls
-- **Keyboard Shortcuts**: Ctrl+S to save, Ctrl+R to reset, Tab to navigate
+- **Portable Binary**: Works from any directory using `import.meta.dir`
+- **Keyboard Shortcuts**: Ctrl+S to save, Ctrl+R to reset, Ctrl+F to force refresh, Tab to navigate
 
 ## Tech Stack
 
@@ -103,18 +105,58 @@ The CLI automatically:
 
 ### 2. Deploy to Workers 🚀
 
-Deploy your configuration to Cloudflare Workers:
+Deploy your configuration to Cloudflare Workers with automatic verification:
 
-- Deploy Now: Deploy configuration to your worker
-- Check Deployment Status: View current deployment information
+- **Deploy Now**: Deploy configuration with pre/post file verification
+- **Check Deployment Status**: View current deployment information
+
+**File Verification**:
+
+- Pre-deployment: Checks that `config.json`, `wrangler.toml`, and `.dev.vars` exist
+- Post-deployment: Verifies files are still intact
+- Shows warnings for missing or invalid files
+
+**Example Output**:
+
+```
+Verifying local configuration files...
+✓ Local configuration files verified
+
+Running: bunx wrangler deploy
+[deployment output...]
+
+✓ Deployment successful!
+✓ Local configuration files verified
+```
 
 ### 3. Manage Secrets 🔐
 
-Manage Cloudflare Workers secrets:
+Manage Cloudflare Workers secrets with automatic local file synchronization:
 
-- Set new secrets (e.g., `OPENROUTER_API_KEY`)
-- List all configured secrets
-- Update existing secrets
+- **Set Secret**: Sets secret in Workers AND updates local `.dev.vars`
+- **List Secrets**: View all configured secrets
+
+**File Synchronization**:
+When you set a secret, the CLI:
+
+1. Sets the secret in Cloudflare Workers (production)
+2. Automatically updates `apps/router/.dev.vars` (local development)
+3. Shows confirmation for both operations
+
+**Example Output**:
+
+```
+Setting secret: OPENROUTER_API_KEY...
+
+✓ Secret set successfully in Cloudflare Workers!
+✓ Local .dev.vars file updated
+```
+
+**Benefits**:
+
+- No manual file editing required
+- Local and remote stay in sync
+- Secrets work immediately in local development
 
 ## Environment Variables
 
@@ -144,15 +186,22 @@ apps/cli/
 │   ├── utils/               # Utilities
 │   │   ├── cache.ts         # Model list caching
 │   │   ├── config.ts        # Config loading/saving
-│   │   ├── deploy.ts        # Deployment functions
-│   │   ├── env.ts           # Environment loading
+│   │   ├── deploy.ts        # Deployment with verification
+│   │   ├── env.ts           # Environment loading (import.meta.dir)
 │   │   ├── openrouter.ts    # OpenRouter API client
-│   │   └── secrets.ts       # Secrets management
+│   │   ├── secrets.ts       # Secrets with .dev.vars sync
+│   │   └── sync.ts          # File synchronization utilities
 │   └── index.tsx            # Entry point
 ├── .cache/                  # Cached model data (gitignored)
+├── .env                     # CLI secrets (gitignored)
 ├── dist/                    # Compiled binary
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+├── README.md                # This file
+├── FILE-SYNC.md             # File synchronization guide
+├── FIXES.md                 # Bug fixes and resolutions
+├── SOLUTION.md              # Technical implementation details
+└── TODO.md                  # Planned features
 ```
 
 ## Development
@@ -185,16 +234,83 @@ bun run fresh
 
 ## Tips
 
+### Configuration
+
 - **Quick Config** lets you configure multiple router types before saving
 - Use **Tab** to quickly move between panels without lifting your hands from the keyboard
 - **Ctrl+S** saves all pending changes at once - no need to save after each selection
 - **Ctrl+R** discards all pending changes if you change your mind
-- Deploy to staging first to test changes before production
-- The CLI automatically adds new models to the provider's models list
+- **Ctrl+F** forces a fresh fetch of models from OpenRouter API (bypasses cache)
 - Changes are only saved when you press Ctrl+S (pending changes are shown at the bottom)
+- Current configuration is shown on the main menu for quick reference
+
+### Secrets & Deployment
+
+- Always use the CLI to set secrets - it keeps local and remote in sync
+- The CLI automatically updates `.dev.vars` when you set secrets
+- Deployment verifies local files before and after deploying
+- Review pending changes before deploying to ensure configuration is correct
+
+### Performance
+
 - Models list is cached for 24 hours - first load fetches from API, subsequent loads use cache
 - Use filter options (Popular, Anthropic, OpenAI) for faster navigation
-- Current configuration is shown on the main menu for quick reference
+- The CLI automatically adds new models to the provider's models list
+
+### File Management
+
+- Never manually edit `.dev.vars` - use the CLI to keep it in sync with Workers
+- The CLI uses `import.meta.dir` to find files, so it works from any directory
+- Local files are automatically verified during deployment
+
+## File Synchronization
+
+The CLI automatically keeps local configuration files in sync with Cloudflare Workers.
+
+### Files Managed
+
+| File            | Location       | Synced When     | Purpose                         |
+| --------------- | -------------- | --------------- | ------------------------------- |
+| `.dev.vars`     | `apps/router/` | Setting secrets | Local development secrets       |
+| `config.json`   | `apps/router/` | Saving config   | Router configuration            |
+| `wrangler.toml` | `apps/router/` | Deployment      | Worker settings (verified only) |
+
+### How It Works
+
+**Setting a Secret**:
+
+```
+User sets OPENROUTER_API_KEY
+  ↓
+1. wrangler secret put OPENROUTER_API_KEY (Cloudflare Workers)
+  ↓
+2. Update apps/router/.dev.vars (local file)
+  ↓
+3. Show success with file update status
+```
+
+**Deploying**:
+
+```
+User deploys to Workers
+  ↓
+1. Verify config.json, wrangler.toml exist
+  ↓
+2. Run wrangler deploy
+  ↓
+3. Post-deployment verification
+  ↓
+4. Show results and warnings
+```
+
+### Benefits
+
+- **Consistency**: Local and remote configurations stay in sync
+- **No Manual Editing**: CLI handles all file updates
+- **Safety**: Verification before and after deployment
+- **Transparency**: Clear feedback about what was updated
+
+See [FILE-SYNC.md](./FILE-SYNC.md) for complete documentation.
 
 ## Troubleshooting
 
@@ -219,11 +335,53 @@ bun run fresh
 - Check your internet connection
 - Try force refresh with Ctrl+F in Quick Config
 
-## Recent Fixes (v2.0.2)
+## What's New in v2.0.2
+
+### File Synchronization ✨
+
+- ✅ Secrets automatically sync to `.dev.vars` when set
+- ✅ Deployment verifies local files before and after deploying
+- ✅ Clear feedback about file operations in the UI
+- ✅ No manual file editing required
+
+### Path Resolution Fixes 🔧
 
 - ✅ Fixed environment loading in compiled binaries using `import.meta.dir`
 - ✅ Fixed deployment path resolution from any directory
 - ✅ CLI now works correctly when run from anywhere on the system
 - ✅ Added multiple fallback strategies for robust path resolution
 
-See [FIXES.md](./FIXES.md) for technical details.
+### Enhanced UI Feedback 📊
+
+- ✅ Shows which files were updated after setting secrets
+- ✅ Displays verification status during deployment
+- ✅ Warns about missing or invalid configuration files
+- ✅ Clear success/error messages for all operations
+
+## Documentation
+
+- **[FILE-SYNC.md](./FILE-SYNC.md)** - Complete guide to file synchronization
+- **[FIXES.md](./FIXES.md)** - Bug fixes and resolutions
+- **[SOLUTION.md](./SOLUTION.md)** - Technical implementation details
+- **[TODO.md](./TODO.md)** - Planned features and roadmap
+
+## Version History
+
+### v2.0.2 (Current)
+
+- File synchronization for secrets and deployment
+- Path resolution using `import.meta.dir`
+- Enhanced UI feedback
+- Pre/post deployment verification
+
+### v2.0.1
+
+- Environment loading from any directory
+- Cache behavior improvements
+- Deployment fixes
+
+### v2.0.0
+
+- Initial UX overhaul
+- Quick Config interface
+- Pending changes system

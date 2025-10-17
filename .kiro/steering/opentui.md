@@ -1,3 +1,8 @@
+---
+inclusion: fileMatch
+fileMatchPattern: "*.tsx"
+---
+
 # OpenTUI Usage
 
 **Version**: v0.1.27 | **Runtime**: Bun | **React**: >=19.0.0

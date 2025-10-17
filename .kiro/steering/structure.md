@@ -6,6 +6,7 @@
 claude-code-setup/
 ├── apps/                    # Application workspaces
 │   ├── router/             # Cloudflare Workers proxy/router service
+│   ├── cli/                # Interactive TUI for router management
 │   └── web/                # Next.js web UI (in development)
 ├── packages/               # Shared packages
 │   ├── core/              # Core utilities, transformers, token counting
@@ -43,6 +44,51 @@ apps/router/
 - `config.json`: Provider settings, API keys, routing rules
 - `wrangler.toml`: Cloudflare deployment config, environment variables
 - `.dev.vars`: Local secrets for development (never commit)
+
+#### apps/cli (Interactive TUI)
+
+```
+apps/cli/
+├── src/
+│   ├── components/          # UI components
+│   │   ├── MainMenu.tsx
+│   │   ├── QuickConfig.tsx
+│   │   ├── DeployManager.tsx
+│   │   └── SecretsManager.tsx
+│   ├── context/             # React context
+│   │   └── ConfigContext.tsx
+│   ├── types/               # TypeScript types
+│   │   └── config.ts
+│   ├── utils/               # Utilities
+│   │   ├── cache.ts         # Model list caching
+│   │   ├── config.ts        # Config loading/saving
+│   │   ├── deploy.ts        # Deployment with verification
+│   │   ├── env.ts           # Environment loading (import.meta.dir)
+│   │   ├── openrouter.ts    # OpenRouter API client
+│   │   ├── secrets.ts       # Secrets with .dev.vars sync
+│   │   └── sync.ts          # File synchronization utilities
+│   └── index.tsx            # Entry point
+├── .cache/                  # Cached model data (gitignored)
+├── dist/                    # Compiled binary (router-workers-cli)
+├── .env                     # CLI secrets (gitignored)
+├── package.json
+├── README.md                # Usage guide
+├── FILE-SYNC.md             # File synchronization documentation
+├── FIXES.md                 # Bug fixes and resolutions
+├── SOLUTION.md              # Technical implementation details
+└── TODO.md                  # Planned features
+```
+
+**Key Features**:
+
+- Compiled to standalone binary using `bun build --compile`
+- Uses `import.meta.dir` for reliable path resolution in compiled binaries
+- Automatically syncs `.dev.vars` when setting secrets
+- Verifies local files before/after deployment
+- Smart caching with 24-hour TTL for model lists
+- Built with OpenTUI (React-based TUI framework)
+
+**Global Command**: `ccr` (after running `bun run link`)
 
 #### apps/web (Next.js)
 
@@ -142,7 +188,28 @@ Each workspace has its own:
 
 - **packages/core/dist/**: Compiled JavaScript and type definitions
 - **apps/router/dist/**: Bundled Workers script
+- **apps/cli/dist/**: Compiled standalone binary (router-workers-cli)
+- **apps/cli/.cache/**: Cached OpenRouter model data (24-hour TTL)
 - **apps/web/.next/**: Next.js build output
 - **.turbo/cache/**: Turborepo task cache
 
 All build outputs are gitignored and regenerated on build.
+
+### Important Files for CLI
+
+- **apps/router/.dev.vars**: Local development secrets (synced by CLI)
+- **apps/router/config.json**: Router configuration (edited by CLI)
+- **apps/router/wrangler.toml**: Cloudflare Workers config (verified by CLI)
+- **apps/cli/.env**: CLI-specific secrets (OPENROUTER_API_KEY)
+
+### Path Resolution in Compiled Binaries
+
+The CLI uses `import.meta.dir` for path resolution, which is embedded at compile time:
+
+```typescript
+// In apps/cli/src/utils/env.ts
+const sourceDir = import.meta.dir; // Points to apps/cli/src/utils
+const projectRoot = resolve(sourceDir, "..", "..", "..", ".."); // Navigate up to root
+```
+
+This allows the compiled binary to work from any directory on the system.
