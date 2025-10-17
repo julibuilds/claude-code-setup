@@ -1,6 +1,7 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import type { Config } from "../types/config";
 import { loadConfig, saveConfig } from "../utils/config";
+import { updateDevVars } from "../utils/secrets";
 
 interface ConfigContextType {
 	config: Config | null;
@@ -32,7 +33,15 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 
 	const updateConfig = useCallback(async (newConfig: Config) => {
 		try {
+			// 1. Save to config.json
 			await saveConfig(newConfig);
+			
+			// 2. Update CONFIG_JSON in .dev.vars for local development
+			const configJson = JSON.stringify(newConfig);
+			const { getRouterPath } = await import("../utils/config");
+			const routerPath = getRouterPath();
+			await updateDevVars(routerPath, "CONFIG_JSON", configJson);
+			
 			setConfig(newConfig);
 		} catch (err) {
 			throw new Error(err instanceof Error ? err.message : "Failed to save config");

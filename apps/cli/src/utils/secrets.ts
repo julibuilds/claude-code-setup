@@ -12,7 +12,7 @@ export interface SecretResult {
 /**
  * Updates or adds a key-value pair in .dev.vars file
  */
-async function updateDevVars(routerPath: string, key: string, value: string): Promise<void> {
+export async function updateDevVars(routerPath: string, key: string, value: string): Promise<void> {
 	const devVarsPath = join(routerPath, ".dev.vars");
 
 	let content = "";
