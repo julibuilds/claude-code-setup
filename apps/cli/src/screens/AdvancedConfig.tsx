@@ -33,22 +33,9 @@ export function AdvancedConfig({ onBack }: AdvancedConfigProps) {
         setLoading(true);
         setModels([]); // Start with empty array
 
-        // Try to load models
+        // Try to load models - let the processing utility handle validation
         const fetchedModels = await fetchOpenRouterModels();
-        if (Array.isArray(fetchedModels)) {
-          // Filter out any null/undefined models before setting
-          const validModels = fetchedModels.filter(model => 
-            model && 
-            typeof model === 'object' && 
-            model.id && 
-            typeof model.id === 'string'
-          );
-          console.log(`Loaded ${validModels.length} valid models out of ${fetchedModels.length} total`);
-          setModels(validModels);
-        } else {
-          console.warn("Invalid models data received:", fetchedModels);
-          setModels([]);
-        }
+        setModels(fetchedModels || []);
       } catch (error) {
         console.error("Failed to load models:", error);
         setModels([]);

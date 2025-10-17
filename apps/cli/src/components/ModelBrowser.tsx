@@ -1,9 +1,10 @@
 import { TextAttributes } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
 import { Table, useThemeColors, type Column } from "@repo/tui";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ROUTER_TYPES, type RouterType } from "../constants";
 import type { Config, OpenRouterModel } from "../types/config";
+import { processModels, filterModels, sortModels, type ProcessedModel } from "../utils/model-processing";
 
 import { SearchInput } from "./SearchInput";
 
@@ -24,13 +25,6 @@ type FilterType =
   | "reasoning"
   | "multimodal";
 type SortType = "name" | "context" | "cost" | "provider";
-
-interface ModelWithMetadata extends OpenRouterModel {
-  costPerMToken: number;
-  provider: string;
-  isReasoning: boolean;
-  isMultimodal: boolean;
-}
 
 export function ModelBrowser({
   models,
@@ -53,114 +47,21 @@ export function ModelBrowser({
     "router" | "filter" | "sort" | "search" | "models"
   >("models");
 
-  // Process models with metadata
-  const processedModels: ModelWithMetadata[] = (models || [])
-    .filter(model => model && typeof model === 'object' && model.id) // Filter out null/undefined models
-    .map((model) => {
-      // Safely handle potentially null/undefined properties
-      const description = model.description || "";
-      const descriptionLower = description.toLowerCase();
-      const modelId = model.id || "";
-      const modelName = model.name || modelId || "Unknown Model";
-      const pricing = model.pricing || { prompt: "0", completion: "0" };
-      
-      return {
-        ...model,
-        id: modelId,
-        name: modelName,
-        description,
-        context_length: model.context_length || 0,
-        pricing,
-        costPerMToken:
-          (parseFloat(pricing.prompt || "0") +
-            parseFloat(pricing.completion || "0")) *
-          1000000,
-        provider: modelId.split("/")[0] || "unknown",
-        isReasoning:
-          modelId.includes("reasoning") ||
-          modelId.includes("think") ||
-          modelId.includes("o1") ||
-          descriptionLower.includes("reasoning"),
-        isMultimodal:
-          descriptionLower.includes("vision") ||
-          descriptionLower.includes("image") ||
-          modelId.includes("vision"),
-      };
-    });
-
-  // Filter models
-  const filteredModels = processedModels.filter((model) => {
-    // Ensure model exists and has required properties
-    if (!model || typeof model !== 'object') return false;
-    
-    // Search filter
-    if (searchText) {
-      const search = searchText.toLowerCase();
-      const modelName = (model.name || "").toLowerCase();
-      const modelId = (model.id || "").toLowerCase();
-      const modelProvider = (model.provider || "").toLowerCase();
-      const modelDescription = (model.description || "").toLowerCase();
-      
-      if (
-        !modelName.includes(search) &&
-        !modelId.includes(search) &&
-        !modelProvider.includes(search) &&
-        !modelDescription.includes(search)
-      ) {
-        return false;
-      }
-    }
-
-    // Type filter
-    switch (filter) {
-      case "anthropic":
-        return model.provider === "anthropic";
-      case "openai":
-        return model.provider === "openai";
-      case "popular":
-        return [
-          "anthropic",
-          "openai",
-          "google",
-          "meta-llama",
-          "deepseek",
-          "x-ai",
-        ].includes(model.provider);
-      case "reasoning":
-        return model.isReasoning;
-      case "multimodal":
-        return model.isMultimodal;
-      default:
-        return true;
-    }
-  });
-
-  // Sort models
-  const sortedModels = [...filteredModels].sort((a, b) => {
-    // Ensure both models exist
-    if (!a || !b) return 0;
-    
-    switch (sort) {
-      case "name":
-        return (a.name || "").localeCompare(b.name || "");
-      case "context":
-        return (b.context_length || 0) - (a.context_length || 0);
-      case "cost":
-        return (a.costPerMToken || 0) - (b.costPerMToken || 0);
-      case "provider":
-        return (a.provider || "").localeCompare(b.provider || "");
-      default:
-        return 0;
-    }
-  });
+  // Process and filter models using clean utility functions
+  const processedModels = useMemo(() => processModels(models), [models]);
+  
+  const filteredAndSortedModels = useMemo(() => {
+    const filtered = filterModels(processedModels, filter, searchText);
+    return sortModels(filtered, sort);
+  }, [processedModels, filter, searchText, sort]);
 
   // Reset selection when filtered models change
   useEffect(() => {
     setSelectedModelIndex(0);
-  }, [filteredModels.length, filter, sort, searchText]);
+  }, [filteredAndSortedModels.length, filter, sort, searchText]);
 
   const handleModelSelect = useCallback(() => {
-    const selectedModel = sortedModels[selectedModelIndex];
+    const selectedModel = filteredAndSortedModels[selectedModelIndex];
     if (!selectedModel || !config) return;
 
     const newRouter = {
@@ -174,7 +75,7 @@ export function ModelBrowser({
     });
   }, [
     selectedModelIndex,
-    sortedModels,
+    filteredAndSortedModels,
     selectedRouter,
     config,
     pendingChanges,
@@ -205,7 +106,7 @@ export function ModelBrowser({
         setSelectedModelIndex((prev) => Math.max(0, prev - 1));
       } else if (evt.name === "down") {
         setSelectedModelIndex((prev) =>
-          Math.min(sortedModels.length - 1, prev + 1)
+          Math.min(filteredAndSortedModels.length - 1, prev + 1)
         );
       }
     } else if (focusArea === "router") {
@@ -399,19 +300,19 @@ export function ModelBrowser({
       </box>
 
       {/* Models Table */}
-      <box border title={`Models (${sortedModels.length})`} flexGrow={1}>
-        {sortedModels.length === 0 ? (
+      <box border title={`Models (${filteredAndSortedModels.length})`} flexGrow={1}>
+        {filteredAndSortedModels.length === 0 ? (
           <box style={{ alignItems: "center", justifyContent: "center" }} flexGrow={1}>
             <text fg={colors.text.muted}>No models found</text>
           </box>
         ) : (
           <Table
             columns={columns}
-            data={sortedModels}
+            data={filteredAndSortedModels}
             selectedIndex={
               focusArea === "models" ? selectedModelIndex : undefined
             }
-            getItemKey={(model, index) => `${model?.id || 'unknown'}-${index}`}
+            getItemKey={(model, index) => `${model.id}-${index}`}
             renderSelectionIndicator={(isSelected) => (
               <text fg={isSelected ? colors.accent.primary : colors.text.muted}>
                 {isSelected ? "▶" : " "}
