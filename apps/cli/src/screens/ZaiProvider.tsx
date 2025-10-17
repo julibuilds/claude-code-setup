@@ -30,8 +30,8 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
   useEffect(() => {
     const loadStatus = async () => {
       try {
-        const provider = await getCurrentProvider();
-        setCurrentProvider(provider);
+        const providerType = await getCurrentProvider();
+        setCurrentProvider({ type: providerType });
         setIsConfigured(await isZaiConfigured());
       } catch {
         // Ignore errors on initial load

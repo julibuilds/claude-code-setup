@@ -58,7 +58,10 @@ export function Menu({ onNavigate }: MenuProps) {
     } else if (evt.name === "down") {
       setSelectedIndex((prev) => Math.min(menuItems.length - 1, prev + 1));
     } else if (evt.name === "return") {
-      onNavigate(menuItems[selectedIndex].screen);
+      const selectedItem = menuItems[selectedIndex];
+      if (selectedItem) {
+        onNavigate(selectedItem.screen);
+      }
     } else if (evt.name === "escape" || evt.name === "q") {
       process.exit(0);
     } else {
