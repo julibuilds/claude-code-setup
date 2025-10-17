@@ -3,6 +3,8 @@
  * All color schemes, spacing, and styling patterns are defined here
  */
 
+import type { BorderStyle } from "@opentui/core";
+
 export const theme = {
 	// Color palette - organized by semantic meaning
 	colors: {
@@ -64,43 +66,43 @@ export const theme = {
 	borderStyles: {
 		standard: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
 		},
 		focused: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#00D9FF",
 			backgroundColor: "#1f2335",
 		},
 		secondary: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#3b4261",
 			backgroundColor: "#28293a",
 		},
 		accent: {
 			border: true,
-			borderStyle: "rounded",
+			borderStyle: "rounded" as BorderStyle,
 			borderColor: "#bb9af7",
 			backgroundColor: "#1a1b26",
 		},
 		success: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#9ece6a",
 			backgroundColor: "#1a1b26",
 		},
 		warning: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#e0af68",
 			backgroundColor: "#1a1b26",
 		},
 		error: {
 			border: true,
-			borderStyle: "heavy",
+			borderStyle: "heavy" as BorderStyle,
 			borderColor: "#f7768e",
 			backgroundColor: "#1a1b26",
 		},
@@ -113,7 +115,7 @@ export const theme = {
 			marginBottom: 2,
 			padding: 2,
 			border: true,
-			borderStyle: "rounded",
+			borderStyle: "rounded" as BorderStyle,
 			borderColor: "#bb9af7",
 			backgroundColor: "#1a1b26",
 			flexDirection: "column" as const,
@@ -122,7 +124,7 @@ export const theme = {
 		// Panel style - used for bordered sections
 		panel: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
 			padding: 2,
@@ -132,7 +134,7 @@ export const theme = {
 		// Focused panel style
 		panelFocused: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#00D9FF",
 			backgroundColor: "#1f2335",
 			padding: 2,
@@ -144,7 +146,7 @@ export const theme = {
 			marginTop: 2,
 			padding: 2,
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#3b4261",
 			backgroundColor: "#28293a",
 			flexDirection: "column" as const,
@@ -153,7 +155,7 @@ export const theme = {
 		// Select/Input container
 		selectContainer: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
 			flexDirection: "column" as const,
@@ -162,7 +164,7 @@ export const theme = {
 		// Focused select container
 		selectContainerFocused: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#00D9FF",
 			backgroundColor: "#1f2335",
 			flexDirection: "column" as const,
@@ -172,7 +174,7 @@ export const theme = {
 		statusBox: {
 			padding: 2,
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
 			flexDirection: "column" as const,
@@ -182,7 +184,7 @@ export const theme = {
 		statusBoxSuccess: {
 			padding: 2,
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#9ece6a",
 			backgroundColor: "#1a1b26",
 			flexDirection: "column" as const,
@@ -192,7 +194,7 @@ export const theme = {
 		statusBoxWarning: {
 			padding: 2,
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#e0af68",
 			backgroundColor: "#1a1b26",
 			flexDirection: "column" as const,
@@ -202,7 +204,7 @@ export const theme = {
 		statusBoxError: {
 			padding: 2,
 			border: true,
-			borderStyle: "heavy",
+			borderStyle: "heavy" as BorderStyle,
 			borderColor: "#f7768e",
 			backgroundColor: "#1a1b26",
 			flexDirection: "column" as const,
@@ -211,7 +213,7 @@ export const theme = {
 		// Main menu container
 		mainMenu: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
 			padding: 3,
@@ -222,7 +224,7 @@ export const theme = {
 		// Quick config container
 		quickConfig: {
 			border: true,
-			borderStyle: "single",
+			borderStyle: "single" as BorderStyle,
 			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
 			padding: 2,
@@ -238,6 +240,39 @@ export const theme = {
 		dim: {
 			attributes: 2, // TextAttributes.DIM equivalent
 		},
+	},
+
+	// Animation configuration
+	animation: {
+		durations: {
+			fast: 150,
+			normal: 300,
+			slow: 500,
+			verySlow: 1000,
+		},
+		easing: {
+			linear: "linear",
+			inOutQuad: "inOutQuad",
+			inOutSine: "inOutSine",
+			inExpo: "inExpo",
+			outExpo: "outExpo",
+			inOutCubic: "inOutCubic",
+		},
+		frameRate: 60, // Target FPS for animations
+	},
+
+	// Focus and interaction states
+	focus: {
+		border: "#00D9FF",
+		text: "#FFFFFF",
+		backgroundColor: "#1f2335",
+	},
+
+	// Layout configuration
+	layout: {
+		gap: 2,
+		padding: 2,
+		margin: 1,
 	},
 };
 
