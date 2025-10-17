@@ -41,20 +41,21 @@ bun run setup
 
 ## Usage
 
-**Important**: Run the CLI from either the project root or the `apps/cli` directory.
+The CLI can be run from **any directory** on your system after linking:
 
 ```bash
-# From project root
-ccr
-
-# Or from apps/cli
-cd apps/cli
+# Run from anywhere after linking
 ccr
 
 # Or run directly without building
 cd apps/cli
 bun run dev
+
+# Or run the binary directly
+/path/to/claude-code-setup/apps/cli/dist/router-workers-cli
 ```
+
+**Note**: The compiled binary uses `import.meta.dir` to locate project files, so it works correctly regardless of your current directory.
 
 ## Navigation
 
@@ -104,9 +105,8 @@ The CLI automatically:
 
 Deploy your configuration to Cloudflare Workers:
 
-- Deploy to production environment
-- Deploy to staging environment
-- Check current deployment status
+- Deploy Now: Deploy configuration to your worker
+- Check Deployment Status: View current deployment information
 
 ### 3. Manage Secrets 🔐
 
@@ -201,17 +201,29 @@ bun run fresh
 **"OPENROUTER_API_KEY not found"**
 
 - Add your OpenRouter API key to `apps/cli/.env` or `apps/router/.dev.vars`
+- The CLI automatically finds these files using `import.meta.dir`, even when running from other directories
 
 **"Config file not found"**
 
-- Ensure you're running the CLI from the project root or that `apps/router/config.json` exists
+- This should not happen with the compiled binary - it uses `import.meta.dir` to locate files
+- If you see this error, try rebuilding: `cd apps/cli && bun run build`
 
-**Deployment fails**
+**Deployment fails with "invalid cwd" error**
 
-- Check that you have Wrangler configured and authenticated
-- Run `bunx wrangler login` in `apps/router/` directory
+- This was fixed in v2.0.2 - rebuild the binary if you see this error
+- The CLI now correctly finds the router directory from any location
 
 **Models not loading**
 
 - Verify your OpenRouter API key is valid
 - Check your internet connection
+- Try force refresh with Ctrl+F in Quick Config
+
+## Recent Fixes (v2.0.2)
+
+- ✅ Fixed environment loading in compiled binaries using `import.meta.dir`
+- ✅ Fixed deployment path resolution from any directory
+- ✅ CLI now works correctly when run from anywhere on the system
+- ✅ Added multiple fallback strategies for robust path resolution
+
+See [FIXES.md](./FIXES.md) for technical details.

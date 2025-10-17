@@ -13,15 +13,18 @@ export function DeployManager(_props: DeployManagerProps) {
 	const [output, setOutput] = useState<Array<{ id: string; text: string }>>([]);
 	const [error, setError] = useState<string | null>(null);
 
-	const handleDeploy = useCallback(async (env: "production" | "staging") => {
+	const handleDeploy = useCallback(async () => {
 		setDeploying(true);
 		setOutput([]);
 		setError(null);
 
 		try {
-			setOutput((prev) => [...prev, { id: `${Date.now()}-0`, text: `Deploying to ${env}...` }]);
+			setOutput((prev) => [
+				...prev,
+				{ id: `${Date.now()}-0`, text: "Deploying to Cloudflare Workers..." },
+			]);
 
-			const result = await deployToWorkers(env, (line) => {
+			const result = await deployToWorkers((line) => {
 				setOutput((prev) => [...prev, { id: `${Date.now()}-${Math.random()}`, text: line }]);
 			});
 
@@ -117,14 +120,9 @@ export function DeployManager(_props: DeployManagerProps) {
 
 	const options: SelectOption[] = [
 		{
-			name: "Deploy to Production",
-			description: "Deploy configuration to production environment",
-			value: "production",
-		},
-		{
-			name: "Deploy to Staging",
-			description: "Deploy configuration to staging environment",
-			value: "staging",
+			name: "Deploy Now",
+			description: "Deploy configuration to Cloudflare Workers",
+			value: "deploy",
 		},
 		{
 			name: "Check Deployment Status",
@@ -162,8 +160,8 @@ export function DeployManager(_props: DeployManagerProps) {
 						if (option) {
 							if (option.value === "status") {
 								handleCheckStatus();
-							} else {
-								handleDeploy(option.value as "production" | "staging");
+							} else if (option.value === "deploy") {
+								handleDeploy();
 							}
 						}
 					}}

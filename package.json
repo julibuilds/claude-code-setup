@@ -6,7 +6,8 @@
 		"dev": "turbo run dev",
 		"lint": "turbo run lint",
 		"check-types": "turbo run check-types",
-		"ci": "turbo run ci"
+		"ci": "turbo run ci",
+		"cln": "bash dev/scripts/cleanup.sh"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",

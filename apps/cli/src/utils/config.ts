@@ -6,6 +6,29 @@ export function getRouterPath(): string {
 	// Try multiple possible locations for the router directory
 	const cwd = process.cwd();
 
+	// For compiled binaries, use import.meta.dir to find the source location
+	// import.meta.dir points to the directory containing this source file
+	// This file is at apps/cli/src/utils/config.ts
+	try {
+		const sourceDir = import.meta.dir;
+		if (sourceDir) {
+			// Go up from apps/cli/src/utils to apps/cli/src
+			const srcDir = resolve(sourceDir, "..");
+			// Go up from apps/cli/src to apps/cli
+			const cliDir = resolve(srcDir, "..");
+			// Go up from apps/cli to apps
+			const appsDir = resolve(cliDir, "..");
+			// Get router path from apps
+			const routerFromSource = resolve(appsDir, "router");
+
+			if (existsSync(join(routerFromSource, "config.json"))) {
+				return routerFromSource;
+			}
+		}
+	} catch (_err) {
+		// Ignore errors finding source path
+	}
+
 	// If running from apps/cli
 	const fromCli = resolve(cwd, "..", "router");
 	if (existsSync(join(fromCli, "config.json"))) {
@@ -23,7 +46,20 @@ export function getRouterPath(): string {
 		return cwd;
 	}
 
-	// Default to apps/router from cwd
+	// Search up directory tree from current directory
+	let searchDir = cwd;
+	for (let i = 0; i < 5; i++) {
+		const routerPath = resolve(searchDir, "apps", "router");
+		if (existsSync(join(routerPath, "config.json"))) {
+			return routerPath;
+		}
+
+		const parent = resolve(searchDir, "..");
+		if (parent === searchDir) break; // Reached root
+		searchDir = parent;
+	}
+
+	// Default to apps/router from cwd (will fail later with helpful error)
 	return fromRoot;
 }
 

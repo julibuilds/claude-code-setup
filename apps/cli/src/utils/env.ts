@@ -23,6 +23,38 @@ function findEnvFiles(): string[] {
 	const cwd = process.cwd();
 	const possiblePaths: string[] = [];
 
+	// For compiled binaries, use import.meta.dir to find the source location
+	// import.meta.dir points to the directory containing the source file
+	// even in compiled executables
+	try {
+		// In a compiled binary, import.meta.dir is embedded at compile time
+		// This file is at apps/cli/src/utils/env.ts
+		// So import.meta.dir points to apps/cli/src/utils
+		const sourceDir = import.meta.dir;
+		if (sourceDir) {
+			// Go up from apps/cli/src/utils to apps/cli/src
+			const srcDir = resolve(sourceDir, "..");
+			// Go up from apps/cli/src to apps/cli
+			const cliDir = resolve(srcDir, "..");
+			// Go up from apps/cli to apps
+			const appsDir = resolve(cliDir, "..");
+			// Go up from apps to project root
+			const projectRoot = resolve(appsDir, "..");
+
+			const envFromSource = resolve(projectRoot, "apps", "cli", ".env");
+			const varsFromSource = resolve(projectRoot, "apps", "router", ".dev.vars");
+
+			if (existsSync(envFromSource)) {
+				possiblePaths.push(envFromSource);
+			}
+			if (existsSync(varsFromSource)) {
+				possiblePaths.push(varsFromSource);
+			}
+		}
+	} catch (_err) {
+		// Ignore errors finding source path
+	}
+
 	// If running from apps/cli
 	possiblePaths.push(resolve(cwd, ".env"));
 	possiblePaths.push(resolve(cwd, "..", "router", ".dev.vars"));
@@ -35,11 +67,9 @@ function findEnvFiles(): string[] {
 	possiblePaths.push(resolve(cwd, ".dev.vars"));
 	possiblePaths.push(resolve(cwd, "..", "cli", ".env"));
 
-	// If running as compiled binary from anywhere, try to find project root
-	// Look for claude-code-setup directory structure
+	// Search up directory tree from current directory
 	let searchDir = cwd;
 	for (let i = 0; i < 5; i++) {
-		// Search up to 5 levels
 		const appsCliEnv = resolve(searchDir, "apps", "cli", ".env");
 		const appsRouterVars = resolve(searchDir, "apps", "router", ".dev.vars");
 

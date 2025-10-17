@@ -65,6 +65,7 @@ concurrent_remove "*.tsbuildinfo" "file"
 concurrent_remove ".eslintcache" "file"
 concurrent_remove ".stylelintcache" "file"
 concurrent_remove ".cache" "dir"
+concurrent_remove ".wrangler" "dir"
 # NAPI build artifacts
 concurrent_remove "index.js" "file"
 concurrent_remove "index.d.ts" "file"

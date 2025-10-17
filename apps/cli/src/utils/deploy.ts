@@ -6,23 +6,15 @@ export interface DeployResult {
 	error?: string;
 }
 
-export async function deployToWorkers(
-	env: "production" | "staging",
-	onOutput?: (line: string) => void
-): Promise<DeployResult> {
+export async function deployToWorkers(onOutput?: (line: string) => void): Promise<DeployResult> {
 	try {
 		const routerPath = getRouterPath();
 
-		onOutput?.(`Deploying to ${env}...`);
+		onOutput?.("Deploying to Cloudflare Workers...");
 		onOutput?.(`Router path: ${routerPath}`);
 		onOutput?.("");
 
 		const args = ["wrangler", "deploy"];
-		if (env === "production") {
-			args.push("--env", "production");
-		} else {
-			args.push("--env", "staging");
-		}
 
 		onOutput?.(`Running: bunx ${args.join(" ")}`);
 		onOutput?.("");
