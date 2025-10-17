@@ -58,7 +58,7 @@ export function ModelBrowser({
   // Reset selection when filtered models change
   useEffect(() => {
     setSelectedModelIndex(0);
-  }, [filteredAndSortedModels.length, filter, sort, searchText]);
+  }, [filter, sort, searchText]);
 
   const handleModelSelect = useCallback(() => {
     const selectedModel = filteredAndSortedModels[selectedModelIndex];
@@ -149,7 +149,7 @@ export function ModelBrowser({
     }
   });
 
-  const columns: Column<ModelWithMetadata>[] = [
+  const columns: Column<ProcessedModel>[] = [
     {
       id: "name",
       label: "Model Name",

@@ -65,7 +65,7 @@ export function ProviderManager({
         }
       } else {
         // Handle string fields
-        (provider as any)[editField] = editValue;
+        (provider as Record<string, unknown>)[editField] = editValue;
       }
     }
 
@@ -264,40 +264,19 @@ export function ProviderManager({
             ) : (
               <>
                 <text fg={colors.text.muted}>
-                  [1] Name:{" "}
-                  <text fg={colors.text.primary}>
-                    {providers[selectedProviderIndex].name}
-                  </text>
+                  {`[1] Name: ${providers[selectedProviderIndex].name}`}
                 </text>
                 <text fg={colors.text.muted}>
-                  [2] URL:{" "}
-                  <text fg={colors.text.primary}>
-                    {providers[selectedProviderIndex].api_base_url}
-                  </text>
+                  {`[2] URL: ${providers[selectedProviderIndex].api_base_url}`}
                 </text>
                 <text fg={colors.text.muted}>
-                  [3] Key:{" "}
-                  <text fg={colors.text.primary}>
-                    {providers[selectedProviderIndex].api_key.replace(
-                      /./g,
-                      "*"
-                    )}
-                  </text>
+                  {`[3] Key: ${providers[selectedProviderIndex].api_key.replace(/./g, "*")}`}
                 </text>
                 <text fg={colors.text.muted}>
-                  [4] Models:{" "}
-                  <text fg={colors.text.primary}>
-                    {providers[selectedProviderIndex].models.join(", ") ||
-                      "None"}
-                  </text>
+                  {`[4] Models: ${providers[selectedProviderIndex].models.join(", ") || "None"}`}
                 </text>
                 <text fg={colors.text.muted}>
-                  [5] Transformers:{" "}
-                  <text fg={colors.text.primary}>
-                    {providers[selectedProviderIndex].transformer.use.join(
-                      ", "
-                    ) || "None"}
-                  </text>
+                  {`[5] Transformers: ${providers[selectedProviderIndex].transformer.use.join(", ") || "None"}`}
                 </text>
               </>
             )}

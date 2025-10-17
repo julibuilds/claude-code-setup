@@ -112,8 +112,7 @@ export function AdvancedConfig({ onBack }: AdvancedConfigProps) {
           return (
             <box alignItems="center" justifyContent="center" flexGrow={1}>
               <text fg={colors.accent.primary}>
-                Error loading model browser:{" "}
-                {error instanceof Error ? error.message : "Unknown error"}
+                {`Error loading model browser: ${error instanceof Error ? error.message : "Unknown error"}`}
               </text>
             </box>
           );
@@ -139,8 +138,7 @@ export function AdvancedConfig({ onBack }: AdvancedConfigProps) {
           return (
             <box alignItems="center" justifyContent="center" flexGrow={1}>
               <text fg={colors.accent.primary}>
-                Error loading provider manager:{" "}
-                {error instanceof Error ? error.message : "Unknown error"}
+                {`Error loading provider manager: ${error instanceof Error ? error.message : "Unknown error"}`}
               </text>
             </box>
           );
@@ -165,8 +163,7 @@ export function AdvancedConfig({ onBack }: AdvancedConfigProps) {
           return (
             <box alignItems="center" justifyContent="center" flexGrow={1}>
               <text fg={colors.accent.primary}>
-                Error loading config summary:{" "}
-                {error instanceof Error ? error.message : "Unknown error"}
+                {`Error loading config summary: ${error instanceof Error ? error.message : "Unknown error"}`}
               </text>
             </box>
           );

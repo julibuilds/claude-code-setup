@@ -45,24 +45,16 @@ export function ConfigSummary({
       content: (
         <box flexDirection="column" style={{ gap: 0 }}>
           <text fg={colors.text.muted}>
-            Host: <text fg={colors.text.primary}>{mergedConfig.HOST}</text>
+            {`Host: ${mergedConfig.HOST}`}
           </text>
           <text fg={colors.text.muted}>
-            Port: <text fg={colors.text.primary}>{mergedConfig.PORT}</text>
+            {`Port: ${mergedConfig.PORT}`}
           </text>
           <text fg={colors.text.muted}>
-            Timeout:{" "}
-            <text fg={colors.text.primary}>
-              {mergedConfig.API_TIMEOUT_MS}ms
-            </text>
+            {`Timeout: ${mergedConfig.API_TIMEOUT_MS}ms`}
           </text>
           <text fg={colors.text.muted}>
-            Logging:{" "}
-            <text fg={colors.text.primary}>
-              {mergedConfig.LOG
-                ? `Enabled (${mergedConfig.LOG_LEVEL})`
-                : "Disabled"}
-            </text>
+            {`Logging: ${mergedConfig.LOG ? `Enabled (${mergedConfig.LOG_LEVEL})` : "Disabled"}`}
           </text>
         </box>
       ),
@@ -77,22 +69,12 @@ export function ConfigSummary({
             const isPending = pendingChanges.Router?.[routerType] !== undefined;
             return (
               <text key={routerType} fg={colors.text.muted}>
-                {routerType}:{" "}
-                <text
-                  fg={isPending ? colors.accent.secondary : colors.text.primary}
-                  attributes={isPending ? TextAttributes.BOLD : undefined}
-                >
-                  {isPending ? "* " : ""}
-                  {modelId || "Not set"}
-                </text>
+                {`${routerType}: ${isPending ? "* " : ""}${modelId || "Not set"}`}
               </text>
             );
           })}
           <text fg={colors.text.muted}>
-            Long Context Threshold:{" "}
-            <text fg={colors.text.primary}>
-              {mergedConfig.Router.longContextThreshold}
-            </text>
+            {`Long Context Threshold: ${mergedConfig.Router.longContextThreshold}`}
           </text>
         </box>
       ),
@@ -110,25 +92,16 @@ export function ConfigSummary({
                 style={{ paddingBottom: 1 }}
               >
                 <text fg={colors.text.muted}>
-                  Provider {index + 1}:{" "}
-                  <text
-                    fg={
-                      isPending ? colors.accent.secondary : colors.text.primary
-                    }
-                    attributes={isPending ? TextAttributes.BOLD : undefined}
-                  >
-                    {isPending ? "* " : ""}
-                    {provider?.name || "Unknown"}
-                  </text>
+                  {`Provider ${index + 1}: ${isPending ? "* " : ""}${provider?.name || "Unknown"}`}
                 </text>
                 <text fg={colors.text.muted} style={{ paddingLeft: 2 }}>
-                  URL: {provider?.api_base_url || "Not set"}
+                  {`URL: ${provider?.api_base_url || "Not set"}`}
                 </text>
                 <text fg={colors.text.muted} style={{ paddingLeft: 2 }}>
-                  Models: {provider?.models?.length || 0} configured
+                  {`Models: ${provider?.models?.length || 0} configured`}
                 </text>
                 <text fg={colors.text.muted} style={{ paddingLeft: 2 }}>
-                  Transformers: {provider?.transformer?.use?.join(", ") || "None"}
+                  {`Transformers: ${provider?.transformer?.use?.join(", ") || "None"}`}
                 </text>
               </box>
             );
@@ -141,37 +114,19 @@ export function ConfigSummary({
       content: (
         <box flexDirection="column" style={{ gap: 0 }}>
           <text fg={colors.text.muted}>
-            Total Providers:{" "}
-            <text fg={colors.text.primary}>
-              {mergedConfig?.Providers?.length || 0}
-            </text>
+            {`Total Providers: ${mergedConfig?.Providers?.length || 0}`}
           </text>
           <text fg={colors.text.muted}>
-            Total Models:{" "}
-            <text fg={colors.text.primary}>
-              {(mergedConfig?.Providers || []).reduce(
-                (sum, p) => sum + (p?.models?.length || 0),
-                0
-              )}
-            </text>
+            {`Total Models: ${(mergedConfig?.Providers || []).reduce(
+              (sum, p) => sum + (p?.models?.length || 0),
+              0
+            )}`}
           </text>
           <text fg={colors.text.muted}>
-            Configured Routers:{" "}
-            <text fg={colors.text.primary}>
-              {Object.values(mergedConfig.Router).filter(Boolean).length}/4
-            </text>
+            {`Configured Routers: ${Object.values(mergedConfig.Router).filter(Boolean).length}/4`}
           </text>
           <text fg={colors.text.muted}>
-            Pending Changes:{" "}
-            <text
-              fg={
-                Object.keys(pendingChanges).length > 0
-                  ? colors.accent.secondary
-                  : colors.text.primary
-              }
-            >
-              {Object.keys(pendingChanges).length}
-            </text>
+            {`Pending Changes: ${Object.keys(pendingChanges).length}`}
           </text>
         </box>
       ),
@@ -220,7 +175,7 @@ export function ConfigSummary({
 
             return issues.map((issue, index) => (
               <text key={index} fg={colors.accent.primary}>
-                ⚠ {issue}
+                {`⚠ ${issue}`}
               </text>
             ));
           })()}
