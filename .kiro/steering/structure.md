@@ -196,13 +196,16 @@ Each workspace has its own:
 ### Build Outputs
 
 - **packages/core/dist/**: Compiled JavaScript and type definitions
-- **apps/router/dist/**: Bundled Workers script
+- **apps/router/dist/**: Bundled Workers script (for local Bun server)
 - **apps/cli/dist/**: Compiled standalone binary (router-workers-cli)
 - **apps/cli/.cache/**: Cached OpenRouter model data (24-hour TTL)
 - **apps/web/.next/**: Next.js build output
 - **.turbo/cache/**: Turborepo task cache
+- **.turbo/cookies/**: Turborepo session cookies
 
 All build outputs are gitignored and regenerated on build.
+
+**Note**: The CLI binary (`apps/cli/dist/router-workers-cli`) is a self-contained executable that includes the Bun runtime and all dependencies.
 
 ### Important Files for CLI
 
