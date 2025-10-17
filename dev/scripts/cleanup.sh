@@ -82,5 +82,12 @@ echo "  • Node.js dependencies, build outputs, cache directories"
 echo "  • Rust artifacts, lock files, native addons"
 echo "  • Debug logs, system files, TypeScript build info"
 echo ""
-echo -e "${BLUE}Next steps:${NC}"
-echo "  bun install && bun run build"
+echo -e "${BLUE}Installing dependencies...${NC}"
+bun install --force
+
+echo ""
+echo -e "${BLUE}Building project...${NC}"
+bun run build
+
+echo ""
+echo -e "${GREEN}✅ All done! Project cleaned, dependencies installed, and built successfully.${NC}"
