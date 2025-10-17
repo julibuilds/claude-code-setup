@@ -7,14 +7,14 @@
 		"ccr": "./dist/router-workers-cli"
 	},
 	"scripts": {
-		"build": "bun build src/index.ts --compile --outfile dist/router-workers-cli",
-		"dev": "bun run src/index.ts",
+		"build": "bun build src/index.tsx --compile --outfile dist/router-workers-cli",
+		"dev": "bun run src/index.tsx",
 		"start": "bun run dist/router-workers-cli",
 		"lint": "biome check --write .",
 		"check-types": "tsc --noEmit",
 		"ci": "biome ci .",
 		"link": "chmod +x dist/router-workers-cli && bun link && bun run scripts/post-link.ts",
-		"setup": "bun install && bun run link",
+		"setup": "bun install && bun run build && bun run link",
 		"clean": "rm -rf node_modules .turbo dist bun.lock",
 		"fresh": "bun run clean && bun install && bun run build && bun run link"
 	},

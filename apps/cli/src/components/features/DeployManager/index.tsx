@@ -1,11 +1,13 @@
 import { type SelectOption, TextAttributes } from "@opentui/core";
-import { useKeyboard, useTerminalDimensions } from "@opentui/react";
+import { useTerminalDimensions } from "@opentui/react";
 import { useCallback, useState } from "react";
 import { deployToWorkers, getDeploymentStatus } from "../../../utils/deploy";
 import { Header } from "../../layout/Header";
 import { Footer } from "../../layout/Footer";
 import { DeploymentLog } from "./DeploymentLog";
+import { Spinner } from "../../common/Spinner";
 import { theme } from "../../../design/theme";
+import { useScreenFocus } from "../../../hooks/useScreenFocus";
 
 interface DeployManagerProps {
 	onBack: () => void;
@@ -94,10 +96,9 @@ export function DeployManager(_props: DeployManagerProps) {
 		}
 	}, []);
 
-	useKeyboard((key) => {
-		if (key.name === "return" && !deploying) {
-			// Allow selection
-		}
+	// Use Core renderer for keyboard events
+	useScreenFocus({
+		// No custom handlers needed - select component handles Enter
 	});
 
 	if (deploying || output.length > 0) {
@@ -116,14 +117,18 @@ export function DeployManager(_props: DeployManagerProps) {
 						marginBottom: 2,
 					}}
 				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: deploying ? theme.colors.warning : theme.colors.success,
-						}}
-					>
-						{deploying ? "🚀 Deployment in Progress..." : "✅ Deployment Complete"}
-					</text>
+					{deploying ? (
+						<Spinner label="Deployment in Progress..." color={theme.colors.warning} />
+					) : (
+						<text
+							style={{
+								attributes: TextAttributes.BOLD,
+								fg: theme.colors.success,
+							}}
+						>
+							✅ Deployment Complete
+						</text>
+					)}
 				</box>
 
 				<DeploymentLog entries={output} error={error} height={height - 12} />

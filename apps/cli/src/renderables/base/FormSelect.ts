@@ -13,7 +13,7 @@ export class FormSelect extends SelectRenderable {
 	private allOptions: SelectOption[] = [];
 	private showFilter = false;
 
-	constructor(id: string, renderer: CliRenderer, options: SelectOption[]) {
+	constructor(id: string, private renderer: CliRenderer, options: SelectOption[]) {
 		super(renderer, {
 			id,
 			options,

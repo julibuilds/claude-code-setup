@@ -11,7 +11,7 @@ export class FormInput extends InputRenderable {
 	private errorText: TextRenderable | null = null;
 	private validationState: "idle" | "valid" | "error" = "idle";
 
-	constructor(id: string, renderer: CliRenderer, opts: InputRenderableOptions) {
+	constructor(id: string, private renderer: CliRenderer, opts: InputRenderableOptions) {
 		super(renderer, { id, ...opts });
 		
 		// Set up focus/blur event handlers

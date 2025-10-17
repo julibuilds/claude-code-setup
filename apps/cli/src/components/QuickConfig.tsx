@@ -1,5 +1,5 @@
 import { type SelectOption, TextAttributes } from "@opentui/core";
-import { useKeyboard, useTerminalDimensions } from "@opentui/react";
+import { useTerminalDimensions } from "@opentui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConfig } from "../context/ConfigContext";
 import type { OpenRouterModel } from "../types/config";
@@ -14,8 +14,10 @@ import { Header } from "./layout/Header";
 import { Footer } from "./layout/Footer";
 import { Panel } from "./layout/Panel";
 import { StatusBox } from "./common/StatusBox";
-import { ErrorBox } from "./common/ErrorBox";
+import { Spinner } from "./common/Spinner";
 import { theme } from "../design/theme";
+import { useScreenFocus } from "../hooks/useScreenFocus";
+import { useMultiPanelFocus } from "../hooks/useMultiPanelFocus";
 
 interface QuickConfigProps {
 	onBack: () => void;
@@ -37,8 +39,15 @@ export function QuickConfig(_props: QuickConfigProps) {
 	const [error, setError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
 
-	// UI State
-	const [focusedPanel, setFocusedPanel] = useState<FocusedPanel>("router-type");
+	// UI State - Use Core-powered multi-panel focus
+	const { focusedPanel: focusedPanelIndex } = useMultiPanelFocus(3);
+	const focusedPanel: FocusedPanel =
+		focusedPanelIndex === 0
+			? "router-type"
+			: focusedPanelIndex === 1
+			? "filter"
+			: "model-list";
+
 	const [selectedRouterType, setSelectedRouterType] = useState<RouterKey>("default");
 	const [filter, setFilter] = useState<FilterType>("popular");
 	const [pendingChanges, setPendingChanges] = useState<PendingChanges>({});
@@ -68,28 +77,11 @@ export function QuickConfig(_props: QuickConfigProps) {
 		loadModels();
 	}, [loadModels]);
 
-	// Keyboard navigation
-	useKeyboard((key) => {
-		if (key.name === "tab") {
-			setFocusedPanel((prev) => {
-				if (prev === "router-type") return "filter";
-				if (prev === "filter") return "model-list";
-				return "router-type";
-			});
-		}
-
-		if (key.ctrl && key.name === "s") {
-			handleSaveAll();
-		}
-
-		if (key.ctrl && key.name === "r") {
-			setPendingChanges({});
-		}
-
-		// Ctrl+F to force refresh models (bypass cache)
-		if (key.ctrl && key.name === "f") {
-			loadModels(true);
-		}
+	// Use Core renderer for keyboard events
+	useScreenFocus({
+		onCtrlS: () => handleSaveAll(),
+		onCtrlR: () => setPendingChanges({}),
+		onCtrlF: () => loadModels(true),
 	});
 
 	const handleModelSelect = useCallback(
@@ -153,21 +145,12 @@ export function QuickConfig(_props: QuickConfigProps) {
 						backgroundColor: theme.colors.bg.dark,
 						flexDirection: "column",
 						alignItems: "center",
+						gap: 2,
 					}}
 				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: theme.colors.accent.cyan,
-							marginBottom: 2,
-						}}
-					>
-						⏳ Loading OpenRouter Models
-					</text>
+					<Spinner label="Loading OpenRouter Models" />
 					<text fg={theme.colors.text.primary}>Fetching model list from API...</text>
-					<text fg={theme.colors.text.dim} style={{ marginTop: 1 }}>
-						This may take a few seconds
-					</text>
+					<text fg={theme.colors.text.dim}>This may take a few seconds</text>
 				</box>
 			</box>
 		);
@@ -192,19 +175,12 @@ export function QuickConfig(_props: QuickConfigProps) {
 						backgroundColor: theme.colors.bg.dark,
 						flexDirection: "column",
 						alignItems: "center",
+						gap: 2,
 					}}
 				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: theme.colors.success,
-							marginBottom: 2,
-						}}
-					>
-						💾 Saving Configuration
-					</text>
+					<Spinner label="Saving Configuration" color={theme.colors.success} />
 					<text fg={theme.colors.text.primary}>Writing changes to config.json...</text>
-					<text fg={theme.colors.text.dim} style={{ marginTop: 1 }}>
+					<text fg={theme.colors.text.dim}>
 						{Object.keys(pendingChanges).length} router(s) being updated
 					</text>
 				</box>

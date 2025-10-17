@@ -1,4 +1,5 @@
 import { theme } from "../../design/theme";
+import { useProgressAnimation } from "../../hooks/useProgressAnimation";
 
 interface ProgressBarProps {
 	/** Label to display before the progress bar */
@@ -7,18 +8,29 @@ interface ProgressBarProps {
 	percent: number;
 	/** Optional custom width */
 	width?: number;
+	/** Whether to animate progress changes (default: true) */
+	animated?: boolean;
+	/** Animation duration in milliseconds (default: 500) */
+	duration?: number;
 }
 
 /**
  * Visual progress bar for long operations
- * Shows a filled bar and percentage
+ * Shows a filled bar and percentage with smooth animation
+ * Uses OpenTUI Core Timeline for 60fps animations
  */
 export function ProgressBar({
 	label,
 	percent,
 	width = 30,
+	animated = true,
+	duration = 500,
 }: ProgressBarProps) {
-	const filledWidth = Math.round((width * percent) / 100);
+	// Use Core Timeline animation for smooth progress
+	const animatedPercent = useProgressAnimation(percent, duration);
+	const displayPercent = animated ? animatedPercent : percent;
+
+	const filledWidth = Math.round((width * displayPercent) / 100);
 	const emptyWidth = width - filledWidth;
 
 	const filledBar = "█".repeat(Math.max(0, filledWidth));
@@ -41,7 +53,7 @@ export function ProgressBar({
 						marginLeft: 2,
 					}}
 				>
-					{Math.round(percent)}%
+					{Math.round(displayPercent)}%
 				</text>
 			</box>
 			<box>
