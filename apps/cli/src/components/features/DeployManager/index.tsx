@@ -194,13 +194,27 @@ export function DeployManager(_props: DeployManagerProps) {
 
       <box
         style={{
-          ...theme.components.selectContainer,
+          border: true,
+          borderStyle: componentStyles.panel.borderStyle,
+          borderColor: colors.border.default,
+          backgroundColor: componentStyles.panel.backgroundColor,
+          flexDirection: "column",
           height: contentHeight,
           marginBottom: 2,
         }}
       >
         <select
-          style={{ height: "100%" }}
+          style={{
+            height: "100%",
+            backgroundColor: componentStyles.panel.backgroundColor,
+            focusedBackgroundColor: componentStyles.list.item.hoverBackgroundColor,
+            textColor: colors.text.primary,
+            focusedTextColor: colors.accent.primary,
+            selectedBackgroundColor: colors.accent.primary,
+            selectedTextColor: colors.background.main,
+            descriptionColor: colors.text.muted,
+            selectedDescriptionColor: colors.text.primary,
+          }}
           options={options}
           focused={true}
           onChange={(_index, option) => {

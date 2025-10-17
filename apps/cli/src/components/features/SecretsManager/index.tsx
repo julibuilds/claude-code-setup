@@ -1,8 +1,8 @@
 import { type SelectOption, TextAttributes } from "@opentui/core";
 import { useKeyboard, useTerminalDimensions } from "@opentui/react";
+import { useComponentStyles, useThemeColors } from "@repo/tui";
 import { useCallback, useState } from "react";
 import { KEYS } from "../../../constants";
-import { theme } from "../../../design/theme";
 import { useFocusManager } from "../../../hooks/useFocusManager";
 import { listWorkerSecrets, setWorkerSecret } from "../../../utils/secrets";
 
@@ -21,6 +21,8 @@ export function SecretsManager(_props: SecretsManagerProps) {
 	const [output, setOutput] = useState<Array<{ id: string; text: string }>>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [processing, setProcessing] = useState(false);
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
 
 	// Use unified focus manager for form fields
 	const { isFocused } = useFocusManager<FocusedField>({
@@ -133,14 +135,15 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						marginBottom: 2,
 						padding: 2,
 						border: true,
-						backgroundColor: theme.colors.bg.dark,
-						borderColor: processing ? theme.colors.warning : theme.colors.success,
+						borderStyle: componentStyles.panel.borderStyle,
+						backgroundColor: componentStyles.panel.backgroundColor,
+						borderColor: processing ? colors.status.warning : colors.status.success,
 					}}
 				>
 					<text
 						style={{
 							attributes: TextAttributes.BOLD,
-							fg: processing ? theme.colors.warning : theme.colors.success,
+							fg: processing ? colors.status.warning : colors.status.success,
 						}}
 					>
 						{processing ? "🔐 Processing Secrets..." : "✅ Secrets Result"}
@@ -150,8 +153,8 @@ export function SecretsManager(_props: SecretsManagerProps) {
 				<scrollbox
 					style={{
 						rootOptions: { height: height - 12, border: true },
-						wrapperOptions: { backgroundColor: theme.colors.bg.mid },
-						viewportOptions: { backgroundColor: theme.colors.bg.dark },
+						wrapperOptions: { backgroundColor: componentStyles.elevated.backgroundColor },
+						viewportOptions: { backgroundColor: componentStyles.panel.backgroundColor },
 						scrollbarOptions: { showArrows: true },
 					}}
 					focused
@@ -161,12 +164,12 @@ export function SecretsManager(_props: SecretsManagerProps) {
 							const isSuccess = item.text.startsWith("✓");
 							const isWarning = item.text.startsWith("⚠");
 							const isEmpty = item.text.trim() === "";
-							const color = isSuccess 
-								? theme.colors.success 
-								: isWarning 
-								? theme.colors.warning 
-								: theme.colors.text.primary;
-							
+							const color = isSuccess
+								? colors.status.success
+								: isWarning
+									? colors.status.warning
+									: colors.text.primary;
+
 							return (
 								<text key={item.id} fg={color}>
 									{isEmpty ? " " : item.text}
@@ -174,8 +177,15 @@ export function SecretsManager(_props: SecretsManagerProps) {
 							);
 						})}
 						{error && (
-							<box style={{ marginTop: 1, padding: 1, border: true, backgroundColor: theme.colors.bg.dark }}>
-								<text style={{ attributes: TextAttributes.BOLD, fg: theme.colors.error }}>
+							<box
+								style={{
+									marginTop: 1,
+									padding: 1,
+									border: true,
+									backgroundColor: componentStyles.panel.backgroundColor,
+								}}
+							>
+								<text style={{ attributes: TextAttributes.BOLD, fg: colors.status.error }}>
 									❌ Error: {error}
 								</text>
 							</box>
@@ -188,15 +198,24 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						marginTop: 2,
 						padding: 2,
 						border: true,
+						borderStyle: componentStyles.panel.borderStyle,
 						flexDirection: "column",
-						backgroundColor: theme.colors.bg.dark,
-						borderColor: theme.colors.text.veryDim,
+						backgroundColor: componentStyles.panel.backgroundColor,
+						borderColor: colors.border.muted,
 					}}
 				>
-					<text style={{ attributes: TextAttributes.BOLD, fg: theme.colors.accent.purple, marginBottom: 1 }}>
-						⌨️  Keyboard Shortcuts
+					<text
+						style={{
+							attributes: TextAttributes.BOLD,
+							fg: colors.accent.secondary,
+							marginBottom: 1,
+						}}
+					>
+						⌨️ Keyboard Shortcuts
 					</text>
-					<text fg={theme.colors.text.primary}>{processing ? "Processing..." : "ESC Back to menu"}</text>
+					<text fg={colors.text.primary}>
+						{processing ? "Processing..." : "ESC Back to menu"}
+					</text>
 				</box>
 			</box>
 		);
@@ -217,21 +236,22 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						marginBottom: 2,
 						padding: 2,
 						border: true,
+						borderStyle: componentStyles.panel.borderStyle,
 						flexDirection: "column",
-						backgroundColor: theme.colors.bg.dark,
-						borderColor: theme.colors.accent.cyan,
+						backgroundColor: componentStyles.panel.backgroundColor,
+						borderColor: colors.accent.primary,
 					}}
 				>
 					<text
 						style={{
 							attributes: TextAttributes.BOLD,
-							fg: theme.colors.accent.cyan,
+							fg: colors.accent.primary,
 							marginBottom: 1,
 						}}
 					>
 						🔐 Set Worker Secret
 					</text>
-					<text fg={theme.colors.text.primary}>Configure secrets for Cloudflare Workers</text>
+					<text fg={colors.text.primary}>Configure secrets for Cloudflare Workers</text>
 				</box>
 
 				<box style={{ flexDirection: "column", gap: 2 }}>
@@ -239,9 +259,12 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						title={isFocused("key") ? "▶ Secret Key" : "Secret Key"}
 						style={{
 							border: true,
+							borderStyle: componentStyles.input.borderStyle,
 							height: 3,
-							backgroundColor: isFocused("key") ? theme.colors.bg.dark : theme.colors.bg.mid,
-							borderColor: isFocused("key") ? theme.colors.accent.cyan : theme.colors.text.dim,
+							backgroundColor: isFocused("key")
+								? componentStyles.panel.backgroundColor
+								: componentStyles.elevated.backgroundColor,
+							borderColor: isFocused("key") ? colors.border.focus : colors.text.muted,
 						}}
 					>
 						<input
@@ -256,9 +279,12 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						title={isFocused("value") ? "▶ Secret Value" : "Secret Value"}
 						style={{
 							border: true,
+							borderStyle: componentStyles.input.borderStyle,
 							height: 3,
-							backgroundColor: isFocused("value") ? theme.colors.bg.dark : theme.colors.bg.mid,
-							borderColor: isFocused("value") ? theme.colors.accent.cyan : theme.colors.text.dim,
+							backgroundColor: isFocused("value")
+								? componentStyles.panel.backgroundColor
+								: componentStyles.elevated.backgroundColor,
+							borderColor: isFocused("value") ? colors.border.focus : colors.text.muted,
 						}}
 					>
 						<input
@@ -274,12 +300,14 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						style={{
 							padding: 1,
 							border: true,
-							borderColor: theme.colors.text.veryDim,
-							backgroundColor: theme.colors.bg.mid,
+							borderStyle: componentStyles.panel.borderStyle,
+							borderColor: colors.border.muted,
+							backgroundColor: componentStyles.elevated.backgroundColor,
 						}}
 					>
-						<text style={{ fg: theme.colors.text.dim }}>
-							{showSecret ? "🔓 Secret visible" : "🔒 Secret hidden"} • Press Ctrl+H to toggle
+						<text style={{ fg: colors.text.muted }}>
+							{showSecret ? "🔓 Secret visible" : "🔒 Secret hidden"} • Press Ctrl+H to
+							toggle
 						</text>
 					</box>
 				</box>
@@ -290,11 +318,12 @@ export function SecretsManager(_props: SecretsManagerProps) {
 							marginTop: 2,
 							padding: 2,
 							border: true,
-							backgroundColor: theme.colors.bg.dark,
-							borderColor: theme.colors.error,
+							borderStyle: componentStyles.panel.borderStyle,
+							backgroundColor: componentStyles.panel.backgroundColor,
+							borderColor: colors.status.error,
 						}}
 					>
-						<text style={{ attributes: TextAttributes.BOLD, fg: theme.colors.error }}>
+						<text style={{ attributes: TextAttributes.BOLD, fg: colors.status.error }}>
 							❌ Error: {error}
 						</text>
 					</box>
@@ -305,16 +334,23 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						marginTop: 2,
 						padding: 2,
 						border: true,
+						borderStyle: componentStyles.panel.borderStyle,
 						flexDirection: "column",
-						backgroundColor: theme.colors.bg.dark,
-						borderColor: theme.colors.text.veryDim,
+						backgroundColor: componentStyles.panel.backgroundColor,
+						borderColor: colors.border.muted,
 					}}
 				>
-					<text style={{ attributes: TextAttributes.BOLD, fg: theme.colors.accent.purple, marginBottom: 1 }}>
-						⌨️  Keyboard Shortcuts
+					<text
+						style={{
+							attributes: TextAttributes.BOLD,
+							fg: colors.accent.secondary,
+							marginBottom: 1,
+						}}
+					>
+						⌨️ Keyboard Shortcuts
 					</text>
-					<text fg={theme.colors.text.primary}>
-						Tab Switch  •  Enter Submit  •  Ctrl+H Toggle Secret  •  ESC Back
+					<text fg={colors.text.primary}>
+						Tab Switch • Enter Submit • Ctrl+H Toggle Secret • ESC Back
 					</text>
 				</box>
 			</box>
@@ -349,26 +385,44 @@ export function SecretsManager(_props: SecretsManagerProps) {
 					marginBottom: 2,
 					padding: 2,
 					border: true,
+					borderStyle: componentStyles.panel.borderStyle,
 					flexDirection: "column",
-					backgroundColor: theme.colors.bg.dark,
-					borderColor: theme.colors.accent.cyan,
+					backgroundColor: componentStyles.panel.backgroundColor,
+					borderColor: colors.accent.primary,
 				}}
 			>
 				<text
 					style={{
 						attributes: TextAttributes.BOLD,
-						fg: theme.colors.accent.cyan,
+						fg: colors.accent.primary,
 						marginBottom: 1,
 					}}
 				>
 					🔐 Manage Cloudflare Workers Secrets
 				</text>
-				<text fg={theme.colors.text.primary}>Configure and view environment secrets</text>
+				<text fg={colors.text.primary}>Configure and view environment secrets</text>
 			</box>
 
-			<box style={{ border: true, height: height - 12, backgroundColor: theme.colors.bg.mid }}>
+			<box
+				style={{
+					border: true,
+					borderStyle: componentStyles.panel.borderStyle,
+					height: height - 12,
+					backgroundColor: componentStyles.elevated.backgroundColor,
+				}}
+			>
 				<select
-					style={{ height: height - 14 }}
+					style={{
+						height: height - 14,
+						backgroundColor: componentStyles.elevated.backgroundColor,
+						focusedBackgroundColor: componentStyles.list.item.hoverBackgroundColor,
+						textColor: colors.text.primary,
+						focusedTextColor: colors.accent.primary,
+						selectedBackgroundColor: colors.accent.primary,
+						selectedTextColor: colors.background.main,
+						descriptionColor: colors.text.muted,
+						selectedDescriptionColor: colors.text.primary,
+					}}
 					options={options}
 					focused={true}
 					onChange={(_, option) => {
@@ -390,15 +444,22 @@ export function SecretsManager(_props: SecretsManagerProps) {
 					marginTop: 2,
 					padding: 2,
 					border: true,
+					borderStyle: componentStyles.panel.borderStyle,
 					flexDirection: "column",
-					backgroundColor: theme.colors.bg.dark,
-					borderColor: theme.colors.text.veryDim,
+					backgroundColor: componentStyles.panel.backgroundColor,
+					borderColor: colors.border.muted,
 				}}
 			>
-				<text style={{ attributes: TextAttributes.BOLD, fg: theme.colors.accent.purple, marginBottom: 1 }}>
-					⌨️  Keyboard Shortcuts
+				<text
+					style={{
+						attributes: TextAttributes.BOLD,
+						fg: colors.accent.secondary,
+						marginBottom: 1,
+					}}
+				>
+					⌨️ Keyboard Shortcuts
 				</text>
-				<text fg={theme.colors.text.primary}>↑↓ Navigate  •  Enter Select  •  ESC Back</text>
+				<text fg={colors.text.primary}>↑↓ Navigate • Enter Select • ESC Back</text>
 			</box>
 		</box>
 	);

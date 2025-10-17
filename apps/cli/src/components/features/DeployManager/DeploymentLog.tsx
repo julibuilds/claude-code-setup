@@ -1,5 +1,5 @@
 import { TextAttributes } from "@opentui/core";
-import { theme } from "../../../design/theme";
+import { useComponentStyles, useThemeColors } from "@repo/tui";
 
 interface LogEntry {
 	id: string;
@@ -14,16 +14,19 @@ interface DeploymentLogProps {
 }
 
 export function DeploymentLog({ entries, error, height }: DeploymentLogProps) {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+
 	return (
 		<scrollbox
 			style={{
 				rootOptions: {
 					height,
 					border: true,
-					backgroundColor: theme.colors.bg.mid,
+					backgroundColor: componentStyles.elevated.backgroundColor,
 				},
-				wrapperOptions: { backgroundColor: theme.colors.bg.mid },
-				viewportOptions: { backgroundColor: theme.colors.bg.dark },
+				wrapperOptions: { backgroundColor: componentStyles.elevated.backgroundColor },
+				viewportOptions: { backgroundColor: componentStyles.panel.backgroundColor },
 				scrollbarOptions: { showArrows: true },
 			}}
 			focused
@@ -36,12 +39,12 @@ export function DeploymentLog({ entries, error, height }: DeploymentLogProps) {
 					const isEmpty = item.text.trim() === "";
 
 					const color = isSuccess
-						? theme.colors.success
+						? colors.status.success
 						: isWarning
-							? theme.colors.warning
+							? colors.status.warning
 							: isError
-								? theme.colors.error
-								: theme.colors.info;
+								? colors.status.error
+								: colors.status.info;
 
 					return (
 						<text key={item.id} fg={color}>
@@ -55,13 +58,13 @@ export function DeploymentLog({ entries, error, height }: DeploymentLogProps) {
 							marginTop: 1,
 							padding: 1,
 							border: true,
-							backgroundColor: theme.colors.bg.dark,
+							backgroundColor: componentStyles.panel.backgroundColor,
 						}}
 					>
 						<text
 							style={{
 								attributes: TextAttributes.BOLD,
-								fg: theme.colors.error,
+								fg: colors.status.error,
 							}}
 						>
 							❌ Error: {error}
