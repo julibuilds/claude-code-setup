@@ -121,38 +121,69 @@ export function SecretsManager(_props: SecretsManagerProps) {
 					padding: 2,
 				}}
 			>
-				<box style={{ marginBottom: 2 }}>
+				<box
+					style={{
+						marginBottom: 2,
+						padding: 2,
+						border: true,
+						backgroundColor: "#1a1b26",
+					}}
+				>
 					<text
 						style={{
 							attributes: TextAttributes.BOLD,
-							fg: "#00D9FF",
+							fg: processing ? "#e0af68" : "#9ece6a",
 						}}
 					>
-						Secrets {processing ? "Processing" : "Result"}
+						{processing ? "🔐 Processing Secrets..." : "✅ Secrets Result"}
 					</text>
 				</box>
 
 				<scrollbox
 					style={{
-						rootOptions: { height: height - 10, border: true },
+						rootOptions: { height: height - 12, border: true },
 						wrapperOptions: { backgroundColor: "#1f2335" },
 						viewportOptions: { backgroundColor: "#1a1b26" },
 						scrollbarOptions: { showArrows: true },
 					}}
 					focused
 				>
-					<box style={{ flexDirection: "column", padding: 1 }}>
-						{output.map((item) => (
-							<text key={item.id} fg={item.text.startsWith("✓") ? "#9ece6a" : "#888"}>
-								{item.text}
-							</text>
-						))}
-						{error && <text fg="red">Error: {error}</text>}
+					<box style={{ flexDirection: "column", padding: 2 }}>
+						{output.map((item) => {
+							const isSuccess = item.text.startsWith("✓");
+							const isWarning = item.text.startsWith("⚠");
+							const isEmpty = item.text.trim() === "";
+							const color = isSuccess ? "#9ece6a" : isWarning ? "#e0af68" : "#7aa2f7";
+							
+							return (
+								<text key={item.id} fg={color}>
+									{isEmpty ? " " : item.text}
+								</text>
+							);
+						})}
+						{error && (
+							<box style={{ marginTop: 1, padding: 1, border: true, backgroundColor: "#1a1b26" }}>
+								<text style={{ attributes: TextAttributes.BOLD, fg: "#f7768e" }}>
+									❌ Error: {error}
+								</text>
+							</box>
+						)}
 					</box>
 				</scrollbox>
 
-				<box style={{ marginTop: 1 }}>
-					<text fg="#666">{processing ? "Processing..." : "ESC Back"}</text>
+				<box
+					style={{
+						marginTop: 2,
+						padding: 2,
+						border: true,
+						flexDirection: "column",
+						backgroundColor: "#1a1b26",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+						⌨️  Keyboard Shortcuts
+					</text>
+					<text fg="#7aa2f7">{processing ? "Processing..." : "ESC Back to menu"}</text>
 				</box>
 			</box>
 		);
@@ -168,19 +199,36 @@ export function SecretsManager(_props: SecretsManagerProps) {
 					padding: 2,
 				}}
 			>
-				<box style={{ marginBottom: 2 }}>
+				<box
+					style={{
+						marginBottom: 2,
+						padding: 2,
+						border: true,
+						flexDirection: "column",
+						backgroundColor: "#1a1b26",
+					}}
+				>
 					<text
 						style={{
 							attributes: TextAttributes.BOLD,
 							fg: "#00D9FF",
+							marginBottom: 1,
 						}}
 					>
-						Set Worker Secret
+						🔐 Set Worker Secret
 					</text>
+					<text fg="#7aa2f7">Configure secrets for Cloudflare Workers</text>
 				</box>
 
-				<box style={{ flexDirection: "column", gap: 1 }}>
-					<box title="Secret Key" style={{ border: true, height: 3 }}>
+				<box style={{ flexDirection: "column", gap: 2 }}>
+					<box
+						title={focused === "key" ? "▶ Secret Key" : "Secret Key"}
+						style={{
+							border: true,
+							height: 3,
+							backgroundColor: focused === "key" ? "#1a1b26" : "#1f2335",
+						}}
+					>
 						<input
 							placeholder="e.g., OPENROUTER_API_KEY"
 							onInput={setSecretKey}
@@ -189,7 +237,14 @@ export function SecretsManager(_props: SecretsManagerProps) {
 						/>
 					</box>
 
-					<box title="Secret Value" style={{ border: true, height: 3 }}>
+					<box
+						title={focused === "value" ? "▶ Secret Value" : "Secret Value"}
+						style={{
+							border: true,
+							height: 3,
+							backgroundColor: focused === "value" ? "#1a1b26" : "#1f2335",
+						}}
+					>
 						<input
 							placeholder="Enter secret value..."
 							onInput={setSecretValue}
@@ -199,15 +254,35 @@ export function SecretsManager(_props: SecretsManagerProps) {
 					</box>
 				</box>
 
-				<box style={{ marginTop: 2 }}>
-					<text fg="#666">Tab Switch • Enter Submit • ESC Back</text>
-				</box>
-
 				{error && (
-					<box style={{ marginTop: 1 }}>
-						<text fg="red">Error: {error}</text>
+					<box
+						style={{
+							marginTop: 2,
+							padding: 2,
+							border: true,
+							backgroundColor: "#1a1b26",
+						}}
+					>
+						<text style={{ attributes: TextAttributes.BOLD, fg: "#f7768e" }}>
+							❌ Error: {error}
+						</text>
 					</box>
 				)}
+
+				<box
+					style={{
+						marginTop: 2,
+						padding: 2,
+						border: true,
+						flexDirection: "column",
+						backgroundColor: "#1a1b26",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+						⌨️  Keyboard Shortcuts
+					</text>
+					<text fg="#7aa2f7">Tab Switch  •  Enter Submit  •  ESC Back</text>
+				</box>
 			</box>
 		);
 	}
@@ -215,12 +290,12 @@ export function SecretsManager(_props: SecretsManagerProps) {
 	// Menu
 	const options: SelectOption[] = [
 		{
-			name: "Set Secret",
+			name: "🔑 Set Secret",
 			description: "Set a new secret or update existing one",
 			value: "set",
 		},
 		{
-			name: "List Secrets",
+			name: "📋 List Secrets",
 			description: "View all configured secrets",
 			value: "list",
 		},
@@ -235,20 +310,30 @@ export function SecretsManager(_props: SecretsManagerProps) {
 				padding: 2,
 			}}
 		>
-			<box style={{ marginBottom: 2 }}>
+			<box
+				style={{
+					marginBottom: 2,
+					padding: 2,
+					border: true,
+					flexDirection: "column",
+					backgroundColor: "#1a1b26",
+				}}
+			>
 				<text
 					style={{
 						attributes: TextAttributes.BOLD,
 						fg: "#00D9FF",
+						marginBottom: 1,
 					}}
 				>
-					Manage Cloudflare Workers Secrets
+					🔐 Manage Cloudflare Workers Secrets
 				</text>
+				<text fg="#7aa2f7">Configure and view environment secrets</text>
 			</box>
 
-			<box style={{ border: true, height: height - 10 }}>
+			<box style={{ border: true, height: height - 12, backgroundColor: "#1f2335" }}>
 				<select
-					style={{ height: height - 12 }}
+					style={{ height: height - 14 }}
 					options={options}
 					focused={true}
 					onChange={(_, option) => {
@@ -266,8 +351,19 @@ export function SecretsManager(_props: SecretsManagerProps) {
 				/>
 			</box>
 
-			<box style={{ marginTop: 1 }}>
-				<text fg="#666">↑↓ Navigate • Enter Select • ESC Back</text>
+			<box
+				style={{
+					marginTop: 2,
+					padding: 2,
+					border: true,
+					flexDirection: "column",
+					backgroundColor: "#1a1b26",
+				}}
+			>
+				<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+					⌨️  Keyboard Shortcuts
+				</text>
+				<text fg="#7aa2f7">↑↓ Navigate  •  Enter Select  •  ESC Back</text>
 			</box>
 		</box>
 	);

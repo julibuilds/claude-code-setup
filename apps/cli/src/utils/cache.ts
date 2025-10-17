@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import type { OpenRouterModel } from "../types/config";
+import { getProjectRoot } from "./project-root";
 
 interface CacheData {
 	timestamp: number;
@@ -8,24 +9,13 @@ interface CacheData {
 }
 
 function getCachePath(): string {
-	const cwd = process.cwd();
-
-	// Try multiple possible locations
-	const possiblePaths = [
-		resolve(cwd, ".cache", "openrouter-models.json"), // From apps/cli
-		resolve(cwd, "apps", "cli", ".cache", "openrouter-models.json"), // From root
-	];
-
-	// Return the first path that exists or the first one if none exist
-	for (const path of possiblePaths) {
-		const dir = join(path, "..");
-		if (existsSync(dir)) {
-			return path;
-		}
+	try {
+		const projectRoot = getProjectRoot();
+		return join(projectRoot, "apps", "cli", ".cache", "openrouter-models.json");
+	} catch (_err) {
+		// Fallback to current directory if project root not found
+		return join(process.cwd(), ".cache", "openrouter-models.json");
 	}
-
-	// Default to apps/cli/.cache (first path)
-	return possiblePaths[0] || resolve(cwd, ".cache", "openrouter-models.json");
 }
 
 export async function getCachedModels(): Promise<OpenRouterModel[] | null> {

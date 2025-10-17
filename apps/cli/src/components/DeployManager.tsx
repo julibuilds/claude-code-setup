@@ -106,38 +106,70 @@ export function DeployManager(_props: DeployManagerProps) {
 					padding: 2,
 				}}
 			>
-				<box style={{ marginBottom: 2 }}>
+				<box
+					style={{
+						marginBottom: 2,
+						padding: 2,
+						border: true,
+						backgroundColor: "#1a1b26",
+					}}
+				>
 					<text
 						style={{
 							attributes: TextAttributes.BOLD,
-							fg: "#00D9FF",
+							fg: deploying ? "#e0af68" : "#9ece6a",
 						}}
 					>
-						Deployment {deploying ? "in Progress" : "Complete"}
+						{deploying ? "🚀 Deployment in Progress..." : "✅ Deployment Complete"}
 					</text>
 				</box>
 
 				<scrollbox
 					style={{
-						rootOptions: { height: height - 10, border: true },
+						rootOptions: { height: height - 12, border: true },
 						wrapperOptions: { backgroundColor: "#1f2335" },
 						viewportOptions: { backgroundColor: "#1a1b26" },
 						scrollbarOptions: { showArrows: true },
 					}}
 					focused
 				>
-					<box style={{ flexDirection: "column", padding: 1 }}>
-						{output.map((item) => (
-							<text key={item.id} fg={item.text.startsWith("✓") ? "#9ece6a" : "#888"}>
-								{item.text}
-							</text>
-						))}
-						{error && <text fg="red">Error: {error}</text>}
+					<box style={{ flexDirection: "column", padding: 2 }}>
+						{output.map((item) => {
+							const isSuccess = item.text.startsWith("✓");
+							const isWarning = item.text.startsWith("⚠");
+							const isError = item.text.toLowerCase().includes("error");
+							const isEmpty = item.text.trim() === "";
+							const color = isSuccess ? "#9ece6a" : isWarning ? "#e0af68" : isError ? "#f7768e" : "#7aa2f7";
+							
+							return (
+								<text key={item.id} fg={color}>
+									{isEmpty ? " " : item.text}
+								</text>
+							);
+						})}
+						{error && (
+							<box style={{ marginTop: 1, padding: 1, border: true, backgroundColor: "#1a1b26" }}>
+								<text style={{ attributes: TextAttributes.BOLD, fg: "#f7768e" }}>
+									❌ Error: {error}
+								</text>
+							</box>
+						)}
 					</box>
 				</scrollbox>
 
-				<box style={{ marginTop: 1 }}>
-					<text fg="#666">{deploying ? "Deploying..." : "ESC Back"}</text>
+				<box
+					style={{
+						marginTop: 2,
+						padding: 2,
+						border: true,
+						flexDirection: "column",
+						backgroundColor: "#1a1b26",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+						⌨️  Keyboard Shortcuts
+					</text>
+					<text fg="#7aa2f7">{deploying ? "Deploying..." : "ESC Back to menu"}</text>
 				</box>
 			</box>
 		);
@@ -165,20 +197,30 @@ export function DeployManager(_props: DeployManagerProps) {
 				padding: 2,
 			}}
 		>
-			<box style={{ marginBottom: 2 }}>
+			<box
+				style={{
+					marginBottom: 2,
+					padding: 2,
+					border: true,
+					flexDirection: "column",
+					backgroundColor: "#1a1b26",
+				}}
+			>
 				<text
 					style={{
 						attributes: TextAttributes.BOLD,
 						fg: "#00D9FF",
+						marginBottom: 1,
 					}}
 				>
-					Deploy to Cloudflare Workers
+					🚀 Deploy to Cloudflare Workers
 				</text>
+				<text fg="#7aa2f7">Deploy your router configuration to the edge</text>
 			</box>
 
-			<box style={{ border: true, height: height - 10 }}>
+			<box style={{ border: true, height: height - 12, backgroundColor: "#1f2335" }}>
 				<select
-					style={{ height: height - 12 }}
+					style={{ height: height - 14 }}
 					options={options}
 					focused={true}
 					onChange={(_, option) => {
@@ -194,8 +236,19 @@ export function DeployManager(_props: DeployManagerProps) {
 				/>
 			</box>
 
-			<box style={{ marginTop: 1 }}>
-				<text fg="#666">↑↓ Navigate • Enter Select • ESC Back</text>
+			<box
+				style={{
+					marginTop: 2,
+					padding: 2,
+					border: true,
+					flexDirection: "column",
+					backgroundColor: "#1a1b26",
+				}}
+			>
+				<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+					⌨️  Keyboard Shortcuts
+				</text>
+				<text fg="#7aa2f7">↑↓ Navigate  •  Enter Select  •  ESC Back</text>
 			</box>
 		</box>
 	);

@@ -11,14 +11,31 @@
 		"includes": ["**/*"]
 	},
 	"formatter": {
-		"enabled": true,
+		"enabled": false,
 		"indentStyle": "tab",
 		"lineWidth": 100
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"suspicious": {
+				"noArrayIndexKey": "warn",
+				"noExplicitAny": "warn",
+				"noAssignInExpressions": "warn"
+			},
+			"style": {
+				"useNodejsImportProtocol": "warn"
+			},
+			"a11y": {
+				"useKeyWithMouseEvents": "warn",
+				"noStaticElementInteractions": "warn",
+				"useSemanticElements": "warn"
+			},
+			"correctness": {
+				"useExhaustiveDependencies": "warn",
+				"useHookAtTopLevel": "warn"
+			}
 		}
 	},
 	"javascript": {
@@ -35,10 +52,10 @@
 		}
 	},
 	"assist": {
-		"enabled": true,
+		"enabled": false,
 		"actions": {
 			"source": {
-				"organizeImports": "on"
+				"organizeImports": "off"
 			}
 		}
 	},

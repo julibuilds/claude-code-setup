@@ -130,16 +130,66 @@ export function QuickConfig(_props: QuickConfigProps) {
 
 	if (loading) {
 		return (
-			<box style={{ flexDirection: "column", padding: 2 }}>
-				<text fg="#00D9FF">Loading OpenRouter models...</text>
+			<box
+				style={{
+					flexDirection: "column",
+					padding: 2,
+					width: Math.min(60, width - 4),
+					height: height - 4,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<box
+					style={{
+						border: true,
+						padding: 3,
+						backgroundColor: "#1a1b26",
+						flexDirection: "column",
+						alignItems: "center",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#00D9FF", marginBottom: 2 }}>
+						⏳ Loading OpenRouter Models
+					</text>
+					<text fg="#7aa2f7">Fetching model list from API...</text>
+					<text fg="#565f89" style={{ marginTop: 1 }}>
+						This may take a few seconds
+					</text>
+				</box>
 			</box>
 		);
 	}
 
 	if (saving) {
 		return (
-			<box style={{ flexDirection: "column", padding: 2 }}>
-				<text fg="#00D9FF">Saving configuration...</text>
+			<box
+				style={{
+					flexDirection: "column",
+					padding: 2,
+					width: Math.min(60, width - 4),
+					height: height - 4,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<box
+					style={{
+						border: true,
+						padding: 3,
+						backgroundColor: "#1a1b26",
+						flexDirection: "column",
+						alignItems: "center",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#9ece6a", marginBottom: 2 }}>
+						💾 Saving Configuration
+					</text>
+					<text fg="#7aa2f7">Writing changes to config.json...</text>
+					<text fg="#565f89" style={{ marginTop: 1 }}>
+						{Object.keys(pendingChanges).length} router(s) being updated
+					</text>
+				</box>
 			</box>
 		);
 	}
@@ -227,19 +277,43 @@ export function QuickConfig(_props: QuickConfigProps) {
 			}}
 		>
 			{/* Header */}
-			<box style={{ marginBottom: 1, flexDirection: "column" }}>
-				<text style={{ attributes: TextAttributes.BOLD, fg: "#00D9FF" }}>⚡ Quick Config</text>
-				<text fg="#888">Configure all router models • Tab to switch panels</text>
+			<box
+				style={{
+					marginBottom: 2,
+					padding: 2,
+					border: true,
+					flexDirection: "column",
+					backgroundColor: "#1a1b26",
+				}}
+			>
+				<text style={{ attributes: TextAttributes.BOLD, fg: "#00D9FF", marginBottom: 1 }}>
+					⚡ Quick Config
+				</text>
+				<text fg="#7aa2f7">Configure all router models • Tab to switch panels</text>
 			</box>
 
 			{/* Three-panel layout */}
-			<box style={{ flexDirection: "row", gap: 1, height: height - 10 }}>
+			<box style={{ flexDirection: "row", gap: 2, height: height - 12 }}>
 				{/* Left: Router Type */}
 				<box style={{ flexDirection: "column", width: 30 }}>
-					<box style={{ marginBottom: 1 }}>
-						<text fg={focusedPanel === "router-type" ? "#00D9FF" : "#666"}>Router Type</text>
+					<box
+						style={{
+							marginBottom: 1,
+							padding: 1,
+							border: focusedPanel === "router-type",
+							backgroundColor: focusedPanel === "router-type" ? "#1a1b26" : "transparent",
+						}}
+					>
+						<text
+							style={{
+								attributes: focusedPanel === "router-type" ? TextAttributes.BOLD : undefined,
+								fg: focusedPanel === "router-type" ? "#00D9FF" : "#7aa2f7",
+							}}
+						>
+							{focusedPanel === "router-type" ? "▶ " : "  "}Router Type
+						</text>
 					</box>
-					<box style={{ border: true, height: panelHeight }}>
+					<box style={{ border: true, height: panelHeight, backgroundColor: "#1f2335" }}>
 						<select
 							style={{ height: panelHeight - 2 }}
 							options={routerTypeOptions}
@@ -256,10 +330,24 @@ export function QuickConfig(_props: QuickConfigProps) {
 
 				{/* Middle: Filter */}
 				<box style={{ flexDirection: "column", width: 25 }}>
-					<box style={{ marginBottom: 1 }}>
-						<text fg={focusedPanel === "filter" ? "#00D9FF" : "#666"}>Filter</text>
+					<box
+						style={{
+							marginBottom: 1,
+							padding: 1,
+							border: focusedPanel === "filter",
+							backgroundColor: focusedPanel === "filter" ? "#1a1b26" : "transparent",
+						}}
+					>
+						<text
+							style={{
+								attributes: focusedPanel === "filter" ? TextAttributes.BOLD : undefined,
+								fg: focusedPanel === "filter" ? "#00D9FF" : "#7aa2f7",
+							}}
+						>
+							{focusedPanel === "filter" ? "▶ " : "  "}Filter
+						</text>
 					</box>
-					<box style={{ border: true, height: panelHeight }}>
+					<box style={{ border: true, height: panelHeight, backgroundColor: "#1f2335" }}>
 						<select
 							style={{ height: panelHeight - 2 }}
 							options={filterOptions}
@@ -276,12 +364,24 @@ export function QuickConfig(_props: QuickConfigProps) {
 
 				{/* Right: Models */}
 				<box style={{ flexDirection: "column", flexGrow: 1 }}>
-					<box style={{ marginBottom: 1 }}>
-						<text fg={focusedPanel === "model-list" ? "#00D9FF" : "#666"}>
-							Models ({displayModels.length})
+					<box
+						style={{
+							marginBottom: 1,
+							padding: 1,
+							border: focusedPanel === "model-list",
+							backgroundColor: focusedPanel === "model-list" ? "#1a1b26" : "transparent",
+						}}
+					>
+						<text
+							style={{
+								attributes: focusedPanel === "model-list" ? TextAttributes.BOLD : undefined,
+								fg: focusedPanel === "model-list" ? "#00D9FF" : "#7aa2f7",
+							}}
+						>
+							{focusedPanel === "model-list" ? "▶ " : "  "}Models ({displayModels.length})
 						</text>
 					</box>
-					<box style={{ border: true, height: panelHeight }}>
+					<box style={{ border: true, height: panelHeight, backgroundColor: "#1f2335" }}>
 						<select
 							style={{ height: panelHeight - 2 }}
 							options={modelOptions}
@@ -301,17 +401,19 @@ export function QuickConfig(_props: QuickConfigProps) {
 			{hasChanges && (
 				<box
 					style={{
-						marginTop: 1,
-						padding: 1,
+						marginTop: 2,
+						padding: 2,
 						border: true,
 						flexDirection: "column",
 						backgroundColor: "#1a1b26",
 					}}
 				>
-					<text style={{ attributes: TextAttributes.BOLD, fg: "#e0af68" }}>Pending Changes:</text>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#e0af68", marginBottom: 1 }}>
+						⚠️  Pending Changes ({Object.keys(pendingChanges).length})
+					</text>
 					{Object.entries(pendingChanges).map(([key, value]) => (
 						<text key={key} fg="#9ece6a">
-							{key}: {value.split(",")[1]}
+							✓ {key}: {value.split(",")[1]}
 						</text>
 					))}
 				</box>
@@ -319,17 +421,39 @@ export function QuickConfig(_props: QuickConfigProps) {
 
 			{/* Error */}
 			{error && (
-				<box style={{ marginTop: 1 }}>
-					<text fg="red">Error: {error}</text>
+				<box
+					style={{
+						marginTop: 2,
+						padding: 2,
+						border: true,
+						backgroundColor: "#1a1b26",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#f7768e" }}>❌ Error: {error}</text>
 				</box>
 			)}
 
 			{/* Footer */}
-			<box style={{ marginTop: 1, flexDirection: "column" }}>
-				<text fg="#666">
-					Tab Switch • Enter Select • Ctrl+S Save • Ctrl+R Reset • Ctrl+F Refresh • ESC Back
+			<box
+				style={{
+					marginTop: 2,
+					padding: 2,
+					border: true,
+					flexDirection: "column",
+					backgroundColor: "#1a1b26",
+				}}
+			>
+				<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+					⌨️  Keyboard Shortcuts
 				</text>
-				{hasChanges && <text fg="#e0af68">⚠ Unsaved changes</text>}
+				<text fg="#7aa2f7">
+					Tab Switch  •  Enter Select  •  Ctrl+S Save  •  Ctrl+R Reset  •  Ctrl+F Refresh  •  ESC Back
+				</text>
+				{hasChanges && (
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#e0af68", marginTop: 1 }}>
+						⚠️  {Object.keys(pendingChanges).length} unsaved change(s) - Press Ctrl+S to save
+					</text>
+				)}
 			</box>
 		</box>
 	);

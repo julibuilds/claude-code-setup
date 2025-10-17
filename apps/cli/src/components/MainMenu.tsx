@@ -50,26 +50,31 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 		<box
 			style={{
 				flexDirection: "column",
-				width: Math.min(80, width - 4),
+				width: Math.min(90, width - 4),
 				height: height - 4,
 				padding: 2,
 			}}
 		>
+			{/* Header with branding */}
 			<box
 				style={{
 					flexDirection: "column",
 					marginBottom: 2,
+					padding: 2,
+					border: true,
+					backgroundColor: "#1a1b26",
 				}}
 			>
 				<text
 					style={{
 						attributes: TextAttributes.BOLD,
 						fg: "#00D9FF",
+						marginBottom: 1,
 					}}
 				>
-					Claude Code Router CLI
+					⚡ Claude Code Router CLI
 				</text>
-				<text fg="#888">Manage your router configuration and deployments</text>
+				<text fg="#7aa2f7">Manage your router configuration and deployments</text>
 			</box>
 
 			{/* Current Config Preview */}
@@ -77,33 +82,45 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 				<box
 					style={{
 						border: true,
-						padding: 1,
+						padding: 2,
 						marginBottom: 2,
 						flexDirection: "column",
 						backgroundColor: "#1a1b26",
 					}}
 				>
-					<text style={{ attributes: TextAttributes.BOLD, fg: "#7aa2f7" }}>
-						Current Configuration
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+						📋 Current Configuration
 					</text>
-					<text fg="#888">Default: {config.Router.default.split(",")[1] || "Not set"}</text>
-					<text fg="#888">Background: {config.Router.background.split(",")[1] || "Not set"}</text>
-					<text fg="#888">Think: {config.Router.think.split(",")[1] || "Not set"}</text>
-					<text fg="#888">
-						Long Context: {config.Router.longContext.split(",")[1] || "Not set"}
-					</text>
+					<box style={{ flexDirection: "column", gap: 0 }}>
+						{[
+							{ label: "Default", value: config.Router.default },
+							{ label: "Background", value: config.Router.background },
+							{ label: "Think", value: config.Router.think },
+							{ label: "Long Context", value: config.Router.longContext },
+						].map(({ label, value }) => {
+							const modelId = value.split(",")[1];
+							const isSet = !!modelId;
+							return (
+								<text key={label} fg={isSet ? "#9ece6a" : "#f7768e"}>
+									{isSet ? "✓" : "✗"} {label}: {modelId || "Not configured"}
+								</text>
+							);
+						})}
+					</box>
 				</box>
 			)}
 
+			{/* Menu Options */}
 			<box
 				style={{
 					border: true,
-					height: Math.min(20, height - 12),
+					height: Math.min(20, height - 16),
 					flexDirection: "column",
+					backgroundColor: "#1f2335",
 				}}
 			>
 				<select
-					style={{ height: Math.min(18, height - 14) }}
+					style={{ height: Math.min(18, height - 18) }}
 					options={options}
 					focused={true}
 					onChange={(index) => {
@@ -113,13 +130,20 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 				/>
 			</box>
 
+			{/* Footer with keyboard shortcuts */}
 			<box
 				style={{
 					marginTop: 2,
+					padding: 2,
+					border: true,
 					flexDirection: "column",
+					backgroundColor: "#1a1b26",
 				}}
 			>
-				<text fg="#666">↑↓ Navigate • Enter Select • ESC Exit</text>
+				<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+					⌨️  Keyboard Shortcuts
+				</text>
+				<text fg="#7aa2f7">↑↓ Navigate  •  Enter Select  •  ESC Exit</text>
 			</box>
 		</box>
 	);

@@ -92,25 +92,93 @@ export function ModelSelector(_props: ModelSelectorProps) {
 
 	if (loading) {
 		return (
-			<box style={{ flexDirection: "column", padding: 2 }}>
-				<text fg="#00D9FF">Loading OpenRouter models...</text>
+			<box
+				style={{
+					flexDirection: "column",
+					padding: 2,
+					width: Math.min(60, width - 4),
+					height: height - 4,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<box
+					style={{
+						border: true,
+						padding: 2,
+						backgroundColor: "#1a1b26",
+						flexDirection: "column",
+						alignItems: "center",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#00D9FF", marginBottom: 1 }}>
+						⏳ Loading OpenRouter Models
+					</text>
+					<text fg="#7aa2f7">Please wait...</text>
+				</box>
 			</box>
 		);
 	}
 
 	if (error) {
 		return (
-			<box style={{ flexDirection: "column", padding: 2 }}>
-				<text fg="red">Error: {error}</text>
-				<text fg="#666">Press ESC to go back</text>
+			<box
+				style={{
+					flexDirection: "column",
+					padding: 2,
+					width: Math.min(60, width - 4),
+					height: height - 4,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<box
+					style={{
+						border: true,
+						padding: 2,
+						backgroundColor: "#1a1b26",
+						flexDirection: "column",
+						alignItems: "center",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#f7768e", marginBottom: 1 }}>
+						❌ Error Loading Models
+					</text>
+					<text fg="#7aa2f7">{error}</text>
+					<text fg="#888" style={{ marginTop: 1 }}>
+						Press ESC to go back
+					</text>
+				</box>
 			</box>
 		);
 	}
 
 	if (saving) {
 		return (
-			<box style={{ flexDirection: "column", padding: 2 }}>
-				<text fg="#00D9FF">Saving configuration...</text>
+			<box
+				style={{
+					flexDirection: "column",
+					padding: 2,
+					width: Math.min(60, width - 4),
+					height: height - 4,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<box
+					style={{
+						border: true,
+						padding: 2,
+						backgroundColor: "#1a1b26",
+						flexDirection: "column",
+						alignItems: "center",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#9ece6a", marginBottom: 1 }}>
+						💾 Saving Configuration
+					</text>
+					<text fg="#7aa2f7">Updating config.json...</text>
+				</box>
 			</box>
 		);
 	}
@@ -118,23 +186,23 @@ export function ModelSelector(_props: ModelSelectorProps) {
 	if (step === "select-type") {
 		const typeOptions: SelectOption[] = [
 			{
-				name: "Default Model",
-				description: `Current: ${config?.Router.default || "Not set"}`,
+				name: "🎯 Default Model",
+				description: `Current: ${config?.Router.default.split(",")[1] || "Not set"}`,
 				value: "default",
 			},
 			{
-				name: "Background Model",
-				description: `Current: ${config?.Router.background || "Not set"}`,
+				name: "🔄 Background Model",
+				description: `Current: ${config?.Router.background.split(",")[1] || "Not set"}`,
 				value: "background",
 			},
 			{
-				name: "Think Model",
-				description: `Current: ${config?.Router.think || "Not set"}`,
+				name: "🧠 Think Model",
+				description: `Current: ${config?.Router.think.split(",")[1] || "Not set"}`,
 				value: "think",
 			},
 			{
-				name: "Long Context Model",
-				description: `Current: ${config?.Router.longContext || "Not set"}`,
+				name: "📚 Long Context Model",
+				description: `Current: ${config?.Router.longContext.split(",")[1] || "Not set"}`,
 				value: "longContext",
 			},
 		];
@@ -148,20 +216,27 @@ export function ModelSelector(_props: ModelSelectorProps) {
 					padding: 2,
 				}}
 			>
-				<box style={{ marginBottom: 2 }}>
+				<box
+					style={{
+						marginBottom: 2,
+						padding: 1,
+						border: true,
+						backgroundColor: "#1a1b26",
+					}}
+				>
 					<text
 						style={{
 							attributes: TextAttributes.BOLD,
 							fg: "#00D9FF",
 						}}
 					>
-						Select Router Type
+						⚙️  Select Router Type
 					</text>
 				</box>
 
-				<box style={{ border: true, height: height - 10 }}>
+				<box style={{ border: true, height: height - 12, backgroundColor: "#1f2335" }}>
 					<select
-						style={{ height: height - 12 }}
+						style={{ height: height - 14 }}
 						options={typeOptions}
 						focused={true}
 						onChange={(_, option) => {
@@ -173,8 +248,15 @@ export function ModelSelector(_props: ModelSelectorProps) {
 					/>
 				</box>
 
-				<box style={{ marginTop: 1 }}>
-					<text fg="#666">↑↓ Navigate • Enter Select • ESC Back</text>
+				<box
+					style={{
+						marginTop: 1,
+						padding: 1,
+						border: true,
+						backgroundColor: "#1a1b26",
+					}}
+				>
+					<text fg="#7aa2f7">⌨️  ↑↓ Navigate • Enter Select • ESC Back</text>
 				</box>
 			</box>
 		);
@@ -184,22 +266,22 @@ export function ModelSelector(_props: ModelSelectorProps) {
 	if (step === "select-filter") {
 		const filterOptions: SelectOption[] = [
 			{
-				name: "Popular Models",
+				name: "⭐ Popular Models",
 				description: "Claude, GPT, Gemini, and other top models",
 				value: "popular",
 			},
 			{
-				name: "Anthropic Models",
+				name: "🤖 Anthropic Models",
 				description: "Claude models only",
 				value: "anthropic",
 			},
 			{
-				name: "OpenAI Models",
+				name: "🧠 OpenAI Models",
 				description: "GPT models only",
 				value: "openai",
 			},
 			{
-				name: "All Models",
+				name: "📋 All Models",
 				description: `All ${models.length} available models`,
 				value: "all",
 			},
@@ -214,20 +296,27 @@ export function ModelSelector(_props: ModelSelectorProps) {
 					padding: 2,
 				}}
 			>
-				<box style={{ marginBottom: 2 }}>
+				<box
+					style={{
+						marginBottom: 2,
+						padding: 1,
+						border: true,
+						backgroundColor: "#1a1b26",
+					}}
+				>
 					<text
 						style={{
 							attributes: TextAttributes.BOLD,
 							fg: "#00D9FF",
 						}}
 					>
-						Filter Models for {selectedType}
+						🔍 Filter Models for {selectedType}
 					</text>
 				</box>
 
-				<box style={{ border: true, height: height - 10 }}>
+				<box style={{ border: true, height: height - 12, backgroundColor: "#1f2335" }}>
 					<select
-						style={{ height: height - 12 }}
+						style={{ height: height - 14 }}
 						options={filterOptions}
 						focused={true}
 						onChange={(_, option) => {
@@ -239,8 +328,15 @@ export function ModelSelector(_props: ModelSelectorProps) {
 					/>
 				</box>
 
-				<box style={{ marginTop: 1 }}>
-					<text fg="#666">↑↓ Navigate • Enter Select • ESC Back</text>
+				<box
+					style={{
+						marginTop: 1,
+						padding: 1,
+						border: true,
+						backgroundColor: "#1a1b26",
+					}}
+				>
+					<text fg="#7aa2f7">⌨️  ↑↓ Navigate • Enter Select • ESC Back</text>
 				</box>
 			</box>
 		);
@@ -298,16 +394,24 @@ export function ModelSelector(_props: ModelSelectorProps) {
 				padding: 2,
 			}}
 		>
-			<box style={{ marginBottom: 1, flexDirection: "column" }}>
+			<box
+				style={{
+					marginBottom: 1,
+					padding: 1,
+					border: true,
+					flexDirection: "column",
+					backgroundColor: "#1a1b26",
+				}}
+			>
 				<text
 					style={{
 						attributes: TextAttributes.BOLD,
 						fg: "#00D9FF",
 					}}
 				>
-					Select Model
+					🎯 Select Model
 				</text>
-				<text fg="#888">
+				<text fg="#7aa2f7">
 					{filterLabel}:{" "}
 					{displayModels.length < filteredModels.length
 						? `Top ${displayModels.length} of ${filteredModels.length}`
@@ -315,9 +419,9 @@ export function ModelSelector(_props: ModelSelectorProps) {
 				</text>
 			</box>
 
-			<box style={{ border: true, height: height - 10 }}>
+			<box style={{ border: true, height: height - 12, backgroundColor: "#1f2335" }}>
 				<select
-					style={{ height: height - 12 }}
+					style={{ height: height - 14 }}
 					options={modelOptions}
 					focused={true}
 					onChange={(_, option) => {
@@ -329,8 +433,15 @@ export function ModelSelector(_props: ModelSelectorProps) {
 				/>
 			</box>
 
-			<box style={{ marginTop: 1 }}>
-				<text fg="#666">↑↓ Navigate • Enter Select • ESC Back</text>
+			<box
+				style={{
+					marginTop: 1,
+					padding: 1,
+					border: true,
+					backgroundColor: "#1a1b26",
+				}}
+			>
+				<text fg="#7aa2f7">⌨️  ↑↓ Navigate • Enter Select • ESC Back</text>
 			</box>
 		</box>
 	);

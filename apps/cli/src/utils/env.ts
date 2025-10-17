@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { getProjectRoot } from "./project-root";
 
 function parseEnvFile(content: string): Record<string, string> {
 	const env: Record<string, string> = {};
@@ -20,86 +21,34 @@ function parseEnvFile(content: string): Record<string, string> {
 }
 
 function findEnvFiles(): string[] {
-	const cwd = process.cwd();
 	const possiblePaths: string[] = [];
 
-	// For compiled binaries, use import.meta.dir to find the source location
-	// import.meta.dir points to the directory containing the source file
-	// even in compiled executables
 	try {
-		// In a compiled binary, import.meta.dir is embedded at compile time
-		// This file is at apps/cli/src/utils/env.ts
-		// So import.meta.dir points to apps/cli/src/utils
-		const sourceDir = import.meta.dir;
-		if (sourceDir) {
-			// Go up from apps/cli/src/utils to apps/cli/src
-			const srcDir = resolve(sourceDir, "..");
-			// Go up from apps/cli/src to apps/cli
-			const cliDir = resolve(srcDir, "..");
-			// Go up from apps/cli to apps
-			const appsDir = resolve(cliDir, "..");
-			// Go up from apps to project root
-			const projectRoot = resolve(appsDir, "..");
+		const projectRoot = getProjectRoot();
 
-			const envFromSource = resolve(projectRoot, "apps", "cli", ".env");
-			const varsFromSource = resolve(projectRoot, "apps", "router", ".dev.vars");
+		const envFromProject = resolve(projectRoot, "apps", "cli", ".env");
+		const varsFromProject = resolve(projectRoot, "apps", "router", ".dev.vars");
 
-			if (existsSync(envFromSource)) {
-				possiblePaths.push(envFromSource);
-			}
-			if (existsSync(varsFromSource)) {
-				possiblePaths.push(varsFromSource);
-			}
+		if (existsSync(envFromProject)) {
+			possiblePaths.push(envFromProject);
+		}
+		if (existsSync(varsFromProject)) {
+			possiblePaths.push(varsFromProject);
 		}
 	} catch (_err) {
-		// Ignore errors finding source path
+		// Can't find project root - will be handled by components that need it
+		// Don't try to load from current directory as it's likely wrong
 	}
 
-	// If running from apps/cli
-	possiblePaths.push(resolve(cwd, ".env"));
-	possiblePaths.push(resolve(cwd, "..", "router", ".dev.vars"));
-
-	// If running from project root
-	possiblePaths.push(resolve(cwd, "apps", "cli", ".env"));
-	possiblePaths.push(resolve(cwd, "apps", "router", ".dev.vars"));
-
-	// If running from apps/router
-	possiblePaths.push(resolve(cwd, ".dev.vars"));
-	possiblePaths.push(resolve(cwd, "..", "cli", ".env"));
-
-	// Search up directory tree from current directory
-	let searchDir = cwd;
-	for (let i = 0; i < 5; i++) {
-		const appsCliEnv = resolve(searchDir, "apps", "cli", ".env");
-		const appsRouterVars = resolve(searchDir, "apps", "router", ".dev.vars");
-
-		if (existsSync(appsCliEnv)) {
-			possiblePaths.push(appsCliEnv);
-		}
-		if (existsSync(appsRouterVars)) {
-			possiblePaths.push(appsRouterVars);
-		}
-
-		const parent = resolve(searchDir, "..");
-		if (parent === searchDir) break; // Reached root
-		searchDir = parent;
-	}
-
-	// Remove duplicates and filter to existing files
-	const uniquePaths = [...new Set(possiblePaths)];
-	return uniquePaths.filter((path) => existsSync(path));
+	// Remove duplicates
+	return [...new Set(possiblePaths)].filter((path) => existsSync(path));
 }
 
 export async function loadEnv() {
 	const envFiles = findEnvFiles();
 
-	if (envFiles.length === 0) {
-		console.error("Warning: No .env files found. Checked:");
-		console.error("  - apps/cli/.env");
-		console.error("  - apps/router/.dev.vars");
-		console.error(`  Current directory: ${process.cwd()}`);
-	}
-
+	// Silently load env files if found
+	// If not found, components will handle the error when they need the API key
 	for (const envPath of envFiles) {
 		try {
 			const envFile = await Bun.file(envPath).text();
@@ -111,9 +60,8 @@ export async function loadEnv() {
 					process.env[key] = value;
 				}
 			}
-		} catch (err) {
+		} catch (_err) {
 			// Silently skip files that can't be read
-			console.error(`Warning: Could not read ${envPath}`);
 		}
 	}
 }
