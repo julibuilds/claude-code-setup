@@ -58,7 +58,7 @@ export function ModelBrowser({
   // Reset selection when filtered models change
   useEffect(() => {
     setSelectedModelIndex(0);
-  }, [filter, sort, searchText]);
+  }, [filteredAndSortedModels.length]);
 
   const handleModelSelect = useCallback(() => {
     const selectedModel = filteredAndSortedModels[selectedModelIndex];
@@ -153,7 +153,7 @@ export function ModelBrowser({
     {
       id: "name",
       label: "Model Name",
-      style: { width: 35 },
+      style: { width: 30 },
       cell: (model, isSelected) => {
         const name = String(model?.name || "Unknown");
         return (
@@ -161,7 +161,7 @@ export function ModelBrowser({
             fg={isSelected ? colors.accent.primary : colors.text.primary}
             attributes={isSelected ? TextAttributes.BOLD : undefined}
           >
-            {name.length > 32 ? `${name.slice(0, 29)}...` : name}
+            {name.length > 27 ? `${name.slice(0, 24)}...` : name}
           </text>
         );
       },
@@ -169,7 +169,7 @@ export function ModelBrowser({
     {
       id: "provider",
       label: "Provider",
-      style: { width: 12 },
+      style: { width: 10 },
       cell: (model, isSelected) => (
         <text fg={isSelected ? colors.accent.primary : colors.text.secondary}>
           {String(model?.provider || "unknown")}
@@ -179,7 +179,7 @@ export function ModelBrowser({
     {
       id: "context",
       label: "Context",
-      style: { width: 10, align: "flex-end" },
+      style: { width: 8, align: "flex-end" },
       cell: (model, isSelected) => (
         <text fg={isSelected ? colors.accent.primary : colors.text.secondary}>
           {String(((model?.context_length || 0) / 1000).toFixed(0))}K
@@ -189,7 +189,7 @@ export function ModelBrowser({
     {
       id: "cost",
       label: "$/1M tok",
-      style: { width: 10, align: "flex-end" },
+      style: { width: 8, align: "flex-end" },
       cell: (model, isSelected) => (
         <text fg={isSelected ? colors.accent.primary : colors.text.secondary}>
           ${String((model?.costPerMToken || 0).toFixed(2))}
@@ -199,11 +199,11 @@ export function ModelBrowser({
     {
       id: "features",
       label: "Features",
-      style: { width: 12 },
+      style: { width: 8 },
       cell: (model, isSelected) => (
         <text fg={isSelected ? colors.accent.primary : colors.text.secondary}>
-          {String(model?.isReasoning ? "🧠" : "")}
-          {String(model?.isMultimodal ? "👁️" : "")}
+          {model?.isReasoning ? "🧠" : ""}
+          {model?.isMultimodal ? "👁️" : ""}
         </text>
       ),
     },
@@ -226,33 +226,35 @@ export function ModelBrowser({
   return (
     <box flexGrow={1} flexDirection="column" style={{ gap: 1 }}>
       {/* Controls */}
-      <box style={{ gap: 2 }}>
+      <box style={{ gap: 1, flexShrink: 0 }}>
         {/* Router Selection */}
-        <box border title="Router Type" style={{ width: 20, padding: 1 }}>
-          <box flexDirection="column">
-            {Object.values(ROUTER_TYPES).map((router) => (
-              <text
-                key={router}
-                fg={
-                  router === selectedRouter
-                    ? focusArea === "router"
-                      ? colors.accent.primary
-                      : colors.accent.secondary
-                    : colors.text.muted
-                }
-                attributes={
-                  router === selectedRouter ? TextAttributes.BOLD : undefined
-                }
-              >
-                {router === selectedRouter ? "▶ " : "  "}
-                {router}
-              </text>
-            ))}
-          </box>
+        <box border title="Router Type" style={{ width: 18, padding: 1, height: 6 }}>
+          <scrollbox>
+            <box flexDirection="column">
+              {Object.values(ROUTER_TYPES).map((router) => (
+                <text
+                  key={router}
+                  fg={
+                    router === selectedRouter
+                      ? focusArea === "router"
+                        ? colors.accent.primary
+                        : colors.accent.secondary
+                      : colors.text.muted
+                  }
+                  attributes={
+                    router === selectedRouter ? TextAttributes.BOLD : undefined
+                  }
+                >
+                  {router === selectedRouter ? "▶ " : "  "}
+                  {router}
+                </text>
+              ))}
+            </box>
+          </scrollbox>
         </box>
 
         {/* Filter */}
-        <box border title="Filter" style={{ width: 15, padding: 1 }}>
+        <box border title="Filter" style={{ width: 12, padding: 1, height: 3 }}>
           <text
             fg={
               focusArea === "filter"
@@ -268,7 +270,7 @@ export function ModelBrowser({
         </box>
 
         {/* Sort */}
-        <box border title="Sort By" style={{ width: 12, padding: 1 }}>
+        <box border title="Sort By" style={{ width: 10, padding: 1, height: 3 }}>
           <text
             fg={
               focusArea === "sort"
@@ -282,7 +284,7 @@ export function ModelBrowser({
         </box>
 
         {/* Search */}
-        <box border title="Search" style={{ width: 20, padding: 1 }}>
+        <box border title="Search" style={{ width: 18, padding: 1, height: 3 }}>
           <SearchInput
             value={searchText}
             onChange={setSearchText}
@@ -292,7 +294,7 @@ export function ModelBrowser({
         </box>
 
         {/* Current Assignment */}
-        <box border title="Current" flexGrow={1} style={{ padding: 1 }}>
+        <box border title="Current" flexGrow={1} style={{ padding: 1, height: 3 }}>
           <text fg={colors.text.muted}>
             {selectedRouter}: {getCurrentValue(selectedRouter)}
           </text>
@@ -300,7 +302,7 @@ export function ModelBrowser({
       </box>
 
       {/* Models Table */}
-      <box border title={`Models (${filteredAndSortedModels.length})`} flexGrow={1}>
+      <box border title={`Models (${filteredAndSortedModels.length})`} flexGrow={1} style={{ minHeight: 10 }}>
         {filteredAndSortedModels.length === 0 ? (
           <box style={{ alignItems: "center", justifyContent: "center" }} flexGrow={1}>
             <text fg={colors.text.muted}>No models found</text>
@@ -323,7 +325,7 @@ export function ModelBrowser({
       </box>
 
       {/* Help */}
-      <box style={{ paddingTop: 1 }}>
+      <box style={{ paddingTop: 1, flexShrink: 0 }}>
         <text fg={colors.text.muted}>
           Tab: Switch • ←→: Navigate • ↑↓: Select Model • Enter: Assign • Focus:{" "}
           {focusArea}

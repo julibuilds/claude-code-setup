@@ -99,60 +99,80 @@ export function Table<T>({
 	const itemVisible = isItemVisible ?? (() => true);
 
 	return (
-		<box style={{ flexDirection: "column", gap: 0 }}>
-			{/* Header row */}
-			<box style={{ flexDirection: "row", gap: 0 }}>
-				{/* Selection indicator header */}
-				{renderSelectionIndicator && (
-					<box style={{ width: 2 }}>
-						<text fg={defaultHeaderColor}>{"  "}</text>
-					</box>
-				)}
+		<scrollbox flexGrow={1} style={{ flexDirection: "column" }}>
+			<box style={{ flexDirection: "column", gap: 0 }}>
+				{/* Header row */}
+				<box style={{ flexDirection: "row", gap: 0, paddingBottom: 1 }}>
+					{/* Selection indicator header */}
+					{renderSelectionIndicator && (
+						<box style={{ width: 2, flexShrink: 0 }}>
+							<text fg={defaultHeaderColor}>{"  "}</text>
+						</box>
+					)}
 
-				{/* Column headers */}
-				{columns.map((col) => (
-					<box key={`header-${col.id}`} style={{ width: col.style?.width || "auto" }}>
-						{typeof col.label === "string" && (
-							<text
-								fg={defaultHeaderColor}
-								style={{
-									alignSelf: col.style?.align || "flex-start",
-									paddingRight: 1,
-								}}
-							>
-								{col.label}
-							</text>
-						)}
-						{typeof col.label === "function" && col.label()}
-						{!col.label && <text> </text>}
-					</box>
-				))}
+					{/* Column headers */}
+					{columns.map((col) => (
+						<box 
+							key={`header-${col.id}`} 
+							style={{ 
+								width: col.style?.width, 
+								flexShrink: col.style?.width ? 0 : 1,
+								flexGrow: col.style?.width ? 0 : 1,
+								paddingRight: 1
+							}}
+						>
+							{typeof col.label === "string" && (
+								<text
+									fg={defaultHeaderColor}
+									style={{
+										justifyContent: col.style?.align || "flex-start",
+									}}
+								>
+									{col.style?.width ? truncateText(col.label, col.style.width - 1) : col.label}
+								</text>
+							)}
+							{typeof col.label === "function" && col.label()}
+							{!col.label && <text> </text>}
+						</box>
+					))}
+				</box>
+
+				{/* Data rows - only render visible items */}
+				{data.map((item, i) => {
+					// Skip invisible items early - only check once per row
+					if (!itemVisible(i)) return null;
+
+					const isSelected = i === selectedIndex;
+					const rowKey = getItemKey(item, i);
+
+					return (
+						<box key={rowKey} style={{ flexDirection: "row", gap: 0 }}>
+							{/* Selection indicator */}
+							{renderSelectionIndicator && (
+								<box style={{ width: 2, flexShrink: 0 }}>
+									{renderSelectionIndicator(isSelected)}
+								</box>
+							)}
+
+							{/* Data cells */}
+							{columns.map((col) => (
+								<box 
+									key={`${col.id}-${rowKey}`} 
+									style={{ 
+										width: col.style?.width,
+										flexShrink: col.style?.width ? 0 : 1,
+										flexGrow: col.style?.width ? 0 : 1,
+										paddingRight: 1,
+										justifyContent: col.style?.align || "flex-start"
+									}}
+								>
+									{col.cell(item, isSelected)}
+								</box>
+							))}
+						</box>
+					);
+				})}
 			</box>
-
-			{/* Data rows - only render visible items */}
-			{data.map((item, i) => {
-				// Skip invisible items early - only check once per row
-				if (!itemVisible(i)) return null;
-
-				const isSelected = i === selectedIndex;
-				const rowKey = getItemKey(item, i);
-
-				return (
-					<box key={rowKey} style={{ flexDirection: "row", gap: 0 }}>
-						{/* Selection indicator */}
-						{renderSelectionIndicator && (
-							<box style={{ width: 2 }}>{renderSelectionIndicator(isSelected)}</box>
-						)}
-
-						{/* Data cells */}
-						{columns.map((col) => (
-							<box key={`${col.id}-${rowKey}`} style={{ width: col.style?.width || "auto" }}>
-								{col.cell(item, isSelected)}
-							</box>
-						))}
-					</box>
-				);
-			})}
-		</box>
+		</scrollbox>
 	);
 }

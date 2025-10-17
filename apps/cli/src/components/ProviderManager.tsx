@@ -221,7 +221,7 @@ export function ProviderManager({
   return (
     <box flexGrow={1} flexDirection="column" style={{ gap: 1 }}>
       {/* Header */}
-      <box style={{ gap: 2 }}>
+      <box style={{ gap: 2, flexShrink: 0 }}>
         <text fg={colors.text.primary} attributes={TextAttributes.BOLD}>
           Provider Configuration
         </text>
@@ -231,7 +231,7 @@ export function ProviderManager({
       </box>
 
       {/* Providers Table */}
-      <box border title="Providers" flexGrow={1}>
+      <box border title="Providers" flexGrow={1} style={{ minHeight: 8 }}>
         {providers.length === 0 ? (
           <box alignItems="center" justifyContent="center" flexGrow={1}>
             <text fg={colors.text.muted}>No providers configured</text>
@@ -253,39 +253,41 @@ export function ProviderManager({
 
       {/* Provider Details */}
       {providers[selectedProviderIndex] && (
-        <box border title="Provider Details" style={{ height: 12, padding: 1 }}>
-          <box flexDirection="column" style={{ gap: 0 }}>
-            {editMode && editField ? (
-              <box flexDirection="column">
-                <text fg={colors.accent.primary}>Editing {editField}:</text>
-                <text fg={colors.text.primary}>{editValue}|</text>
-                <text fg={colors.text.muted}>Enter: Save • Escape: Cancel</text>
-              </box>
-            ) : (
-              <>
-                <text fg={colors.text.muted}>
-                  {`[1] Name: ${providers[selectedProviderIndex].name}`}
-                </text>
-                <text fg={colors.text.muted}>
-                  {`[2] URL: ${providers[selectedProviderIndex].api_base_url}`}
-                </text>
-                <text fg={colors.text.muted}>
-                  {`[3] Key: ${providers[selectedProviderIndex].api_key.replace(/./g, "*")}`}
-                </text>
-                <text fg={colors.text.muted}>
-                  {`[4] Models: ${providers[selectedProviderIndex].models.join(", ") || "None"}`}
-                </text>
-                <text fg={colors.text.muted}>
-                  {`[5] Transformers: ${providers[selectedProviderIndex].transformer.use.join(", ") || "None"}`}
-                </text>
-              </>
-            )}
-          </box>
+        <box border title="Provider Details" style={{ height: 8, padding: 1, flexShrink: 0 }}>
+          <scrollbox>
+            <box flexDirection="column" style={{ gap: 0 }}>
+              {editMode && editField ? (
+                <box flexDirection="column">
+                  <text fg={colors.accent.primary}>Editing {editField}:</text>
+                  <text fg={colors.text.primary}>{editValue}|</text>
+                  <text fg={colors.text.muted}>Enter: Save • Escape: Cancel</text>
+                </box>
+              ) : (
+                <>
+                  <text fg={colors.text.muted}>
+                    {`[1] Name: ${providers[selectedProviderIndex].name}`}
+                  </text>
+                  <text fg={colors.text.muted}>
+                    {`[2] URL: ${providers[selectedProviderIndex].api_base_url}`}
+                  </text>
+                  <text fg={colors.text.muted}>
+                    {`[3] Key: ${providers[selectedProviderIndex].api_key.replace(/./g, "*")}`}
+                  </text>
+                  <text fg={colors.text.muted}>
+                    {`[4] Models: ${providers[selectedProviderIndex].models.join(", ") || "None"}`}
+                  </text>
+                  <text fg={colors.text.muted}>
+                    {`[5] Transformers: ${providers[selectedProviderIndex].transformer?.use?.join(", ") || "None"}`}
+                  </text>
+                </>
+              )}
+            </box>
+          </scrollbox>
         </box>
       )}
 
       {/* Help */}
-      <box style={{ paddingTop: 1 }}>
+      <box style={{ paddingTop: 1, flexShrink: 0 }}>
         <text fg={colors.text.muted}>
           ↑↓: Select • 1-5: Edit Field • N: New Provider • D: Delete • Enter:
           Edit Name

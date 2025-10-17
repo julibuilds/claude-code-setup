@@ -187,30 +187,33 @@ export function ConfigSummary({
   return (
     <box flexGrow={1} flexDirection="column" style={{ gap: 1 }}>
       {/* Header */}
-      <box>
+      <box style={{ flexShrink: 0 }}>
         <text fg={colors.text.primary} attributes={TextAttributes.BOLD}>
           Configuration Summary
         </text>
       </box>
 
       {/* Sections */}
-      <box flexGrow={1} flexDirection="column" style={{ gap: 1 }}>
-        {sections.map((section, index) => (
-          <box
-            key={index}
-            border
-            title={section.title}
-            style={{
-              padding: 1,
-            }}
-          >
-            {section.content}
-          </box>
-        ))}
-      </box>
+      <scrollbox flexGrow={1}>
+        <box flexDirection="column" style={{ gap: 1 }}>
+          {sections.map((section, index) => (
+            <box
+              key={index}
+              border
+              title={section.title}
+              style={{
+                padding: 1,
+                backgroundColor: selectedSection === index && focused ? colors.background.highlight : undefined,
+              }}
+            >
+              {section.content}
+            </box>
+          ))}
+        </box>
+      </scrollbox>
 
       {/* Help */}
-      <box style={{ paddingTop: 1 }}>
+      <box style={{ paddingTop: 1, flexShrink: 0 }}>
         <text fg={colors.text.muted}>↑↓: Navigate Sections</text>
       </box>
     </box>

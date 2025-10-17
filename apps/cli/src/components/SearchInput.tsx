@@ -50,7 +50,7 @@ export function SearchInput({
   const isPlaceholder = !value;
 
   return (
-    <box style={{ flexDirection: "row", alignItems: "center" }}>
+    <box style={{ flexDirection: "row", alignItems: "center", flexGrow: 1 }}>
       <text
         fg={
           isPlaceholder

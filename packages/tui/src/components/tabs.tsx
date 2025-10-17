@@ -70,6 +70,7 @@ export function Tabs({
 
 	return (
 		<box
+			flexGrow={1}
 			style={{
 				flexDirection: isHorizontal ? "column" : "row",
 				...(typeof width === "number" ? { width } : {}),
@@ -81,7 +82,8 @@ export function Tabs({
 				style={{
 					flexDirection: isHorizontal ? "row" : "column",
 					backgroundColor: componentStyles.tabs.container.backgroundColor,
-					gap: isHorizontal ? 1 : 0,
+					gap: isHorizontal ? 0 : 0,
+					flexShrink: 0,
 				}}
 				border={true}
 				borderStyle="single"
@@ -105,6 +107,9 @@ export function Tabs({
 								flexDirection: "row",
 								alignItems: "center",
 								gap: 1,
+								border: focused && isActive,
+								borderStyle: "single",
+								borderColor: focused && isActive ? componentStyles.tabs.container.borderColor : undefined,
 							}}
 							onMouseDown={() => handleTabChange(tab.id)}
 						>
@@ -127,10 +132,11 @@ export function Tabs({
 
 			{/* Tab Content */}
 			<box
+				flexGrow={1}
 				style={{
-					flexGrow: 1,
 					backgroundColor: componentStyles.tabs.content.backgroundColor,
 					padding: componentStyles.tabs.content.padding,
+					overflow: "hidden",
 				}}
 			>
 				{activeContent}
