@@ -8,7 +8,6 @@ export {
 	type AccordionItemProps,
 	type AccordionProps,
 } from "./components/accordion";
-export { Badge, type BadgeProps, type BadgeVariant } from "./components/badge";
 export { Button, type ButtonProps } from "./components/button";
 export { Card, type CardProps } from "./components/card";
 export { Checkbox, type CheckboxProps } from "./components/checkbox";
@@ -35,9 +34,7 @@ export {
 	levenshteinDistance,
 	type WordDiffPart,
 } from "./components/diff-view/word-diff";
-export { DraggableBox, type DraggableBoxProps } from "./components/draggable-box";
 export { Dropdown } from "./components/dropdown";
-export { ErrorBox, type ErrorBoxProps } from "./components/error-box";
 export {
 	type FileIcon,
 	Image,
@@ -46,17 +43,28 @@ export {
 	type ImageSource,
 } from "./components/image";
 export { Kbd, type KbdProps } from "./components/kbd";
+export {
+	BentoGrid,
+	type BentoGridItem,
+	type BentoGridProps,
+	Container,
+	type ContainerProps,
+	Grid,
+	type GridProps,
+	SplitView,
+	type SplitViewProps,
+	Stack,
+	type StackProps,
+} from "./components/layouts";
 export { List } from "./components/list";
 export { LoadingBar, Progress, type ProgressProps } from "./components/loading-bar";
-export { MinimumSizeWarning, type MinimumSizeWarningProps } from "./components/minimum-size-warning";
 export { Modal, type ModalProps, type ModalSize } from "./components/modal";
-export { ProgressBar, type ProgressBarProps } from "./components/progress-bar";
-export { ResponsiveBox, type ResponsiveBoxProps } from "./components/responsive-box";
+// Note: ScrollBox is a simple wrapper, consumers can import from "@opentui/react" directly
+// or use the scrollbox component if needed
+export * from "./components/scrollbox";
 export { Select, type SelectOption, type SelectProps } from "./components/select";
 export { Separator, type SeparatorProps } from "./components/separator";
 export { Slider, type SliderProps } from "./components/slider";
-export { Spinner, type SpinnerProps } from "./components/spinner";
-export { StatusBox, type StatusBoxProps, type StatusType } from "./components/status-box";
 export { Switch, type SwitchProps } from "./components/switch";
 export {
 	type Column,
@@ -79,7 +87,6 @@ export {
 	type ActivityLogScrollState,
 	useActivityLogScroll,
 } from "./hooks/use-activity-log-scroll";
-export { useAnimationFrame } from "./hooks/use-animation-frame";
 export { useDebugConsole } from "./hooks/use-debug-console";
 export { useEvent } from "./hooks/use-event";
 export {
@@ -91,51 +98,17 @@ export {
 	useExternalEvent,
 	useExternalEvents,
 } from "./hooks/use-external-events";
-export { type FrameCallbackOptions, useFrameCallback } from "./hooks/use-frame-callback";
 export { useId } from "./hooks/use-id";
 // Experimental mouse support
 export { useClickable, useMouse } from "./hooks/use-mouse";
 export { useOverflowDetection } from "./hooks/use-overflow-detection";
 export { useResponsive } from "./hooks/use-responsive";
-export {
-	type SelectionRange,
-	TextSelectionProvider,
-	useTextSelection,
-} from "./hooks/use-text-selection";
 
 // ============================================================================
 // Utilities
 // ============================================================================
 
-// Animation utilities
-export {
-	Animation,
-	type AnimationOptions,
-	animateProperty,
-	createAnimation,
-	createSpring,
-	createTimeline,
-	type EasingFunction,
-	easingFunctions,
-	getEasingFunction,
-	interpolate,
-	interpolateColor,
-	SpringAnimation,
-	type SpringOptions,
-	Timeline,
-} from "./utils/animation";
 export { debounce } from "./utils/debounce";
-export {
-	calculatePanelHeights,
-	DEFAULT_BREAKPOINTS,
-	getLayoutMode,
-	getResponsiveGap,
-	getResponsivePadding,
-	type LayoutMode,
-	type PanelHeightConfig,
-	type ResponsiveBreakpoints,
-	truncateText as truncateTextResponsive,
-} from "./utils/responsive";
 export { createDescendants, type DescendantContextType } from "./utils/descendants";
 export {
 	ErrorBoundary,
@@ -185,59 +158,6 @@ export {
 	setupSignalHandlers,
 	triggerExit,
 } from "./utils/signal-handlers";
-// Styled text utilities
-export {
-	bg,
-	bgBlack,
-	bgBlue,
-	bgCyan,
-	bgGray,
-	bgGreen,
-	bgMagenta,
-	bgRed,
-	bgWhite,
-	bgYellow,
-	black,
-	blink,
-	blue,
-	bold,
-	box,
-	boxText,
-	combine,
-	criticalText,
-	cyan,
-	dim,
-	emphasisText,
-	errorText,
-	fg,
-	gradient,
-	gray,
-	green,
-	highlightText,
-	ifElse,
-	infoText,
-	italic,
-	linkText,
-	magenta,
-	mutedText,
-	pad,
-	pipe,
-	rainbow,
-	red,
-	reverse,
-	strikethrough,
-	stripAnsi,
-	subtleText,
-	successText,
-	type TextStyleFn,
-	truncate,
-	underline,
-	visibleLength,
-	warningText,
-	when,
-	white,
-	yellow,
-} from "./utils/styled-text";
 export {
 	createDefaultHighlighter,
 	DEFAULT_LANGUAGES,
@@ -270,6 +190,7 @@ export {
 	createDivergingScale,
 	createLayerColorScale,
 	createSequentialScale,
+	interpolateColor,
 } from "./styles/color-scales";
 export {
 	type ColorPalette,
@@ -284,7 +205,6 @@ export {
 	useTheme,
 	useThemeColors,
 } from "./styles/theme-system";
-export { darkTheme, lightTheme, neonTheme } from "./styles/themes";
 
 // ============================================================================
 // Types

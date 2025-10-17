@@ -45,16 +45,6 @@ export interface ColorPalette {
 		bright: string;
 	};
 
-	// Panel state colors
-	panelState: {
-		active: string;
-		inactive: string;
-		disabled: string;
-		error: string;
-		success: string;
-		warning: string;
-	};
-
 	// Special colors
 	special: {
 		transparent: string;
@@ -248,15 +238,6 @@ export interface ComponentStyles {
 		};
 		padding: number;
 		border: boolean;
-		pressEffect: {
-			enabled: boolean;
-			character: string;
-			color: string;
-			duration: number;
-		};
-		hover: {
-			brightenFactor: number;
-		};
 	};
 
 	// Input styles
@@ -321,18 +302,6 @@ export interface ComponentStyles {
 		label: {
 			textColor: string;
 		};
-		vertical: {
-			width: number;
-			indicatorPosition: "left" | "right";
-		};
-		animation: {
-			speed: number;
-			smoothing: number;
-		};
-		progress: {
-			char: string;
-			emptyChar: string;
-		};
 	};
 
 	// Kbd/Command styles
@@ -393,110 +362,6 @@ export interface ComponentStyles {
 		emptyText: {
 			color: string;
 			message: string;
-		};
-	};
-
-	// Draggable component
-	draggable: {
-		dragOpacity: number;
-		dragBorderColor: string;
-		activeBorderColor: string;
-		hoverBorderColor: string;
-		boundaryColor: string;
-	};
-
-	// Mouse trail effects
-	mouseTrail: {
-		enabled: boolean;
-		trailColor: string;
-		dragColor: string;
-		activatedColor: string;
-		fadeDuration: number;
-	};
-
-	// Animation defaults
-	animation: {
-		defaultDuration: number;
-		defaultEasing: string;
-		enableReducedMotion: boolean;
-	};
-
-	// Stats/Dashboard
-	stats: {
-		labelColor: string;
-		valueColor: string;
-		warningColor: string;
-		criticalColor: string;
-		successColor: string;
-		progressChar: string;
-		emptyChar: string;
-	};
-
-	// Selection
-	selection: {
-		backgroundColor: string;
-		textColor: string;
-		borderColor: string;
-		cursor: string;
-	};
-
-	// Charts
-	chart: {
-		lineChart: {
-			primaryColor: string;
-			secondaryColor: string;
-			tertiaryColor: string;
-			glowEnabled: boolean;
-			filledOpacity: number;
-		};
-		gauge: {
-			successColor: string;
-			warningColor: string;
-			errorColor: string;
-			backgroundColor: string;
-		};
-	};
-
-	// Layout components
-	splitPane: {
-		divider: {
-			color: string;
-			char: string;
-			hoverColor: string;
-			activeColor: string;
-		};
-		pane: {
-			backgroundColor: string;
-			padding: number;
-		};
-		resize: {
-			enabled: boolean;
-			minSize: number;
-		};
-	};
-
-	appLayout: {
-		header: {
-			backgroundColor: string;
-			borderColor: string;
-			height: number;
-			padding: number;
-		};
-		sidebar: {
-			backgroundColor: string;
-			borderColor: string;
-			width: number;
-			padding: number;
-		};
-		content: {
-			backgroundColor: string;
-			padding: number;
-		};
-		footer: {
-			backgroundColor: string;
-			borderColor: string;
-			height: number;
-			padding: number;
 		};
 	};
 }

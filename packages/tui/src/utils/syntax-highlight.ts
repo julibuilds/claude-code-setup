@@ -98,7 +98,7 @@ export function detectLanguage(filePath: string): BundledLanguage {
  * ```
  */
 export async function createDefaultHighlighter(
-	themes: BundledTheme[] = ["github-dark-default"], // TODO: Allow custom themes?
+	themes: BundledTheme[] = ["github-dark-default"],
 	langs: BundledLanguage[] = DEFAULT_LANGUAGES
 ): Promise<Highlighter> {
 	return createHighlighter({

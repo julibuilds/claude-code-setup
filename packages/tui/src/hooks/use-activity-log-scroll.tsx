@@ -135,7 +135,15 @@ export function useActivityLogScroll({
 		}
 
 		// Item is fully visible, don't scroll
-	}, [itemCount, safeSelectedIndex, viewportHeight, viewportStart, viewportEnd, getItemHeight]);
+	}, [
+		itemCount,
+		safeSelectedIndex,
+		viewportHeight,
+		viewportStart,
+		viewportEnd,
+		itemPositions,
+		getItemHeight,
+	]);
 
 	// Auto-follow when in follow mode and new items arrive
 	useEffect(() => {

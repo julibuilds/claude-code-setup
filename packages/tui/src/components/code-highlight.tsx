@@ -108,7 +108,7 @@ export function CodeHighlight({
 	theme = "github-dark-default",
 	renderToken = defaultRenderToken,
 	renderLine = defaultRenderLine,
-	wrap = false, // TODO: Address this ("'wrap' is declared but its value is never read.")
+	wrap = false,
 	initialGrammarState,
 }: CodeHighlightProps): ReactNode {
 	let grammarState = initialGrammarState;

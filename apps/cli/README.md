@@ -88,26 +88,6 @@ Manage Cloudflare Workers secrets:
 
 ## Architecture
 
-### Project Structure
-
-```
-apps/cli/
-├── src/
-│   ├── components/
-│   │   ├── common/          # Reusable components
-│   │   ├── layout/          # Layout components
-│   │   └── features/        # Feature screens
-│   ├── constants/           # App constants
-│   ├── context/             # React context
-│   ├── design/              # Theme and design system
-│   ├── hooks/               # Custom React hooks
-│   ├── types/               # TypeScript types
-│   └── utils/               # Utilities
-├── dist/                    # Compiled binary
-├── .cache/                  # Cached model data
-└── package.json
-```
-
 ### Key Technologies
 
 - **OpenTUI v0.1.27**: React-based TUI framework
@@ -115,27 +95,6 @@ apps/cli/
 - **Bun**: Runtime and build tool
 - **TypeScript 5.9+**: Type safety
 - **Zod**: Schema validation
-
-### Design System
-
-Centralized theme in `src/design/theme.ts`:
-
-- Color palette (bg, accent, status, text)
-- Spacing scale
-- Border styles
-- Component styles
-- Animation configuration
-
-### Focus Management
-
-Unified focus management via `useFocusManager` hook:
-
-```typescript
-const { focused, isFocused } = useFocusManager({
-  initialFocus: "field1",
-  items: ["field1", "field2", "field3"]
-});
-```
 
 ## Development
 
@@ -157,24 +116,6 @@ bun run clean            # Clean build artifacts
 bun run fresh            # Clean, install, build, link
 ```
 
-### Adding New Features
-
-1. Create feature directory in `src/components/features/`
-2. Use layout components from `src/components/layout/`
-3. Use common components from `src/components/common/`
-4. Follow theme system from `src/design/theme.ts`
-5. Use constants from `src/constants/`
-6. Add error boundaries for robustness
-
-### Code Style
-
-- **Indentation**: Tabs (not spaces)
-- **Line Width**: 100 characters
-- **File Size**: Max 450 lines per file
-- **Quotes**: Double quotes
-- **Semicolons**: Always required
-- **Imports**: Organized via Biome
-
 ## Configuration
 
 ### Environment Variables
@@ -192,51 +133,3 @@ The CLI automatically detects the project root using:
 1. Stored project root (from `bun run link`)
 2. Search up from current directory
 3. `import.meta.dir` (for local development)
-
-## Troubleshooting
-
-### CLI Not Found
-
-```bash
-# Re-link the binary
-cd apps/cli
-bun run link
-```
-
-### Config Not Found
-
-```bash
-# Ensure you're in the project directory
-cd /path/to/claude-code-setup
-
-# Or run from apps/cli
-cd apps/cli
-bun run dev
-```
-
-### Cache Issues
-
-```bash
-# Clear model cache
-rm -rf apps/cli/.cache
-```
-
-### Build Issues
-
-```bash
-# Clean rebuild
-cd apps/cli
-bun run fresh
-```
-
-## Contributing
-
-1. Follow the code style guidelines
-2. Keep files under 450 lines
-3. Use the design system consistently
-4. Add TypeScript types for all functions
-5. Test locally before committing
-
-## License
-
-See root LICENSE file.

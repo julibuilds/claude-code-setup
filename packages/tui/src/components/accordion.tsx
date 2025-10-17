@@ -62,7 +62,7 @@ export interface AccordionItemProps {
  * Can be controlled or uncontrolled.
  */
 export function AccordionItem({
-	id, // TODO: Address this ("'id' is declared but its value is never read.")
+	id,
 	title,
 	children,
 	defaultOpen = false,
@@ -200,7 +200,6 @@ export function Accordion({
 	const openIds = controlledOpenIds !== undefined ? controlledOpenIds : internalOpenIds;
 
 	const handleItemOpenChange = (itemId: string, isOpen: boolean) => {
-		// TODO: Address this ("'handleItemOpenChange' is declared but its value is never read.")
 		let newOpenIds: string[];
 
 		if (multiple) {

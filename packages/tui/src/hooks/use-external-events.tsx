@@ -66,7 +66,7 @@ export function useExternalEvents<TEmitter extends EventEmitter = EventEmitter>(
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [emitter, ...subscriptions.map((s) => s.event), subscriptions]);
+	}, [emitter, ...subscriptions.map((s) => s.event)]);
 }
 
 /**

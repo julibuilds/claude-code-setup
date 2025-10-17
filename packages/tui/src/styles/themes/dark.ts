@@ -36,14 +36,6 @@ export const darkTheme: Theme = {
 			muted: "#1A1A1A",
 			bright: "#555555",
 		},
-		panelState: {
-			active: "#0080FF",
-			inactive: "#333333",
-			disabled: "#1A1A1A",
-			error: "#FF0000",
-			success: "#00FF80",
-			warning: "#FF8000",
-		},
 		special: {
 			transparent: "transparent",
 			selection: "#0080FF",
@@ -240,15 +232,6 @@ export const darkTheme: Theme = {
 			},
 			padding: 1,
 			border: true,
-			pressEffect: {
-				enabled: true,
-				character: "✦",
-				color: "#00FF80",
-				duration: 300,
-			},
-			hover: {
-				brightenFactor: 1.2,
-			},
 		},
 		input: {
 			backgroundColor: "#1A1A1A",
@@ -303,18 +286,6 @@ export const darkTheme: Theme = {
 			label: {
 				textColor: "#FFFFFF",
 			},
-			vertical: {
-				width: 3,
-				indicatorPosition: "right",
-			},
-			animation: {
-				speed: 0.5,
-				smoothing: 0.1,
-			},
-			progress: {
-				char: "█",
-				emptyChar: "░",
-			},
 		},
 		kbd: {
 			backgroundColor: "#1E1E1E",
@@ -367,95 +338,6 @@ export const darkTheme: Theme = {
 			emptyText: {
 				color: "#666666",
 				message: "No files to display",
-			},
-		},
-		draggable: {
-			dragOpacity: 0.7,
-			dragBorderColor: "#0080FF",
-			activeBorderColor: "#00FF80",
-			hoverBorderColor: "#555555",
-			boundaryColor: "#FF8000",
-		},
-		mouseTrail: {
-			enabled: true,
-			trailColor: "#0080FF",
-			dragColor: "#00FF80",
-			activatedColor: "#FF8000",
-			fadeDuration: 500,
-		},
-		animation: {
-			defaultDuration: 300,
-			defaultEasing: "easeOutExpo",
-			enableReducedMotion: false,
-		},
-		stats: {
-			labelColor: "#999999",
-			valueColor: "#FFFFFF",
-			warningColor: "#FF8000",
-			criticalColor: "#FF0000",
-			successColor: "#00FF80",
-			progressChar: "█",
-			emptyChar: "░",
-		},
-		selection: {
-			backgroundColor: "#0080FF",
-			textColor: "#000000",
-			borderColor: "#00FF80",
-			cursor: "│",
-		},
-		chart: {
-			lineChart: {
-				primaryColor: "#0080FF",
-				secondaryColor: "#00FF80",
-				tertiaryColor: "#FF8000",
-				glowEnabled: true,
-				filledOpacity: 0.3,
-			},
-			gauge: {
-				successColor: "#00FF80",
-				warningColor: "#FF8000",
-				errorColor: "#FF0000",
-				backgroundColor: "#1E1E1E",
-			},
-		},
-		splitPane: {
-			divider: {
-				color: "#333333",
-				char: "│",
-				hoverColor: "#0080FF",
-				activeColor: "#00FF80",
-			},
-			pane: {
-				backgroundColor: "#1E1E1E",
-				padding: 1,
-			},
-			resize: {
-				enabled: true,
-				minSize: 10,
-			},
-		},
-		appLayout: {
-			header: {
-				backgroundColor: "#1E1E1E",
-				borderColor: "#333333",
-				height: 3,
-				padding: 1,
-			},
-			sidebar: {
-				backgroundColor: "#1E1E1E",
-				borderColor: "#333333",
-				width: 30,
-				padding: 1,
-			},
-			content: {
-				backgroundColor: "#000000",
-				padding: 2,
-			},
-			footer: {
-				backgroundColor: "#1E1E1E",
-				borderColor: "#333333",
-				height: 3,
-				padding: 1,
 			},
 		},
 	},

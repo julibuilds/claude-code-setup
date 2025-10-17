@@ -6,21 +6,13 @@ import { useState } from "react";
  *
  * @example
  * ```tsx
- * const { position, isPressed, onClick, onMouseEnter, onMouseLeave } = useMouse()
+ * const { position, isPressed, onClick } = useMouse()
  *
  * onClick((x, y) => {
  *   console.log('Clicked at', x, y)
  * })
  *
- * return (
- *   <box
- *     onMouseDown={(e) => handleClick(e)}
- *     onMouseEnter={onMouseEnter(() => console.log('Mouse entered'))}
- *     onMouseLeave={onMouseLeave(() => console.log('Mouse left'))}
- *   >
- *     Content
- *   </box>
- * )
+ * return <box onMouseDown={(e) => handleClick(e)}>Content</box>
  * ```
  */
 export function useMouse() {
@@ -61,20 +53,6 @@ export function useMouse() {
 		};
 	};
 
-	// Handler for mouse enter events
-	const onMouseEnter = (callback?: () => void) => {
-		return () => {
-			callback?.();
-		};
-	};
-
-	// Handler for mouse leave events
-	const onMouseLeave = (callback?: () => void) => {
-		return () => {
-			callback?.();
-		};
-	};
-
 	return {
 		position,
 		isPressed,
@@ -82,8 +60,6 @@ export function useMouse() {
 		onMove,
 		onMouseDown,
 		onMouseUp,
-		onMouseEnter,
-		onMouseLeave,
 	};
 }
 
