@@ -5,7 +5,7 @@
 		}
 	],
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"editor.formatOnSave": false,
+	"editor.formatOnSave": true,
 	"editor.formatOnSaveMode": "file",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.biome": "explicit",
@@ -13,27 +13,27 @@
 	},
 	"[javascript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.formatOnSave": false
+		"editor.formatOnSave": true
 	},
 	"[typescript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.formatOnSave": false
+		"editor.formatOnSave": true
 	},
 	"[javascriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.formatOnSave": false
+		"editor.formatOnSave": true
 	},
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.formatOnSave": false
+		"editor.formatOnSave": true
 	},
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features",
-		"editor.formatOnSave": false
+		"editor.formatOnSave": true
 	},
 	"[json]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.formatOnSave": false
+		"editor.formatOnSave": true
 	},
 	"files.associations": {
 		"wrangler.json": "jsonc",
@@ -52,6 +52,5 @@
 	},
 	"[markdown]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"typescript.autoClosingTags": false
+	}
 }

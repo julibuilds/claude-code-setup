@@ -1,466 +1,401 @@
-import { type SelectOption, TextAttributes } from "@opentui/core";
-import { useKeyboard, useTerminalDimensions } from "@opentui/react";
+import { TextAttributes } from "@opentui/core";
+import { useKeyboard } from "@opentui/react";
 import { useComponentStyles, useThemeColors } from "@repo/tui";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { KEYS } from "../../../constants";
-import { useFocusManager } from "../../../hooks/useFocusManager";
-import { listWorkerSecrets, setWorkerSecret } from "../../../utils/secrets";
+import { useResponsiveLayout } from "../../../hooks/useResponsiveLayout";
+import {
+  configureOpenRouterProvider,
+  configureZaiProvider,
+  getCurrentProvider,
+  getProviderConfig,
+} from "../../../utils/claude-settings";
+import { Footer } from "../../layout/Footer";
+import { Header } from "../../layout/Header";
 
-interface SecretsManagerProps {
-	onBack: () => void;
+interface ZaiProviderProps {
+  onBack: () => void;
 }
 
-type FocusedField = "menu" | "key" | "value";
+type FocusState = "provider-select" | "api-key-input";
+type ProviderType = "openrouter" | "zai";
 
-export function SecretsManager(_props: SecretsManagerProps) {
-	const { width, height } = useTerminalDimensions();
-	const [action, setAction] = useState<"menu" | "set" | "list">("menu");
-	const [secretKey, setSecretKey] = useState("");
-	const [secretValue, setSecretValue] = useState("");
-	const [showSecret, setShowSecret] = useState(false);
-	const [output, setOutput] = useState<Array<{ id: string; text: string }>>([]);
-	const [error, setError] = useState<string | null>(null);
-	const [processing, setProcessing] = useState(false);
-	const colors = useThemeColors();
-	const componentStyles = useComponentStyles();
+export function ZaiProvider({ onBack }: ZaiProviderProps) {
+  const { width, height, isNarrow, padding, gap } = useResponsiveLayout();
+  const colors = useThemeColors();
+  const componentStyles = useComponentStyles();
 
-	// Use unified focus manager for form fields
-	const { isFocused } = useFocusManager<FocusedField>({
-		initialFocus: "menu",
-		items: ["key", "value"],
-		enableTab: action === "set",
-	});
+  const [currentProvider, setCurrentProvider] =
+    useState<ProviderType>("openrouter");
+  const [selectedProvider, setSelectedProvider] =
+    useState<ProviderType>("openrouter");
+  const [apiKey, setApiKey] = useState("");
+  const [storedApiKey, setStoredApiKey] = useState("");
+  const [focused, setFocused] = useState<FocusState>("provider-select");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [message, setMessage] = useState("");
 
-	useKeyboard((key) => {
-		if (key.name === KEYS.ESCAPE && action !== "menu") {
-			setAction("menu");
-			setSecretKey("");
-			setSecretValue("");
-			setShowSecret(false);
-			setOutput([]);
-			setError(null);
-		}
+  useEffect(() => {
+    const loadProvider = async () => {
+      try {
+        const provider = await getCurrentProvider();
+        const config = await getProviderConfig();
+        setCurrentProvider(provider);
+        setSelectedProvider(provider);
+        if (config.apiKey) {
+          setStoredApiKey(config.apiKey);
+          setApiKey(config.apiKey);
+        }
+      } catch (err) {
+        setStatus("error");
+        const errorMsg = err instanceof Error ? err.message : "Unknown error";
+        setMessage(`Failed to load provider: ${errorMsg}`);
+      }
+    };
+    loadProvider();
+  }, []);
 
-		// Toggle secret visibility with Ctrl+H
-		if (key.ctrl && key.name === "h" && action === "set") {
-			setShowSecret((prev) => !prev);
-		}
-	});
+  const handleProviderSwitch = useCallback(async () => {
+    if (selectedProvider === currentProvider) {
+      setMessage("Already using this provider");
+      return;
+    }
 
-	const handleSetSecret = useCallback(async () => {
-		if (!secretKey || !secretValue) {
-			setError("Both key and value are required");
-			return;
-		}
+    setStatus("loading");
+    setMessage("Configuring provider...");
 
-		setProcessing(true);
-		setOutput([]);
-		setError(null);
+    try {
+      if (selectedProvider === "zai") {
+        if (!apiKey.trim()) {
+          setStatus("error");
+          setMessage("Please enter a Z.AI API key");
+          setFocused("api-key-input");
+          return;
+        }
+        await configureZaiProvider(apiKey.trim());
+        setMessage("✓ Z.AI provider configured successfully");
+      } else {
+        await configureOpenRouterProvider();
+        setMessage("✓ OpenRouter/Workers provider configured successfully");
+      }
 
-		try {
-			setOutput((prev) => [
-				...prev,
-				{ id: `${Date.now()}-0`, text: `Setting secret: ${secretKey}...` },
-			]);
+      setCurrentProvider(selectedProvider);
+      setStatus("success");
 
-			const result = await setWorkerSecret(secretKey, secretValue);
+      setTimeout(() => {
+        setStatus("idle");
+        setMessage("");
+      }, 3000);
+    } catch (err) {
+      setStatus("error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setMessage(`Failed to configure provider: ${errorMsg}`);
+    }
+  }, [selectedProvider, currentProvider, apiKey]);
 
-			if (result.success) {
-				const messages = [
-					{ id: `${Date.now()}-empty`, text: "" },
-					{ id: `${Date.now()}-success`, text: "✓ Secret set successfully in Cloudflare Workers!" },
-				];
+  useKeyboard((key) => {
+    if (key.name === KEYS.TAB) {
+      setFocused((prev) =>
+        prev === "provider-select" ? "api-key-input" : "provider-select"
+      );
+      return;
+    }
 
-				if (result.localFileUpdated) {
-					messages.push({
-						id: `${Date.now()}-local`,
-						text: "✓ Local .dev.vars file updated",
-					});
-				}
+    if (focused === "provider-select") {
+      if (key.name === KEYS.UP || key.name === KEYS.DOWN) {
+        setSelectedProvider((prev) =>
+          prev === "openrouter" ? "zai" : "openrouter"
+        );
+      }
+      if (key.name === KEYS.RETURN) {
+        handleProviderSwitch();
+      }
+    }
 
-				if (result.error) {
-					messages.push({
-						id: `${Date.now()}-warning`,
-						text: `⚠ Warning: ${result.error}`,
-					});
-				}
+    if (focused === "api-key-input" && key.name === KEYS.RETURN) {
+      if (selectedProvider === "zai") {
+        handleProviderSwitch();
+      }
+    }
+  });
 
-				setOutput((prev) => [...prev, ...messages]);
-				setSecretKey("");
-				setSecretValue("");
-			} else {
-				setError(result.error || "Failed to set secret");
-			}
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Failed to set secret");
-		} finally {
-			setProcessing(false);
-		}
-	}, [secretKey, secretValue]);
+  const containerPadding = Math.max(2, padding);
+  const containerWidth = Math.min(isNarrow ? width - 2 : 90, width - 4);
 
-	const handleListSecrets = useCallback(async () => {
-		setProcessing(true);
-		setOutput([]);
-		setError(null);
-
-		try {
-			setOutput((prev) => [...prev, { id: `${Date.now()}-fetch`, text: "Fetching secrets..." }]);
-
-			const secrets = await listWorkerSecrets();
-			const secretItems = [
-				{ id: `${Date.now()}-empty`, text: "" },
-				{ id: `${Date.now()}-header`, text: "Configured secrets:" },
-				...secrets.map((s, i) => ({ id: `${Date.now()}-secret-${i}`, text: s })),
-			];
-			setOutput((prev) => [...prev, ...secretItems]);
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Failed to list secrets");
-		} finally {
-			setProcessing(false);
-		}
-	}, []);
-
-	if (action === "list" || (action === "set" && (processing || output.length > 0))) {
-		return (
-			<box
-				style={{
-					flexDirection: "column",
-					width: Math.min(100, width - 4),
-					height: height - 4,
-					padding: 2,
-				}}
-			>
-				<box
-					style={{
-						marginBottom: 2,
-						padding: 2,
-						border: true,
-						borderStyle: componentStyles.panel.borderStyle,
-						backgroundColor: componentStyles.panel.backgroundColor,
-						borderColor: processing ? colors.status.warning : colors.status.success,
-					}}
-				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: processing ? colors.status.warning : colors.status.success,
-						}}
-					>
-						{processing ? "🔐 Processing Secrets..." : "✅ Secrets Result"}
-					</text>
-				</box>
-
-				<scrollbox
-					style={{
-						rootOptions: { height: height - 12, border: true },
-						wrapperOptions: { backgroundColor: componentStyles.elevated.backgroundColor },
-						viewportOptions: { backgroundColor: componentStyles.panel.backgroundColor },
-						scrollbarOptions: { showArrows: true },
-					}}
-					focused
-				>
-					<box style={{ flexDirection: "column", padding: 2 }}>
-						{output.map((item) => {
-							const isSuccess = item.text.startsWith("✓");
-							const isWarning = item.text.startsWith("⚠");
-							const isEmpty = item.text.trim() === "";
-							const color = isSuccess
-								? colors.status.success
-								: isWarning
-									? colors.status.warning
-									: colors.text.primary;
-
-							return (
-								<text key={item.id} fg={color}>
-									{isEmpty ? " " : item.text}
-								</text>
-							);
-						})}
-						{error && (
-							<box
-								style={{
-									marginTop: 1,
-									padding: 1,
-									border: true,
-									backgroundColor: componentStyles.panel.backgroundColor,
-								}}
-							>
-								<text style={{ attributes: TextAttributes.BOLD, fg: colors.status.error }}>
-									❌ Error: {error}
-								</text>
-							</box>
-						)}
-					</box>
-				</scrollbox>
-
-				<box
-					style={{
-						marginTop: 2,
-						padding: 2,
-						border: true,
-						borderStyle: componentStyles.panel.borderStyle,
-						flexDirection: "column",
-						backgroundColor: componentStyles.panel.backgroundColor,
-						borderColor: colors.border.muted,
-					}}
-				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: colors.accent.secondary,
-							marginBottom: 1,
-						}}
-					>
-						⌨️ Keyboard Shortcuts
-					</text>
-					<text fg={colors.text.primary}>
-						{processing ? "Processing..." : "ESC Back to menu"}
-					</text>
-				</box>
-			</box>
-		);
-	}
-
-	if (action === "set") {
-		return (
-			<box
-				style={{
-					flexDirection: "column",
-					width: Math.min(80, width - 4),
-					height: height - 4,
-					padding: 2,
-				}}
-			>
-				<box
-					style={{
-						marginBottom: 2,
-						padding: 2,
-						border: true,
-						borderStyle: componentStyles.panel.borderStyle,
-						flexDirection: "column",
-						backgroundColor: componentStyles.panel.backgroundColor,
-						borderColor: colors.accent.primary,
-					}}
-				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: colors.accent.primary,
-							marginBottom: 1,
-						}}
-					>
-						🔐 Set Worker Secret
-					</text>
-					<text fg={colors.text.primary}>Configure secrets for Cloudflare Workers</text>
-				</box>
-
-				<box style={{ flexDirection: "column", gap: 2 }}>
-					<box
-						title={isFocused("key") ? "▶ Secret Key" : "Secret Key"}
-						style={{
-							border: true,
-							borderStyle: componentStyles.input.borderStyle,
-							height: 3,
-							backgroundColor: isFocused("key")
-								? componentStyles.panel.backgroundColor
-								: componentStyles.elevated.backgroundColor,
-							borderColor: isFocused("key") ? colors.border.focus : colors.text.muted,
-						}}
-					>
-						<input
-							placeholder="e.g., OPENROUTER_API_KEY"
-							onInput={setSecretKey}
-							onSubmit={handleSetSecret}
-							focused={isFocused("key")}
-						/>
-					</box>
-
-					<box
-						title={isFocused("value") ? "▶ Secret Value" : "Secret Value"}
-						style={{
-							border: true,
-							borderStyle: componentStyles.input.borderStyle,
-							height: 3,
-							backgroundColor: isFocused("value")
-								? componentStyles.panel.backgroundColor
-								: componentStyles.elevated.backgroundColor,
-							borderColor: isFocused("value") ? colors.border.focus : colors.text.muted,
-						}}
-					>
-						<input
-							placeholder={showSecret ? "Enter secret value..." : "••••••••"}
-							onInput={setSecretValue}
-							onSubmit={handleSetSecret}
-							focused={isFocused("value")}
-						/>
-					</box>
-
-					{/* Secret visibility hint */}
-					<box
-						style={{
-							padding: 1,
-							border: true,
-							borderStyle: componentStyles.panel.borderStyle,
-							borderColor: colors.border.muted,
-							backgroundColor: componentStyles.elevated.backgroundColor,
-						}}
-					>
-						<text style={{ fg: colors.text.muted }}>
-							{showSecret ? "🔓 Secret visible" : "🔒 Secret hidden"} • Press Ctrl+H to
-							toggle
-						</text>
-					</box>
-				</box>
-
-				{error && (
-					<box
-						style={{
-							marginTop: 2,
-							padding: 2,
-							border: true,
-							borderStyle: componentStyles.panel.borderStyle,
-							backgroundColor: componentStyles.panel.backgroundColor,
-							borderColor: colors.status.error,
-						}}
-					>
-						<text style={{ attributes: TextAttributes.BOLD, fg: colors.status.error }}>
-							❌ Error: {error}
-						</text>
-					</box>
-				)}
-
-				<box
-					style={{
-						marginTop: 2,
-						padding: 2,
-						border: true,
-						borderStyle: componentStyles.panel.borderStyle,
-						flexDirection: "column",
-						backgroundColor: componentStyles.panel.backgroundColor,
-						borderColor: colors.border.muted,
-					}}
-				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: colors.accent.secondary,
-							marginBottom: 1,
-						}}
-					>
-						⌨️ Keyboard Shortcuts
-					</text>
-					<text fg={colors.text.primary}>
-						Tab Switch • Enter Submit • Ctrl+H Toggle Secret • ESC Back
-					</text>
-				</box>
-			</box>
-		);
-	}
-
-	// Menu
-	const options: SelectOption[] = [
-		{
-			name: "🔑 Set Secret",
-			description: "Set a new secret or update existing one",
-			value: "set",
-		},
-		{
-			name: "📋 List Secrets",
-			description: "View all configured secrets",
-			value: "list",
-		},
-	];
-
-	return (
-		<box
-			style={{
-				flexDirection: "column",
-				width: Math.min(80, width - 4),
-				height: height - 4,
-				padding: 2,
-			}}
-		>
-			<box
-				style={{
-					marginBottom: 2,
-					padding: 2,
-					border: true,
-					borderStyle: componentStyles.panel.borderStyle,
-					flexDirection: "column",
-					backgroundColor: componentStyles.panel.backgroundColor,
-					borderColor: colors.accent.primary,
-				}}
-			>
-				<text
-					style={{
-						attributes: TextAttributes.BOLD,
-						fg: colors.accent.primary,
-						marginBottom: 1,
-					}}
-				>
-					🔐 Manage Cloudflare Workers Secrets
-				</text>
-				<text fg={colors.text.primary}>Configure and view environment secrets</text>
-			</box>
-
-			<box
-				style={{
-					border: true,
-					borderStyle: componentStyles.panel.borderStyle,
-					height: height - 12,
-					backgroundColor: componentStyles.elevated.backgroundColor,
-				}}
-			>
-				<select
-					style={{
-						height: height - 14,
-						backgroundColor: componentStyles.elevated.backgroundColor,
-						focusedBackgroundColor: componentStyles.list.item.hoverBackgroundColor,
-						textColor: colors.text.primary,
-						focusedTextColor: colors.accent.primary,
-						selectedBackgroundColor: colors.accent.primary,
-						selectedTextColor: colors.background.main,
-						descriptionColor: colors.text.muted,
-						selectedDescriptionColor: colors.text.primary,
-					}}
-					options={options}
-					focused={true}
-					onChange={(_, option) => {
-						if (option) {
-							if (option.value === "set") {
-								setAction("set");
-							} else if (option.value === "list") {
-								setAction("list");
-								handleListSecrets();
-							}
-						}
-					}}
-					showScrollIndicator
-				/>
-			</box>
-
-			<box
-				style={{
-					marginTop: 2,
-					padding: 2,
-					border: true,
-					borderStyle: componentStyles.panel.borderStyle,
-					flexDirection: "column",
-					backgroundColor: componentStyles.panel.backgroundColor,
-					borderColor: colors.border.muted,
-				}}
-			>
-				<text
-					style={{
-						attributes: TextAttributes.BOLD,
-						fg: colors.accent.secondary,
-						marginBottom: 1,
-					}}
-				>
-					⌨️ Keyboard Shortcuts
-				</text>
-				<text fg={colors.text.primary}>↑↓ Navigate • Enter Select • ESC Back</text>
-			</box>
-		</box>
-	);
+  return (
+    <box
+      style={{
+        border: true,
+        borderStyle: componentStyles.panel.borderStyle,
+        borderColor: colors.border.default,
+        backgroundColor: componentStyles.panel.backgroundColor,
+        padding: containerPadding,
+        flexDirection: "column",
+        alignItems: "center",
+        width: containerWidth,
+        height: height - 4,
+      }}
+    >
+      <Header
+        icon="🔄"
+        title={isNarrow ? "Provider Setup" : "Provider Configuration"}
+        subtitle={
+          isNarrow
+            ? "Switch providers"
+            : "Switch between OpenRouter/Workers and Z.AI provider"
+        }
+        status={
+          status === "success"
+            ? "success"
+            : status === "error"
+            ? "error"
+            : "info"
+        }
+        statusText={
+          currentProvider === "zai"
+            ? "Using Z.AI provider"
+            : "Using OpenRouter/Workers provider"
+        }
+        compact={isNarrow}
+      />
+      <box
+        style={{
+          padding: isNarrow ? 1 : 2,
+          border: true,
+          borderStyle: componentStyles.panel.borderStyle,
+          borderColor:
+            currentProvider === "zai"
+              ? colors.status.info
+              : colors.panelState?.success || colors.status.success,
+          backgroundColor:
+            currentProvider === "zai"
+              ? componentStyles.messageBox.info.backgroundColor
+              : componentStyles.messageBox.success.backgroundColor,
+          flexDirection: "column",
+          marginBottom: gap,
+          width: "100%",
+        }}
+      >
+        <text
+          style={{
+            attributes: TextAttributes.BOLD,
+            fg:
+              currentProvider === "zai"
+                ? colors.status.info
+                : colors.status.success,
+            marginBottom: 1,
+          }}
+        >
+          📋 Current Provider
+        </text>
+        <text style={{ fg: colors.text.primary, marginBottom: 0.5 }}>
+          {currentProvider === "zai" ? "Z.AI" : "OpenRouter/Workers"}
+        </text>
+        {currentProvider === "zai" && storedApiKey && (
+          <text style={{ fg: colors.text.muted, marginTop: 0.5 }}>
+            API Key: {storedApiKey.substring(0, 8)}...
+          </text>
+        )}
+      </box>
+      <box
+        style={{
+          padding: isNarrow ? 1 : 2,
+          border: true,
+          borderStyle: componentStyles.panel.borderStyle,
+          borderColor:
+            focused === "provider-select"
+              ? colors.border.focus
+              : colors.border.default,
+          backgroundColor: componentStyles.elevated.backgroundColor,
+          flexDirection: "column",
+          marginBottom: gap,
+          width: "100%",
+        }}
+      >
+        <text
+          style={{
+            attributes: TextAttributes.BOLD,
+            fg: colors.text.primary,
+            marginBottom: 1,
+          }}
+        >
+          Select Provider
+        </text>
+        <box
+          style={{
+            padding: 1,
+            backgroundColor:
+              selectedProvider === "openrouter"
+                ? componentStyles.list.item.hoverBackgroundColor
+                : "transparent",
+            marginBottom: 0.5,
+          }}
+        >
+          <text
+            style={{
+              fg:
+                selectedProvider === "openrouter"
+                  ? colors.accent.primary
+                  : colors.text.primary,
+            }}
+          >
+            {selectedProvider === "openrouter" ? "▶ " : "  "}OpenRouter/Workers
+          </text>
+        </box>
+        <box
+          style={{
+            padding: 1,
+            backgroundColor:
+              selectedProvider === "zai"
+                ? componentStyles.list.item.hoverBackgroundColor
+                : "transparent",
+          }}
+        >
+          <text
+            style={{
+              fg:
+                selectedProvider === "zai"
+                  ? colors.accent.primary
+                  : colors.text.primary,
+            }}
+          >
+            {selectedProvider === "zai" ? "▶ " : "  "}Z.AI
+          </text>
+        </box>
+      </box>
+      {selectedProvider === "zai" && (
+        <box
+          title="Z.AI API Key"
+          style={{
+            border: true,
+            borderStyle: componentStyles.panel.borderStyle,
+            borderColor:
+              focused === "api-key-input"
+                ? colors.border.focus
+                : colors.border.default,
+            backgroundColor: componentStyles.elevated.backgroundColor,
+            height: 3,
+            marginBottom: gap,
+            width: "100%",
+          }}
+        >
+          <input
+            placeholder="Enter your Z.AI API key..."
+            value={apiKey}
+            onInput={setApiKey}
+            onSubmit={handleProviderSwitch}
+            focused={focused === "api-key-input"}
+          />
+        </box>
+      )}
+      {message && (
+        <box
+          style={{
+            padding: isNarrow ? 1 : 2,
+            border: true,
+            borderStyle: componentStyles.panel.borderStyle,
+            borderColor:
+              status === "success"
+                ? colors.status.success
+                : status === "error"
+                ? colors.status.error
+                : colors.status.info,
+            backgroundColor:
+              status === "success"
+                ? componentStyles.messageBox.success.backgroundColor
+                : status === "error"
+                ? componentStyles.messageBox.error.backgroundColor
+                : componentStyles.messageBox.info.backgroundColor,
+            flexDirection: "column",
+            marginBottom: gap,
+            width: "100%",
+          }}
+        >
+          <text
+            style={{
+              fg:
+                status === "success"
+                  ? colors.status.success
+                  : status === "error"
+                  ? colors.status.error
+                  : colors.status.info,
+            }}
+          >
+            {message}
+          </text>
+        </box>
+      )}
+      <box
+        style={{
+          padding: isNarrow ? 1 : 2,
+          border: true,
+          borderStyle: componentStyles.panel.borderStyle,
+          borderColor: colors.border.default,
+          backgroundColor: componentStyles.elevated.backgroundColor,
+          flexDirection: "column",
+          marginBottom: gap,
+          width: "100%",
+        }}
+      >
+        <text
+          style={{
+            attributes: TextAttributes.BOLD,
+            fg: colors.text.primary,
+            marginBottom: 1,
+          }}
+        >
+          ℹ️ Instructions
+        </text>
+        <text style={{ fg: colors.text.muted, marginBottom: 0.5 }}>
+          1. Use ↑↓ to select provider
+        </text>
+        <text style={{ fg: colors.text.muted, marginBottom: 0.5 }}>
+          2. Press Tab to switch to API key input (Z.AI only)
+        </text>
+        <text style={{ fg: colors.text.muted, marginBottom: 0.5 }}>
+          3. Press Enter to apply configuration
+        </text>
+        <text style={{ fg: colors.text.muted }}>
+          4. Press ESC to return to menu
+        </text>
+      </box>
+      <Footer
+        shortcuts={
+          isNarrow
+            ? [
+                { keys: "↑↓", description: "Select", category: "Nav" },
+                { keys: "Tab", description: "Switch", category: "Nav" },
+                { keys: "Enter", description: "Apply", category: "Action" },
+                { keys: "ESC", description: "Back", category: "General" },
+              ]
+            : [
+                {
+                  keys: "↑↓",
+                  description: "Select Provider",
+                  category: "Navigation",
+                },
+                {
+                  keys: "Tab",
+                  description: "Switch Focus",
+                  category: "Navigation",
+                },
+                {
+                  keys: "Enter",
+                  description: "Apply Config",
+                  category: "Action",
+                },
+                {
+                  keys: "ESC",
+                  description: "Back to Menu",
+                  category: "General",
+                },
+              ]
+        }
+        groupByCategory={!isNarrow}
+        compact={isNarrow}
+      />
+    </box>
+  );
 }
