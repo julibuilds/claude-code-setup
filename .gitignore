@@ -45,3 +45,6 @@ _examples
 *.secret
 
 _backup
+
+# CLI cache
+apps/cli/.cache

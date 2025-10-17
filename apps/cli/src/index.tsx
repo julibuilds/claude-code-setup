@@ -1,14 +1,13 @@
 import { render, useKeyboard } from "@opentui/react";
 import { useCallback, useState } from "react";
-import { ConfigViewer } from "./components/ConfigViewer";
 import { DeployManager } from "./components/DeployManager";
 import { MainMenu } from "./components/MainMenu";
-import { ModelSelector } from "./components/ModelSelector";
+import { QuickConfig } from "./components/QuickConfig";
 import { SecretsManager } from "./components/SecretsManager";
 import { ConfigProvider } from "./context/ConfigContext";
 import { loadEnv } from "./utils/env";
 
-type Screen = "menu" | "config" | "models" | "deploy" | "secrets";
+type Screen = "menu" | "quick-config" | "deploy" | "secrets";
 
 function App() {
 	const [screen, setScreen] = useState<Screen>("menu");
@@ -37,8 +36,7 @@ function App() {
 			}}
 		>
 			{screen === "menu" && <MainMenu onNavigate={handleNavigate} />}
-			{screen === "config" && <ConfigViewer onBack={() => setScreen("menu")} />}
-			{screen === "models" && <ModelSelector onBack={() => setScreen("menu")} />}
+			{screen === "quick-config" && <QuickConfig onBack={() => setScreen("menu")} />}
 			{screen === "deploy" && <DeployManager onBack={() => setScreen("menu")} />}
 			{screen === "secrets" && <SecretsManager onBack={() => setScreen("menu")} />}
 		</box>

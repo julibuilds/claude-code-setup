@@ -1,38 +1,35 @@
 import { type SelectOption, TextAttributes } from "@opentui/core";
 import { useKeyboard, useTerminalDimensions } from "@opentui/react";
 import { useState } from "react";
+import { useConfig } from "../context/ConfigContext";
 
 interface MainMenuProps {
-	onNavigate: (screen: "config" | "models" | "deploy" | "secrets") => void;
+	onNavigate: (screen: "quick-config" | "deploy" | "secrets") => void;
 }
 
 export function MainMenu({ onNavigate }: MainMenuProps) {
 	const { width, height } = useTerminalDimensions();
+	const { config } = useConfig();
 	const [selectedIndex, setSelectedIndex] = useState(0);
 
 	const options: SelectOption[] = [
 		{
-			name: "View Configuration",
-			description: "View current router configuration",
-			value: "config",
+			name: "⚡ Quick Config",
+			description: "Configure all router models in one place",
+			value: "quick-config",
 		},
 		{
-			name: "Select Models",
-			description: "Browse and configure OpenRouter models",
-			value: "models",
-		},
-		{
-			name: "Deploy to Workers",
+			name: "🚀 Deploy to Workers",
 			description: "Deploy configuration to Cloudflare Workers",
 			value: "deploy",
 		},
 		{
-			name: "Manage Secrets",
+			name: "🔐 Manage Secrets",
 			description: "Update Cloudflare Workers secrets",
 			value: "secrets",
 		},
 		{
-			name: "Exit",
+			name: "❌ Exit",
 			description: "Exit the application",
 			value: "exit",
 		},
@@ -44,7 +41,7 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 			if (selected?.value === "exit") {
 				process.exit(0);
 			} else if (selected) {
-				onNavigate(selected.value as "config" | "models" | "deploy" | "secrets");
+				onNavigate(selected.value as "quick-config" | "deploy" | "secrets");
 			}
 		}
 	});
@@ -74,6 +71,29 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 				</text>
 				<text fg="#888">Manage your router configuration and deployments</text>
 			</box>
+
+			{/* Current Config Preview */}
+			{config && (
+				<box
+					style={{
+						border: true,
+						padding: 1,
+						marginBottom: 2,
+						flexDirection: "column",
+						backgroundColor: "#1a1b26",
+					}}
+				>
+					<text style={{ attributes: TextAttributes.BOLD, fg: "#7aa2f7" }}>
+						Current Configuration
+					</text>
+					<text fg="#888">Default: {config.Router.default.split(",")[1] || "Not set"}</text>
+					<text fg="#888">Background: {config.Router.background.split(",")[1] || "Not set"}</text>
+					<text fg="#888">Think: {config.Router.think.split(",")[1] || "Not set"}</text>
+					<text fg="#888">
+						Long Context: {config.Router.longContext.split(",")[1] || "Not set"}
+					</text>
+				</box>
+			)}
 
 			<box
 				style={{

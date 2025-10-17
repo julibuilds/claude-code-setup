@@ -35,7 +35,29 @@ function findEnvFiles(): string[] {
 	possiblePaths.push(resolve(cwd, ".dev.vars"));
 	possiblePaths.push(resolve(cwd, "..", "cli", ".env"));
 
-	return possiblePaths.filter((path) => existsSync(path));
+	// If running as compiled binary from anywhere, try to find project root
+	// Look for claude-code-setup directory structure
+	let searchDir = cwd;
+	for (let i = 0; i < 5; i++) {
+		// Search up to 5 levels
+		const appsCliEnv = resolve(searchDir, "apps", "cli", ".env");
+		const appsRouterVars = resolve(searchDir, "apps", "router", ".dev.vars");
+
+		if (existsSync(appsCliEnv)) {
+			possiblePaths.push(appsCliEnv);
+		}
+		if (existsSync(appsRouterVars)) {
+			possiblePaths.push(appsRouterVars);
+		}
+
+		const parent = resolve(searchDir, "..");
+		if (parent === searchDir) break; // Reached root
+		searchDir = parent;
+	}
+
+	// Remove duplicates and filter to existing files
+	const uniquePaths = [...new Set(possiblePaths)];
+	return uniquePaths.filter((path) => existsSync(path));
 }
 
 export async function loadEnv() {

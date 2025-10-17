@@ -9,10 +9,11 @@ This is a Turborepo monorepo containing a Claude Code Router system that intelli
 ## Monorepo Structure
 
 - `apps/router` - Main router service (Hono-based HTTP server)
+- `apps/cli` - Terminal UI for router configuration and Cloudflare Workers deployment
 - `apps/web` - Next.js web application (frontend/dashboard)
 - `packages/core` - Shared core library with types, transformers, and utilities
 - `packages/ui` - Shared UI components
-- `dev/` - Development tooling (ESLint, TypeScript configs)
+- `dev/` - Development tooling (TypeScript configs)
 
 ## Build Commands
 
@@ -27,6 +28,7 @@ bun run dev
 
 # Development mode (specific app)
 cd apps/router && bun run dev
+cd apps/cli && bun run dev
 cd apps/web && bun run dev
 
 # Build all packages/apps
@@ -35,6 +37,7 @@ bun run build
 # Build specific package/app
 cd packages/core && bun run build
 cd apps/router && bun run build
+cd apps/cli && bun run build
 
 # Type checking across all workspaces
 bun run check-types
@@ -80,6 +83,93 @@ bun run deploy:workers
 ```
 
 See `apps/router/README.workers.md` and `apps/router/DOCKER.md` for deployment guides.
+
+## CLI Application (`apps/cli`)
+
+### Overview
+
+Interactive Terminal User Interface (TUI) for managing router configurations and Cloudflare Workers deployments. Built with OpenTUI, React 19, and Zustand.
+
+### Key Features
+
+- **View Configuration**: Display current router settings and model assignments
+- **Model Selection**: Browse and select from available OpenRouter models
+- **Configuration Management**: Update router types (default, background, think, longContext)
+- **Deploy Management**: Deploy to production or staging environments
+- **Secrets Management**: Set and list Cloudflare Workers secrets
+- **Smart Caching**: 24-hour model list cache to reduce API calls
+- **Filtered Views**: Browse by Popular, Anthropic, OpenAI, or All models
+
+### Local Development
+
+```bash
+cd apps/cli
+
+# Development mode
+bun run dev
+
+# Build for production
+bun run build
+
+# Link globally (makes 'ccr' command available)
+bun run link
+
+# One-step setup
+bun run setup
+
+# Type checking
+bun run check-types
+
+# Linting
+bun run lint
+```
+
+### Usage
+
+```bash
+# From project root (after setup)
+ccr
+
+# Or from apps/cli directory
+cd apps/cli && bun run dev
+```
+
+### Environment Variables
+
+Required:
+- `OPENROUTER_API_KEY`: Your OpenRouter API key (for fetching models)
+
+The CLI loads from:
+- `apps/cli/.env`
+- `apps/router/.dev.vars`
+
+### Project Structure
+
+```
+apps/cli/
+├── src/
+│   ├── components/          # UI components
+│   │   ├── MainMenu.tsx
+│   │   ├── ConfigViewer.tsx
+│   │   ├── ModelSelector.tsx
+│   │   ├── DeployManager.tsx
+│   │   └── SecretsManager.tsx
+│   ├── context/             # React context
+│   │   └── ConfigContext.tsx
+│   ├── types/               # TypeScript types
+│   │   └── config.ts
+│   ├── utils/               # Utilities
+│   │   ├── cache.ts         # Model list caching (24h)
+│   │   ├── config.ts        # Config loading/saving
+│   │   ├── deploy.ts        # Deployment functions
+│   │   ├── env.ts           # Environment loading
+│   │   ├── openrouter.ts    # OpenRouter API client
+│   │   └── secrets.ts       # Secrets management
+│   └── index.tsx            # Entry point
+├── .cache/                  # Cached model data (gitignored)
+├── dist/                    # Compiled binary
+└── package.json
+```
 
 ## Core Package (`packages/core`)
 

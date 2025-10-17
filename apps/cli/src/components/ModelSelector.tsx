@@ -17,14 +17,15 @@ export function ModelSelector(_props: ModelSelectorProps) {
 	const [models, setModels] = useState<OpenRouterModel[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [step, setStep] = useState<"select-type" | "select-model">("select-type");
+	const [step, setStep] = useState<"select-type" | "select-filter" | "select-model">("select-type");
 	const [selectedType, setSelectedType] = useState<RouterKey | null>(null);
+	const [filter, setFilter] = useState<"popular" | "anthropic" | "openai" | "all">("popular");
 	const [saving, setSaving] = useState(false);
 
 	const loadModels = useCallback(async () => {
 		try {
 			setLoading(true);
-			const fetchedModels = await fetchOpenRouterModels();
+			const fetchedModels = await fetchOpenRouterModels(true);
 			setModels(fetchedModels);
 			setError(null);
 		} catch (err) {
@@ -40,8 +41,16 @@ export function ModelSelector(_props: ModelSelectorProps) {
 
 	const handleTypeSelect = useCallback((type: RouterKey) => {
 		setSelectedType(type);
-		setStep("select-model");
+		setStep("select-filter");
 	}, []);
+
+	const handleFilterSelect = useCallback(
+		(selectedFilter: "popular" | "anthropic" | "openai" | "all") => {
+			setFilter(selectedFilter);
+			setStep("select-model");
+		},
+		[]
+	);
 
 	const handleModelSelect = useCallback(
 		async (modelId: string) => {
@@ -71,9 +80,13 @@ export function ModelSelector(_props: ModelSelectorProps) {
 	);
 
 	useKeyboard((key) => {
-		if (key.name === "escape" && step === "select-model") {
-			setStep("select-type");
-			setSelectedType(null);
+		if (key.name === "escape") {
+			if (step === "select-model") {
+				setStep("select-filter");
+			} else if (step === "select-filter") {
+				setStep("select-type");
+				setSelectedType(null);
+			}
 		}
 	});
 
@@ -167,12 +180,114 @@ export function ModelSelector(_props: ModelSelectorProps) {
 		);
 	}
 
+	// Step: select-filter
+	if (step === "select-filter") {
+		const filterOptions: SelectOption[] = [
+			{
+				name: "Popular Models",
+				description: "Claude, GPT, Gemini, and other top models",
+				value: "popular",
+			},
+			{
+				name: "Anthropic Models",
+				description: "Claude models only",
+				value: "anthropic",
+			},
+			{
+				name: "OpenAI Models",
+				description: "GPT models only",
+				value: "openai",
+			},
+			{
+				name: "All Models",
+				description: `All ${models.length} available models`,
+				value: "all",
+			},
+		];
+
+		return (
+			<box
+				style={{
+					flexDirection: "column",
+					width: Math.min(100, width - 4),
+					height: height - 4,
+					padding: 2,
+				}}
+			>
+				<box style={{ marginBottom: 2 }}>
+					<text
+						style={{
+							attributes: TextAttributes.BOLD,
+							fg: "#00D9FF",
+						}}
+					>
+						Filter Models for {selectedType}
+					</text>
+				</box>
+
+				<box style={{ border: true, height: height - 10 }}>
+					<select
+						style={{ height: height - 12 }}
+						options={filterOptions}
+						focused={true}
+						onChange={(_, option) => {
+							if (option) {
+								handleFilterSelect(option.value as "popular" | "anthropic" | "openai" | "all");
+							}
+						}}
+						showScrollIndicator
+					/>
+				</box>
+
+				<box style={{ marginTop: 1 }}>
+					<text fg="#666">↑↓ Navigate • Enter Select • ESC Back</text>
+				</box>
+			</box>
+		);
+	}
+
 	// Step: select-model
-	const modelOptions: SelectOption[] = models.map((model) => ({
+	const popularProviders = [
+		"anthropic",
+		"openai",
+		"google",
+		"meta-llama",
+		"deepseek",
+		"x-ai",
+		"qwen",
+	];
+
+	let filteredModels = models;
+	if (filter === "popular") {
+		filteredModels = models.filter((model) =>
+			popularProviders.some((provider) => model.id.startsWith(provider + "/"))
+		);
+	} else if (filter === "anthropic") {
+		filteredModels = models.filter((model) => model.id.startsWith("anthropic/"));
+	} else if (filter === "openai") {
+		filteredModels = models.filter((model) => model.id.startsWith("openai/"));
+	}
+
+	// Sort by context length (descending) to show most capable models first
+	filteredModels = [...filteredModels].sort((a, b) => b.context_length - a.context_length);
+
+	// Limit to 100 models max to avoid rendering issues
+	const displayModels = filteredModels.slice(0, 100);
+
+	const modelOptions: SelectOption[] = displayModels.map((model) => ({
 		name: model.id,
 		description: formatModelForDisplay(model),
 		value: model.id,
 	}));
+
+	const filterLabel =
+		filter === "popular"
+			? "Popular"
+			: filter === "anthropic"
+				? "Anthropic"
+				: filter === "openai"
+					? "OpenAI"
+					: "All";
 
 	return (
 		<box
@@ -183,16 +298,21 @@ export function ModelSelector(_props: ModelSelectorProps) {
 				padding: 2,
 			}}
 		>
-			<box style={{ marginBottom: 2, flexDirection: "column" }}>
+			<box style={{ marginBottom: 1, flexDirection: "column" }}>
 				<text
 					style={{
 						attributes: TextAttributes.BOLD,
 						fg: "#00D9FF",
 					}}
 				>
-					Select Model for {selectedType}
+					Select Model
 				</text>
-				<text fg="#888">{models.length} models available</text>
+				<text fg="#888">
+					{filterLabel}:{" "}
+					{displayModels.length < filteredModels.length
+						? `Top ${displayModels.length} of ${filteredModels.length}`
+						: `${displayModels.length} models`}
+				</text>
 			</box>
 
 			<box style={{ border: true, height: height - 10 }}>

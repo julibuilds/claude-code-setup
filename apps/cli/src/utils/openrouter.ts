@@ -1,10 +1,27 @@
 import type { OpenRouterModel } from "../types/config";
+import { getCachedModels, setCachedModels } from "./cache";
 
 const OPENROUTER_API_BASE = "https://openrouter.ai/api/v1";
 
-export async function fetchOpenRouterModels(): Promise<OpenRouterModel[]> {
+export async function fetchOpenRouterModels(useCache = true): Promise<OpenRouterModel[]> {
 	const apiKey = process.env.OPENROUTER_API_KEY;
 
+	// Try to get from cache first
+	if (useCache) {
+		const cached = await getCachedModels();
+		if (cached) {
+			// Cache exists, but warn if API key is missing (for future refreshes)
+			if (!apiKey) {
+				console.warn(
+					"\nWarning: OPENROUTER_API_KEY not found. Using cached models.\n" +
+						"Cache will expire in 24 hours. Add API key to refresh models.\n"
+				);
+			}
+			return cached;
+		}
+	}
+
+	// No cache available, need API key to fetch
 	if (!apiKey) {
 		const cwd = process.cwd();
 		throw new Error(
@@ -29,7 +46,12 @@ export async function fetchOpenRouterModels(): Promise<OpenRouterModel[]> {
 	}
 
 	const data = (await response.json()) as { data: OpenRouterModel[] };
-	return data.data;
+	const models = data.data;
+
+	// Cache the results
+	await setCachedModels(models);
+
+	return models;
 }
 
 export function filterAnthropicModels(models: OpenRouterModel[]): OpenRouterModel[] {

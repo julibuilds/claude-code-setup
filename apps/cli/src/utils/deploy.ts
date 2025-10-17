@@ -13,6 +13,10 @@ export async function deployToWorkers(
 	try {
 		const routerPath = getRouterPath();
 
+		onOutput?.(`Deploying to ${env}...`);
+		onOutput?.(`Router path: ${routerPath}`);
+		onOutput?.("");
+
 		const args = ["wrangler", "deploy"];
 		if (env === "production") {
 			args.push("--env", "production");
@@ -26,6 +30,7 @@ export async function deployToWorkers(
 		const result = await execa("bunx", args, {
 			cwd: routerPath,
 			all: true,
+			stdio: "pipe",
 		});
 
 		const output = result.all || result.stdout;
@@ -38,10 +43,13 @@ export async function deployToWorkers(
 		}
 
 		return { success: true };
-	} catch (err) {
+	} catch (err: unknown) {
+		const error = err as { message?: string; stderr?: string; stdout?: string };
+		const errorMessage = error.stderr || error.stdout || error.message || "Deployment failed";
+
 		return {
 			success: false,
-			error: err instanceof Error ? err.message : "Deployment failed",
+			error: errorMessage,
 		};
 	}
 }

@@ -4,12 +4,14 @@ Interactive TUI (Terminal User Interface) for managing Claude Code Router config
 
 ## Features
 
-- **View Configuration**: Display current router settings and model assignments
-- **Model Selection**: Browse and select from all available OpenRouter models
-- **Easy Configuration**: Update router types (default, background, think, longContext) with a few keystrokes
+- **⚡ Quick Config**: All-in-one interface to configure all router models simultaneously
+- **Pending Changes**: Review and batch-save multiple configuration changes
+- **Smart Filtering**: Browse by Popular, Anthropic, OpenAI, or All models
+- **Live Preview**: See current and pending configurations side-by-side
 - **Deploy Management**: Deploy to production or staging environments
 - **Secrets Management**: Set and list Cloudflare Workers secrets
-- **Real-time Updates**: Fetch latest models from OpenRouter API
+- **Smart Caching**: Models list is cached for 24 hours to reduce API calls
+- **Keyboard Shortcuts**: Ctrl+S to save, Ctrl+R to reset, Tab to navigate
 
 ## Tech Stack
 
@@ -58,34 +60,47 @@ bun run dev
 
 - **↑↓ Arrow Keys**: Navigate menus and lists
 - **Enter**: Select option
-- **Tab**: Switch between input fields
+- **Tab**: Switch between panels (Quick Config)
+- **Ctrl+S**: Save all pending changes
+- **Ctrl+R**: Reset/discard pending changes
 - **ESC**: Go back or exit
 
 ## Features Overview
 
-### 1. View Configuration
+### 1. Quick Config ⚡
 
-Displays your current router configuration including:
+**All-in-one configuration interface** with three panels:
 
-- Router settings (default, background, think, longContext models)
-- Long context threshold
-- Configured OpenRouter models
+- **Left Panel**: Select router type (default, background, think, longContext)
+- **Middle Panel**: Filter models (Popular, Anthropic, OpenAI, All)
+- **Right Panel**: Browse and select models
 
-### 2. Select Models
+**Workflow**:
 
-Two-step process:
+1. Use arrow keys to select router type
+2. Press Tab to move to filter panel
+3. Press Tab to move to model list
+4. Select model with Enter
+5. Repeat for other router types
+6. Press Ctrl+S to save all changes
 
-1. Choose which router type to configure (default, background, think, longContext)
-2. Browse and select from all available OpenRouter models
+**Features**:
+
+- See current values for all router types
+- Preview pending changes before saving
+- Configure multiple router types in one session
+- Batch save with Ctrl+S
+- Reset changes with Ctrl+R
+- Visual indicators for unsaved changes
 
 The CLI automatically:
 
 - Fetches latest models from OpenRouter API
-- Shows context length for each model
+- Shows context length and pricing for each model
 - Updates both the router configuration and provider models list
 - Saves changes to `apps/router/config.json`
 
-### 3. Deploy to Workers
+### 2. Deploy to Workers 🚀
 
 Deploy your configuration to Cloudflare Workers:
 
@@ -93,7 +108,7 @@ Deploy your configuration to Cloudflare Workers:
 - Deploy to staging environment
 - Check current deployment status
 
-### 4. Manage Secrets
+### 3. Manage Secrets 🔐
 
 Manage Cloudflare Workers secrets:
 
@@ -119,8 +134,7 @@ apps/cli/
 ├── src/
 │   ├── components/          # UI components
 │   │   ├── MainMenu.tsx
-│   │   ├── ConfigViewer.tsx
-│   │   ├── ModelSelector.tsx
+│   │   ├── QuickConfig.tsx
 │   │   ├── DeployManager.tsx
 │   │   └── SecretsManager.tsx
 │   ├── context/             # React context
@@ -128,12 +142,14 @@ apps/cli/
 │   ├── types/               # TypeScript types
 │   │   └── config.ts
 │   ├── utils/               # Utilities
+│   │   ├── cache.ts         # Model list caching
 │   │   ├── config.ts        # Config loading/saving
 │   │   ├── deploy.ts        # Deployment functions
 │   │   ├── env.ts           # Environment loading
 │   │   ├── openrouter.ts    # OpenRouter API client
 │   │   └── secrets.ts       # Secrets management
 │   └── index.tsx            # Entry point
+├── .cache/                  # Cached model data (gitignored)
 ├── dist/                    # Compiled binary
 ├── package.json
 └── tsconfig.json
@@ -169,10 +185,16 @@ bun run fresh
 
 ## Tips
 
-- Use the Model Selector to quickly switch between models without editing JSON
+- **Quick Config** lets you configure multiple router types before saving
+- Use **Tab** to quickly move between panels without lifting your hands from the keyboard
+- **Ctrl+S** saves all pending changes at once - no need to save after each selection
+- **Ctrl+R** discards all pending changes if you change your mind
 - Deploy to staging first to test changes before production
 - The CLI automatically adds new models to the provider's models list
-- All changes are saved to `apps/router/config.json` immediately
+- Changes are only saved when you press Ctrl+S (pending changes are shown at the bottom)
+- Models list is cached for 24 hours - first load fetches from API, subsequent loads use cache
+- Use filter options (Popular, Anthropic, OpenAI) for faster navigation
+- Current configuration is shown on the main menu for quick reference
 
 ## Troubleshooting
 
