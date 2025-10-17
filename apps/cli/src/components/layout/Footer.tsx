@@ -1,5 +1,5 @@
 import { TextAttributes } from "@opentui/core";
-import { theme } from "../../design/theme";
+import { useComponentStyles, useThemeColors } from "@repo/tui";
 
 export interface Shortcut {
 	keys: string;
@@ -23,12 +23,15 @@ interface FooterProps {
  */
 export function Footer({
 	shortcuts,
-	backgroundColor = theme.colors.bg.dark,
+	backgroundColor,
 	groupByCategory = false,
 }: FooterProps) {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+
 	const groupShortcutsByCategory = (shortcuts: Shortcut[]) => {
 		const groups: Record<string, Shortcut[]> = {};
-		shortcuts.forEach(shortcut => {
+		shortcuts.forEach((shortcut) => {
 			const category = shortcut.category || "General";
 			if (!groups[category]) {
 				groups[category] = [];
@@ -44,7 +47,7 @@ export function Footer({
 				<text
 					style={{
 						attributes: TextAttributes.BOLD,
-						fg: theme.colors.accent.purple,
+						fg: colors.accent.secondary,
 						marginBottom: 1,
 					}}
 				>
@@ -52,16 +55,17 @@ export function Footer({
 				</text>
 			)}
 			{shortcuts.map((shortcut, i) => (
-				<text 
-					key={i} 
+				<text
+					key={i}
 					style={{
-						fg: theme.colors.text.primary,
+						fg: colors.text.primary,
 						marginLeft: category !== "General" ? 2 : 0,
 					}}
 				>
-					<span style={{ fg: theme.colors.accent.cyan, attributes: TextAttributes.BOLD }}>
+					<span style={{ fg: colors.accent.primary, attributes: TextAttributes.BOLD }}>
 						{shortcut.keys}
-					</span> {shortcut.description}
+					</span>{" "}
+					{shortcut.description}
 				</text>
 			))}
 		</box>
@@ -71,15 +75,16 @@ export function Footer({
 		if (groupByCategory) {
 			const groups = groupShortcutsByCategory(shortcuts);
 			return Object.entries(groups).map(([category, shortcuts]) =>
-				renderShortcutGroup(category, shortcuts)
+				renderShortcutGroup(category, shortcuts),
 			);
 		}
 
 		return shortcuts.map((shortcut, i) => (
-			<text key={i} style={{ fg: theme.colors.text.primary }}>
-				<span style={{ fg: theme.colors.accent.cyan, attributes: TextAttributes.BOLD }}>
+			<text key={i} style={{ fg: colors.text.primary }}>
+				<span style={{ fg: colors.accent.primary, attributes: TextAttributes.BOLD }}>
 					{shortcut.keys}
-				</span> {shortcut.description}
+				</span>{" "}
+				{shortcut.description}
 			</text>
 		));
 	};
@@ -87,15 +92,19 @@ export function Footer({
 	return (
 		<box
 			style={{
-				...theme.components.footer,
-				backgroundColor,
 				marginTop: 2,
+				padding: 2,
+				border: true,
+				borderStyle: componentStyles.panel.borderStyle,
+				borderColor: colors.border.muted,
+				backgroundColor: backgroundColor || componentStyles.elevated.backgroundColor,
+				flexDirection: "column",
 			}}
 		>
 			<text
 				style={{
 					attributes: TextAttributes.BOLD,
-					fg: theme.colors.accent.purple,
+					fg: colors.accent.secondary,
 					marginBottom: 1,
 				}}
 			>

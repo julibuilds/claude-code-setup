@@ -1,5 +1,5 @@
 import { TextAttributes } from "@opentui/core";
-import { theme } from "../../../design/theme";
+import { useComponentStyles, useThemeColors } from "@repo/tui";
 
 interface StatusOverlayProps {
 	type: "loading" | "saving";
@@ -14,6 +14,9 @@ export function StatusOverlay({
 	height,
 	pendingChangesCount = 0,
 }: StatusOverlayProps) {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+
 	const isLoading = type === "loading";
 	const icon = isLoading ? "⏳" : "💾";
 	const title = isLoading ? "Loading OpenRouter Models" : "Saving Configuration";
@@ -23,7 +26,7 @@ export function StatusOverlay({
 	const detail = isLoading
 		? "This may take a few seconds"
 		: `${pendingChangesCount} router(s) being updated`;
-	const color = isLoading ? theme.colors.accent.cyan : theme.colors.success;
+	const color = isLoading ? colors.accent.primary : colors.status.success;
 
 	return (
 		<box
@@ -39,8 +42,9 @@ export function StatusOverlay({
 			<box
 				style={{
 					border: true,
+					borderStyle: componentStyles.panel.borderStyle,
 					padding: 3,
-					backgroundColor: theme.colors.bg.dark,
+					backgroundColor: componentStyles.panel.backgroundColor,
 					flexDirection: "column",
 					alignItems: "center",
 				}}
@@ -54,8 +58,8 @@ export function StatusOverlay({
 				>
 					{icon} {title}
 				</text>
-				<text fg={theme.colors.text.primary}>{message}</text>
-				<text fg={theme.colors.text.dim} style={{ marginTop: 1 }}>
+				<text fg={colors.text.primary}>{message}</text>
+				<text fg={colors.text.muted} style={{ marginTop: 1 }}>
 					{detail}
 				</text>
 			</box>

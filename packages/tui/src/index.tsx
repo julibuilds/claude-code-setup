@@ -8,6 +8,7 @@ export {
 	type AccordionItemProps,
 	type AccordionProps,
 } from "./components/accordion";
+export { Badge, type BadgeProps, type BadgeVariant } from "./components/badge";
 export { Button, type ButtonProps } from "./components/button";
 export { Card, type CardProps } from "./components/card";
 export { Checkbox, type CheckboxProps } from "./components/checkbox";
@@ -36,6 +37,7 @@ export {
 } from "./components/diff-view/word-diff";
 export { DraggableBox, type DraggableBoxProps } from "./components/draggable-box";
 export { Dropdown } from "./components/dropdown";
+export { ErrorBox, type ErrorBoxProps } from "./components/error-box";
 export {
 	type FileIcon,
 	Image,
@@ -47,9 +49,12 @@ export { Kbd, type KbdProps } from "./components/kbd";
 export { List } from "./components/list";
 export { LoadingBar, Progress, type ProgressProps } from "./components/loading-bar";
 export { Modal, type ModalProps, type ModalSize } from "./components/modal";
+export { ProgressBar, type ProgressBarProps } from "./components/progress-bar";
 export { Select, type SelectOption, type SelectProps } from "./components/select";
 export { Separator, type SeparatorProps } from "./components/separator";
 export { Slider, type SliderProps } from "./components/slider";
+export { Spinner, type SpinnerProps } from "./components/spinner";
+export { StatusBox, type StatusBoxProps, type StatusType } from "./components/status-box";
 export { Switch, type SwitchProps } from "./components/switch";
 export {
 	type Column,

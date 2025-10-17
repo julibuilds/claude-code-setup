@@ -1,6 +1,5 @@
-import { type SelectOption, TextAttributes } from "@opentui/core";
-import { TextAttributes as TAEnum } from "@opentui/core";
-import { theme } from "../../design/theme";
+import type { SelectOption } from "@opentui/core";
+import { useComponentStyles, useThemeColors } from "@repo/tui";
 
 interface SelectListProps {
 	/** Options to display */
@@ -9,76 +8,46 @@ interface SelectListProps {
 	focused?: boolean;
 	/** Callback when selection changes */
 	onChange: (index: number, option: SelectOption | null) => void;
-	/** Optional title above the select */
-	title?: string;
-	/** Show scroll indicator for long lists */
-	showScrollIndicator?: boolean;
 	/** Height of the select container */
 	height?: number | `${number}%` | "auto";
-	/** Help text displayed below the select */
-	helpText?: string;
+	/** Show scroll indicator for long lists */
+	showScrollIndicator?: boolean;
 }
 
 /**
- * Wrapper around OpenTUI select component with standardized styling
- * Normalizes height calculations and adds visual feedback
+ * Wrapper around OpenTUI select component with standardized styling using TUI theme
  */
 export function SelectList({
 	options,
 	focused = false,
 	onChange,
-	title,
-	showScrollIndicator = true,
 	height = "100%",
-	helpText,
+	showScrollIndicator = true,
 }: SelectListProps) {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+
 	return (
-		<box style={{ flexDirection: "column" }}>
-			{title && (
-				<text
-					style={{
-						attributes: TAEnum.BOLD,
-						fg: theme.colors.text.primary,
-						marginBottom: 1,
-					}}
-				>
-					{title}
-				</text>
-			)}
-			<box
+		<box style={{ flexDirection: "column", flexGrow: 1 }}>
+			<select
+				options={options}
+				focused={focused}
+				onChange={onChange}
+				showScrollIndicator={showScrollIndicator}
 				style={{
-					...(focused ? theme.components.selectContainerFocused : theme.components.selectContainer),
-					flexDirection: "column",
+					height,
+					backgroundColor: focused
+						? componentStyles.elevated.backgroundColor
+						: componentStyles.panel.backgroundColor,
+					focusedBackgroundColor: componentStyles.list.item.hoverBackgroundColor,
+					textColor: colors.text.primary,
+					focusedTextColor: colors.accent.primary,
+					selectedBackgroundColor: colors.accent.primary,
+					selectedTextColor: colors.background.main,
+					descriptionColor: colors.text.muted,
+					selectedDescriptionColor: colors.text.primary,
 				}}
-			>
-				<select
-					options={options}
-					focused={focused}
-					onChange={onChange}
-					showScrollIndicator={showScrollIndicator}
-					style={{
-						height,
-						backgroundColor: focused ? theme.colors.bg.mid : theme.colors.bg.dark,
-						focusedBackgroundColor: theme.colors.bg.light,
-						textColor: theme.colors.text.primary,
-						focusedTextColor: theme.colors.accent.cyan,
-						selectedBackgroundColor: theme.colors.accent.cyan,
-						selectedTextColor: theme.colors.bg.dark,
-						descriptionColor: theme.colors.text.dim,
-						selectedDescriptionColor: theme.colors.text.primary,
-					}}
-				/>
-			</box>
-			{helpText && (
-				<text
-					style={{
-						fg: theme.colors.text.dim,
-						marginTop: 1,
-					}}
-				>
-					{helpText}
-				</text>
-			)}
+			/>
 		</box>
 	);
 }

@@ -1,7 +1,8 @@
-import { theme } from "../../design/theme";
-import { useProgressAnimation } from "../../hooks/useProgressAnimation";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { useComponentStyles, useThemeColors } from "../styles/theme-system";
 
-interface ProgressBarProps {
+export interface ProgressBarProps {
 	/** Label to display before/above the progress bar */
 	label?: string;
 	/** Progress percentage (0-100) */
@@ -24,7 +25,6 @@ interface ProgressBarProps {
 /**
  * Visual progress bar for long operations
  * Shows a filled bar and percentage with smooth animation
- * Consolidated from ui/ProgressBar and common/ProgressBar
  * 
  * Supports two styles:
  * 1. Character-based (default): Uses █ and ░ characters
@@ -38,13 +38,46 @@ export function ProgressBar({
 	animated = true,
 	duration = 500,
 	showPercentage = true,
-	color = theme.colors.accent.cyan,
+	color,
 	height,
-}: ProgressBarProps) {
+}: ProgressBarProps): ReactNode {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+	
 	const displayProgress = percent ?? progress ?? 0;
-	const animatedPercent = useProgressAnimation(displayProgress, duration);
+	const [animatedPercent, setAnimatedPercent] = useState(displayProgress);
+
+	useEffect(() => {
+		if (!animated) {
+			setAnimatedPercent(displayProgress);
+			return;
+		}
+
+		const startValue = animatedPercent;
+		const endValue = displayProgress;
+		const startTime = Date.now();
+
+		const animate = () => {
+			const elapsed = Date.now() - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			
+			// Ease out quad
+			const eased = 1 - (1 - progress) * (1 - progress);
+			const current = startValue + (endValue - startValue) * eased;
+			
+			setAnimatedPercent(current);
+
+			if (progress < 1) {
+				requestAnimationFrame(animate);
+			}
+		};
+
+		requestAnimationFrame(animate);
+	}, [displayProgress, animated, duration]);
+
 	const displayPercent = animated ? animatedPercent : displayProgress;
 	const roundedPercent = Math.round(displayPercent);
+	const barColor = color || colors.accent.primary;
 
 	// Box-style progress bar (when height is provided)
 	if (height) {
@@ -54,8 +87,8 @@ export function ProgressBar({
 					height,
 					border: true,
 					borderStyle: "single",
-					borderColor: theme.colors.text.dim,
-					backgroundColor: theme.colors.bg.dark,
+					borderColor: colors.border.default,
+					backgroundColor: componentStyles.card.backgroundColor,
 					flexDirection: "column",
 					padding: 1,
 				}}
@@ -66,7 +99,7 @@ export function ProgressBar({
 						style={{
 							flexGrow: 1,
 							height: 1,
-							backgroundColor: theme.colors.bg.mid,
+							backgroundColor: componentStyles.slider.track.backgroundColor,
 							flexDirection: "row",
 						}}
 					>
@@ -74,14 +107,14 @@ export function ProgressBar({
 							style={{
 								width: `${roundedPercent}%`,
 								height: 1,
-								backgroundColor: color,
+								backgroundColor: barColor,
 							}}
 						/>
 					</box>
 
 					{/* Percentage display */}
 					{showPercentage && (
-						<text style={{ fg: theme.colors.text.primary, width: 5 }}>
+						<text style={{ fg: colors.text.primary, width: 5 }}>
 							{roundedPercent}%
 						</text>
 					)}
@@ -91,7 +124,7 @@ export function ProgressBar({
 				{label && (
 					<text
 						style={{
-							fg: theme.colors.text.dim,
+							fg: colors.text.muted,
 							marginTop: 1,
 						}}
 					>
@@ -106,30 +139,22 @@ export function ProgressBar({
 	const filledWidth = Math.round((width * displayPercent) / 100);
 	const emptyWidth = width - filledWidth;
 
-	const filledBar = "█".repeat(Math.max(0, filledWidth));
-	const emptyBar = "░".repeat(Math.max(0, emptyWidth));
+	const filledBar = componentStyles.stats.progressChar.repeat(Math.max(0, filledWidth));
+	const emptyBar = componentStyles.stats.emptyChar.repeat(Math.max(0, emptyWidth));
 	const progressBar = `${filledBar}${emptyBar}`;
 
 	return (
 		<box style={{ flexDirection: "column", marginBottom: 2 }}>
 			{(label || showPercentage) && (
 				<box style={{ marginBottom: 1, flexDirection: "row", gap: 2 }}>
-					{label && (
-						<text style={{ fg: color }}>
-							{label}
-						</text>
-					)}
+					{label && <text style={{ fg: barColor }}>{label}</text>}
 					{showPercentage && (
-						<text style={{ fg: theme.colors.text.dim }}>
-							{roundedPercent}%
-						</text>
+						<text style={{ fg: colors.text.muted }}>{roundedPercent}%</text>
 					)}
 				</box>
 			)}
 			<box>
-				<text style={{ fg: color }}>
-					{progressBar}
-				</text>
+				<text style={{ fg: barColor }}>{progressBar}</text>
 			</box>
 		</box>
 	);

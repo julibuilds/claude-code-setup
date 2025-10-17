@@ -1,7 +1,8 @@
 import { TextAttributes } from "@opentui/core";
-import { theme } from "../../design/theme";
+import type { ReactNode } from "react";
+import { useComponentStyles, useThemeColors } from "../styles/theme-system";
 
-interface ErrorBoxProps {
+export interface ErrorBoxProps {
 	/** Error title */
 	title: string;
 	/** Error description */
@@ -10,34 +11,46 @@ interface ErrorBoxProps {
 	suggestions?: string[];
 	/** Optional recovery action hint */
 	recoveryHint?: string;
+	/** Optional padding override */
+	padding?: number;
+	/** Optional margin override */
+	marginTop?: number;
+	marginBottom?: number;
 }
 
 /**
- * Enhanced error display with icon, title, message, and suggestions
- * Provides better context and recovery guidance for errors
+ * ErrorBox component for displaying errors with context and recovery guidance
+ * Provides better error messages with suggestions and recovery hints
  */
 export function ErrorBox({
 	title,
 	description,
 	suggestions,
 	recoveryHint,
-}: ErrorBoxProps) {
+	padding = 2,
+	marginTop = 2,
+	marginBottom = 2,
+}: ErrorBoxProps): ReactNode {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+
 	return (
 		<box
 			style={{
-				...theme.components.statusBox,
-				backgroundColor: theme.colors.bg.dark,
+				backgroundColor: componentStyles.messageBox.error.backgroundColor,
 				flexDirection: "column",
 				border: true,
-				padding: 2,
-				marginTop: 2,
-				marginBottom: 2,
+				borderStyle: "heavy",
+				borderColor: colors.status.error,
+				padding,
+				marginTop,
+				marginBottom,
 			}}
 		>
 			<text
 				style={{
 					attributes: TextAttributes.BOLD,
-					fg: theme.colors.error,
+					fg: colors.status.error,
 					marginBottom: 1,
 				}}
 			>
@@ -46,7 +59,7 @@ export function ErrorBox({
 
 			<text
 				style={{
-					fg: theme.colors.text.primary,
+					fg: colors.text.primary,
 					marginBottom: suggestions || recoveryHint ? 1 : 0,
 				}}
 			>
@@ -57,14 +70,14 @@ export function ErrorBox({
 				<box style={{ flexDirection: "column", marginBottom: 1 }}>
 					<text
 						style={{
-							fg: theme.colors.text.dim,
+							fg: colors.text.muted,
 							marginBottom: 1,
 						}}
 					>
 						This usually means:
 					</text>
 					{suggestions.map((suggestion, i) => (
-						<text key={i} fg={theme.colors.text.dim}>
+						<text key={i} fg={colors.text.muted}>
 							- {suggestion}
 						</text>
 					))}
@@ -74,7 +87,7 @@ export function ErrorBox({
 			{recoveryHint && (
 				<text
 					style={{
-						fg: theme.colors.accent.cyan,
+						fg: colors.accent.primary,
 						marginTop: 1,
 					}}
 				>

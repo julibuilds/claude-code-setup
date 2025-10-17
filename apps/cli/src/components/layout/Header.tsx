@@ -1,5 +1,5 @@
 import { TextAttributes } from "@opentui/core";
-import { theme } from "../../design/theme";
+import { useComponentStyles, useThemeColors } from "@repo/tui";
 
 interface HeaderProps {
 	/** Header icon/emoji */
@@ -19,31 +19,49 @@ interface HeaderProps {
  * Provides consistent branding and context with improved styling
  */
 export function Header({ icon = "", title, subtitle, status, statusText }: HeaderProps) {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+
 	const getStatusIcon = (status?: string) => {
 		switch (status) {
-			case "success": return "✓";
-			case "warning": return "⚠";
-			case "error": return "✗";
-			case "info": return "ℹ";
-			default: return "";
+			case "success":
+				return "✓";
+			case "warning":
+				return "⚠";
+			case "error":
+				return "✗";
+			case "info":
+				return "ℹ";
+			default:
+				return "";
 		}
 	};
 
 	const getStatusColor = (status?: string) => {
 		switch (status) {
-			case "success": return theme.colors.success;
-			case "warning": return theme.colors.warning;
-			case "error": return theme.colors.error;
-			case "info": return theme.colors.info;
-			default: return theme.colors.text.primary;
+			case "success":
+				return colors.status.success;
+			case "warning":
+				return colors.status.warning;
+			case "error":
+				return colors.status.error;
+			case "info":
+				return colors.status.info;
+			default:
+				return colors.text.primary;
 		}
 	};
 
 	return (
 		<box
 			style={{
-				...theme.components.header,
 				marginBottom: 2,
+				padding: 2,
+				border: true,
+				borderStyle: componentStyles.panel.borderStyle,
+				borderColor: colors.accent.secondary,
+				backgroundColor: componentStyles.panel.backgroundColor,
+				flexDirection: "column",
 				alignItems: "center",
 			}}
 		>
@@ -51,19 +69,19 @@ export function Header({ icon = "", title, subtitle, status, statusText }: Heade
 			<text
 				style={{
 					attributes: TextAttributes.BOLD,
-					fg: theme.colors.accent.cyan,
+					fg: colors.accent.primary,
 					marginBottom: subtitle ? 1 : 0,
 					alignSelf: "center",
 				}}
 			>
 				{icon ? `${icon} ${title}` : title}
 			</text>
-			
+
 			{/* Subtitle */}
 			{subtitle && (
-				<text 
+				<text
 					style={{
-						fg: theme.colors.text.primary,
+						fg: colors.text.primary,
 						marginBottom: status ? 1 : 0,
 						alignSelf: "center",
 					}}
@@ -71,10 +89,10 @@ export function Header({ icon = "", title, subtitle, status, statusText }: Heade
 					{subtitle}
 				</text>
 			)}
-			
+
 			{/* Status indicator */}
 			{status && statusText && (
-				<text 
+				<text
 					style={{
 						fg: getStatusColor(status),
 						attributes: TextAttributes.BOLD,

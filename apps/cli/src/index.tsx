@@ -1,6 +1,6 @@
 import { render, useKeyboard } from "@opentui/react";
+import { ErrorBoundary, neonTheme, ThemeProvider } from "@repo/tui";
 import { useCallback, useState } from "react";
-import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { DeployManager } from "./components/features/DeployManager";
 import { MainMenu } from "./components/features/MainMenu";
 import { QuickConfig } from "./components/features/QuickConfig";
@@ -40,22 +40,22 @@ function App() {
 			}}
 		>
 			{screen === SCREENS.MENU && (
-				<ErrorBoundary screenName="MainMenu">
+				<ErrorBoundary>
 					<MainMenu onNavigate={handleNavigate} />
 				</ErrorBoundary>
 			)}
 			{screen === SCREENS.QUICK_CONFIG && (
-				<ErrorBoundary screenName="QuickConfig">
+				<ErrorBoundary>
 					<QuickConfig onBack={handleBack} />
 				</ErrorBoundary>
 			)}
 			{screen === SCREENS.DEPLOY && (
-				<ErrorBoundary screenName="DeployManager">
+				<ErrorBoundary>
 					<DeployManager onBack={handleBack} />
 				</ErrorBoundary>
 			)}
 			{screen === SCREENS.SECRETS && (
-				<ErrorBoundary screenName="SecretsManager">
+				<ErrorBoundary>
 					<SecretsManager onBack={handleBack} />
 				</ErrorBoundary>
 			)}
@@ -68,7 +68,9 @@ await loadEnv();
 
 // Render the app
 render(
-	<ConfigProvider>
-		<App />
-	</ConfigProvider>
+	<ThemeProvider initialTheme={neonTheme}>
+		<ConfigProvider>
+			<App />
+		</ConfigProvider>
+	</ThemeProvider>
 );

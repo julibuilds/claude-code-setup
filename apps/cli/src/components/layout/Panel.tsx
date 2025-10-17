@@ -1,5 +1,5 @@
 import { TextAttributes } from "@opentui/core";
-import { theme } from "../../design/theme";
+import { useComponentStyles, useThemeColors } from "@repo/tui";
 
 interface PanelProps {
 	/** Panel title */
@@ -37,44 +37,87 @@ export function Panel({
 	variant = "standard",
 	showFocusIndicator = true,
 }: PanelProps) {
+	const colors = useThemeColors();
+	const componentStyles = useComponentStyles();
+
 	const getPanelStyle = () => {
+		const baseStyle = {
+			border: true,
+			borderStyle: componentStyles.panel.borderStyle,
+			padding,
+			flexDirection: "column" as const,
+		};
+
 		if (focused) {
-			return theme.components.panelFocused;
+			return {
+				...baseStyle,
+				borderColor: colors.border.focus,
+				backgroundColor: componentStyles.elevated.backgroundColor,
+			};
 		}
-		
+
 		switch (variant) {
 			case "accent":
-				return { ...theme.borderStyles.accent, padding, flexDirection: "column" as const };
+				return {
+					...baseStyle,
+					borderColor: colors.accent.secondary,
+					backgroundColor: componentStyles.panel.backgroundColor,
+				};
 			case "success":
-				return { ...theme.borderStyles.success, padding, flexDirection: "column" as const };
+				return {
+					...baseStyle,
+					borderColor: colors.status.success,
+					backgroundColor: componentStyles.panel.backgroundColor,
+				};
 			case "warning":
-				return { ...theme.borderStyles.warning, padding, flexDirection: "column" as const };
+				return {
+					...baseStyle,
+					borderColor: colors.status.warning,
+					backgroundColor: componentStyles.panel.backgroundColor,
+				};
 			case "error":
-				return { ...theme.borderStyles.error, padding, flexDirection: "column" as const };
+				return {
+					...baseStyle,
+					borderColor: colors.status.error,
+					backgroundColor: componentStyles.panel.backgroundColor,
+				};
 			default:
-				return theme.components.panel;
+				return {
+					...baseStyle,
+					borderColor: colors.border.default,
+					backgroundColor: componentStyles.panel.backgroundColor,
+				};
 		}
 	};
 
 	const getTitleColor = () => {
-		if (focused) return theme.colors.accent.cyan;
-		
+		if (focused) return colors.accent.primary;
+
 		switch (variant) {
-			case "success": return theme.colors.success;
-			case "warning": return theme.colors.warning;
-			case "error": return theme.colors.error;
-			case "accent": return theme.colors.accent.purple;
-			default: return theme.colors.text.primary;
+			case "success":
+				return colors.status.success;
+			case "warning":
+				return colors.status.warning;
+			case "error":
+				return colors.status.error;
+			case "accent":
+				return colors.accent.secondary;
+			default:
+				return colors.text.primary;
 		}
 	};
 
 	const getFocusIcon = () => {
 		if (!focused || !showFocusIndicator) return "";
 		switch (variant) {
-			case "success": return "✓";
-			case "warning": return "⚠";
-			case "error": return "✗";
-			default: return "▶";
+			case "success":
+				return "✓";
+			case "warning":
+				return "⚠";
+			case "error":
+				return "✗";
+			default:
+				return "▶";
 		}
 	};
 

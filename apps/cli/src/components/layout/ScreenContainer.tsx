@@ -1,5 +1,5 @@
 import { useTerminalDimensions } from "@opentui/react";
-import { theme } from "../../design/theme";
+import { useThemeColors } from "@repo/tui";
 
 interface ScreenContainerProps {
 	children: React.ReactNode;
@@ -19,6 +19,7 @@ export function ScreenContainer({
 	maxWidth = 100,
 }: ScreenContainerProps) {
 	const { width, height } = useTerminalDimensions();
+	const colors = useThemeColors();
 
 	return (
 		<box
@@ -27,7 +28,7 @@ export function ScreenContainer({
 				width: Math.min(maxWidth, width - padding * 2),
 				height: height - padding * 2,
 				padding,
-				backgroundColor: theme.colors.bg.dark,
+				backgroundColor: colors.background.main,
 			}}
 		>
 			{children}
