@@ -24,6 +24,7 @@ Claude Code is an agentic coding tool that lives in your terminal, understands y
     # Complete
     claude
     ```
+
   </Tab>
 
   <Tab title="Cursor Guided Installation Method">
@@ -32,6 +33,7 @@ Claude Code is an agentic coding tool that lives in your terminal, understands y
     ```bash  theme={null}
     https://docs.anthropic.com/en/docs/claude-code/overview Help me install Claude Code
     ```
+
   </Tab>
 </Tabs>
 
@@ -111,6 +113,7 @@ Claude Code is an agentic coding tool that lives in your terminal, understands y
         </CodeGroup>
       </Tab>
     </Tabs>
+
   </Step>
 </Steps>
 
@@ -131,7 +134,7 @@ After launching, grant Claude Code permission to access files in your folder as 
 
 You can use Claude Code for development Now!
 
-***
+---
 
 ## FAQ
 
@@ -140,10 +143,10 @@ You can use Claude Code for development Now!
 <Check>
   Mapping between Claude Code internal model environment variables and GLM models, with the default configuration as follows:
 
-  * `ANTHROPIC_DEFAULT_OPUS_MODEL`: `GLM-4.6`
-  * `ANTHROPIC_DEFAULT_SONNET_MODEL`: `GLM-4.6`
-  * `ANTHROPIC_DEFAULT_HAIKU_MODEL`: `GLM-4.5-Air`
-</Check>
+- `ANTHROPIC_DEFAULT_OPUS_MODEL`: `GLM-4.6`
+- `ANTHROPIC_DEFAULT_SONNET_MODEL`: `GLM-4.6`
+- `ANTHROPIC_DEFAULT_HAIKU_MODEL`: `GLM-4.5-Air`
+  </Check>
 
 If adjustments are needed, you can directly modify the configuration file (for example, \~/.claude/settings.json in Claude Code) to switch to other models.
 
@@ -153,7 +156,7 @@ If adjustments are needed, you can directly modify the configuration file (for e
 
 1. Configure `~/.claude/settings.json` with the following content:
 
-```text  theme={null}
+```text theme={null}
 {
   "env": {
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air",
@@ -175,9 +178,9 @@ Refer to the [Vision MCP Server](../mcp/vision-mcp-server) and [Search MCP Serve
 
 If you manually modified the `~/.claude/settings.json` configuration file but found the changes did not take effect, refer to the following troubleshooting steps.
 
-* Close all Claude Code windows, open a new command-line window, and run `claude` again to start.
-* If the issue persists, try deleting the `~/.claude/settings.json` file and then reconfigure the environment variables; Claude Code will automatically generate a new configuration file.
-* Confirm that the JSON format of the configuration file is correct, check the variable names, and ensure there are no missing or extra commas; you can use an online JSON validator tool to check.
+- Close all Claude Code windows, open a new command-line window, and run `claude` again to start.
+- If the issue persists, try deleting the `~/.claude/settings.json` file and then reconfigure the environment variables; Claude Code will automatically generate a new configuration file.
+- Confirm that the JSON format of the configuration file is correct, check the variable names, and ensure there are no missing or extra commas; you can use an online JSON validator tool to check.
 
 ### Recommended Claude Code Version
 
@@ -185,7 +188,7 @@ We recommend using the latest version of Claude Code. You can check the current 
 
 > We have verified compatibility with Claude Code 2.0.14 and other versions.
 
-```bash  theme={null}
+```bash theme={null}
 # Check the current version
 claude --version
 

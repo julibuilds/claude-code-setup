@@ -1,6 +1,7 @@
+import type { PasteEvent } from "@opentui/core";
 import { TextAttributes } from "@opentui/core";
 import { useKeyboard } from "@opentui/react";
-import { Button, TextInput, useThemeColors } from "@repo/tui";
+import { Button, useOpentuiPaste, useThemeColors } from "@repo/tui";
 import { useCallback, useEffect, useState } from "react";
 import {
   configureZaiProvider,
@@ -13,12 +14,13 @@ interface ZaiProviderProps {
   onBack: () => void;
 }
 
-type FocusArea = "apiKey" | "configure" | "status";
+type FocusArea = "apiKey" | "configure" | "none";
 
 export function ZaiProvider({ onBack }: ZaiProviderProps) {
   const colors = useThemeColors();
   const [focusArea, setFocusArea] = useState<FocusArea>("apiKey");
   const [apiKey, setApiKey] = useState("");
+  const [displayValue, setDisplayValue] = useState("");
   const [currentProvider, setCurrentProvider] = useState<ProviderConfig | null>(
     null
   );
@@ -52,7 +54,7 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
 
     try {
       await configureZaiProvider(apiKey);
-      setStatusMessage("✓ ZAI provider configured successfully");
+      setStatusMessage("✓ ZAI provider configured successfully!");
       setIsConfigured(true);
       setCurrentProvider({ type: "zai", apiKey });
       setApiKey("");
@@ -69,24 +71,41 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
     }
   }, [apiKey]);
 
+  // Update display value when masking changes or focus changes
+  useEffect(() => {
+    if (focusArea === "apiKey") {
+      // When focused, show actual value
+      setDisplayValue(apiKey);
+    } else {
+      // When not focused, show masked value
+      setDisplayValue(
+        maskApiKey && apiKey ? "*".repeat(apiKey.length) : apiKey
+      );
+    }
+  }, [focusArea, apiKey, maskApiKey]);
+
   useKeyboard((evt) => {
     if (evt.name === "escape") {
       onBack();
     } else if (evt.name === "tab") {
-      setFocusArea((prev) => {
-        if (prev === "apiKey") return "configure";
-        if (prev === "configure") return "status";
-        return "apiKey";
-      });
+      setFocusArea((prev) => (prev === "apiKey" ? "configure" : "apiKey"));
     } else if (evt.ctrl && evt.name === "h") {
       setMaskApiKey((prev) => !prev);
-    } else if (evt.name === "return" && focusArea === "configure") {
-      handleConfigure();
     }
   });
 
-  const displayApiKey =
-    maskApiKey && apiKey ? "*".repeat(apiKey.length) : apiKey;
+  // Handle paste events
+  useOpentuiPaste(
+    useCallback(
+      (event: PasteEvent) => {
+        if (focusArea === "apiKey" && event.text) {
+          // Append pasted text to current API key value
+          setApiKey((prev) => prev + event.text);
+        }
+      },
+      [focusArea]
+    )
+  );
 
   return (
     <box flexGrow={1} flexDirection="column" style={{ padding: 1 }}>
@@ -102,6 +121,9 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
         </text>
         <text fg={colors.text.muted}>
           This will update your Claude settings to use ZAI's API endpoint.
+        </text>
+        <text fg={colors.accent.primary} attributes={TextAttributes.BOLD}>
+          ⚠ If you have a /login managed key, run: claude /logout first
         </text>
       </box>
 
@@ -133,11 +155,24 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
       </box>
 
       <box border title="ZAI API Key" style={{ height: 3, marginBottom: 1 }}>
-        <TextInput
-          value={displayApiKey}
+        <input
+          value={displayValue}
           placeholder="Enter your ZAI API key..."
           focused={focusArea === "apiKey"}
-          onChange={setApiKey}
+          onInput={(value: string) => {
+            // Only update if focused and not all asterisks (masked input)
+            if (
+              focusArea === "apiKey" &&
+              !(value.match(/^\*+$/) && !apiKey.startsWith("*"))
+            ) {
+              setApiKey(value);
+            }
+          }}
+          onSubmit={() => {
+            if (apiKey.trim()) {
+              setFocusArea("configure");
+            }
+          }}
         />
       </box>
 
@@ -175,13 +210,16 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
         style={{ padding: 1, marginBottom: 1 }}
       >
         <text fg={colors.text.muted}>
-          • ZAI provides access to Claude models
+          • ZAI provides access to GLM models via Claude-compatible API
         </text>
         <text fg={colors.text.muted}>
-          • Configuration updates ~/.claude/settings.local.json
+          • Configuration updates ~/.claude/settings.json
         </text>
         <text fg={colors.text.muted}>
-          • Your API key is stored securely in local settings
+          • Your API key is stored in ANTHROPIC_AUTH_TOKEN env var
+        </text>
+        <text fg={colors.text.muted}>
+          • If you see auth conflicts, run: claude /logout
         </text>
       </box>
 
