@@ -47,7 +47,7 @@ export function SelectList({
 			)}
 			<box
 				style={{
-					...theme.components.selectContainer,
+					...(focused ? theme.components.selectContainerFocused : theme.components.selectContainer),
 					flexDirection: "column",
 				}}
 			>
@@ -58,6 +58,14 @@ export function SelectList({
 					showScrollIndicator={showScrollIndicator}
 					style={{
 						height,
+						backgroundColor: focused ? theme.colors.bg.mid : theme.colors.bg.dark,
+						focusedBackgroundColor: theme.colors.bg.light,
+						textColor: theme.colors.text.primary,
+						focusedTextColor: theme.colors.accent.cyan,
+						selectedBackgroundColor: theme.colors.accent.cyan,
+						selectedTextColor: theme.colors.bg.dark,
+						descriptionColor: theme.colors.text.dim,
+						selectedDescriptionColor: theme.colors.text.primary,
 					}}
 				/>
 			</box>

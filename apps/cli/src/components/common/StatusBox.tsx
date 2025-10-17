@@ -16,32 +16,32 @@ interface StatusBoxProps {
 
 const statusConfig: Record<
 	StatusType,
-	{ icon: string; color: string; bgColor: string }
+	{ icon: string; color: string; componentStyle: Record<string, unknown> }
 > = {
 	success: {
 		icon: "✓",
 		color: theme.colors.success,
-		bgColor: theme.colors.bg.dark,
+		componentStyle: theme.components.statusBoxSuccess,
 	},
 	error: {
 		icon: "✗",
 		color: theme.colors.error,
-		bgColor: theme.colors.bg.dark,
+		componentStyle: theme.components.statusBoxError,
 	},
 	warning: {
 		icon: "⚠",
 		color: theme.colors.warning,
-		bgColor: theme.colors.bg.dark,
+		componentStyle: theme.components.statusBoxWarning,
 	},
 	info: {
 		icon: "ℹ",
 		color: theme.colors.info,
-		bgColor: theme.colors.bg.dark,
+		componentStyle: theme.components.statusBox,
 	},
 	loading: {
 		icon: "⏳",
 		color: theme.colors.accent.cyan,
-		bgColor: theme.colors.bg.dark,
+		componentStyle: theme.components.statusBox,
 	},
 };
 
@@ -61,9 +61,7 @@ export function StatusBox({
 	return (
 		<box
 			style={{
-				...theme.components.statusBox,
-				backgroundColor: config.bgColor,
-				flexDirection: "column",
+				...config.componentStyle,
 				marginTop: 2,
 				marginBottom: 2,
 			}}
@@ -77,7 +75,16 @@ export function StatusBox({
 			>
 				{displayIcon} {message}
 			</text>
-			{details && <text fg={theme.colors.text.dim}>{details}</text>}
+			{details && (
+				<text 
+					style={{
+						fg: theme.colors.text.dim,
+						marginTop: 0.5,
+					}}
+				>
+					{details}
+				</text>
+			)}
 		</box>
 	);
 }

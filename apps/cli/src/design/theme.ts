@@ -64,15 +64,45 @@ export const theme = {
 	borderStyles: {
 		standard: {
 			border: true,
+			borderStyle: "single",
+			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
 		},
 		focused: {
 			border: true,
+			borderStyle: "single",
+			borderColor: "#00D9FF",
 			backgroundColor: "#1f2335",
 		},
 		secondary: {
 			border: true,
+			borderStyle: "single",
+			borderColor: "#3b4261",
 			backgroundColor: "#28293a",
+		},
+		accent: {
+			border: true,
+			borderStyle: "rounded",
+			borderColor: "#bb9af7",
+			backgroundColor: "#1a1b26",
+		},
+		success: {
+			border: true,
+			borderStyle: "single",
+			borderColor: "#9ece6a",
+			backgroundColor: "#1a1b26",
+		},
+		warning: {
+			border: true,
+			borderStyle: "single",
+			borderColor: "#e0af68",
+			backgroundColor: "#1a1b26",
+		},
+		error: {
+			border: true,
+			borderStyle: "heavy",
+			borderColor: "#f7768e",
+			backgroundColor: "#1a1b26",
 		},
 	},
 
@@ -83,15 +113,30 @@ export const theme = {
 			marginBottom: 2,
 			padding: 2,
 			border: true,
-			flexDirection: "column" as const,
+			borderStyle: "rounded",
+			borderColor: "#bb9af7",
 			backgroundColor: "#1a1b26",
+			flexDirection: "column" as const,
 		},
 
 		// Panel style - used for bordered sections
 		panel: {
 			border: true,
+			borderStyle: "single",
+			borderColor: "#565f89",
+			backgroundColor: "#1a1b26",
+			padding: 2,
+			flexDirection: "column" as const,
+		},
+
+		// Focused panel style
+		panelFocused: {
+			border: true,
+			borderStyle: "single",
+			borderColor: "#00D9FF",
 			backgroundColor: "#1f2335",
 			padding: 2,
+			flexDirection: "column" as const,
 		},
 
 		// Footer style - used for keyboard shortcuts
@@ -99,22 +144,89 @@ export const theme = {
 			marginTop: 2,
 			padding: 2,
 			border: true,
+			borderStyle: "single",
+			borderColor: "#3b4261",
+			backgroundColor: "#28293a",
 			flexDirection: "column" as const,
-			backgroundColor: "#1a1b26",
 		},
 
 		// Select/Input container
 		selectContainer: {
 			border: true,
+			borderStyle: "single",
+			borderColor: "#565f89",
+			backgroundColor: "#1a1b26",
+			flexDirection: "column" as const,
+		},
+
+		// Focused select container
+		selectContainerFocused: {
+			border: true,
+			borderStyle: "single",
+			borderColor: "#00D9FF",
 			backgroundColor: "#1f2335",
 			flexDirection: "column" as const,
 		},
 
 		// Message/status box
 		statusBox: {
-			padding: 1,
+			padding: 2,
 			border: true,
+			borderStyle: "single",
+			borderColor: "#565f89",
 			backgroundColor: "#1a1b26",
+			flexDirection: "column" as const,
+		},
+
+		// Success status box
+		statusBoxSuccess: {
+			padding: 2,
+			border: true,
+			borderStyle: "single",
+			borderColor: "#9ece6a",
+			backgroundColor: "#1a1b26",
+			flexDirection: "column" as const,
+		},
+
+		// Warning status box
+		statusBoxWarning: {
+			padding: 2,
+			border: true,
+			borderStyle: "single",
+			borderColor: "#e0af68",
+			backgroundColor: "#1a1b26",
+			flexDirection: "column" as const,
+		},
+
+		// Error status box
+		statusBoxError: {
+			padding: 2,
+			border: true,
+			borderStyle: "heavy",
+			borderColor: "#f7768e",
+			backgroundColor: "#1a1b26",
+			flexDirection: "column" as const,
+		},
+
+		// Main menu container
+		mainMenu: {
+			border: true,
+			borderStyle: "single",
+			borderColor: "#565f89",
+			backgroundColor: "#1a1b26",
+			padding: 3,
+			flexDirection: "column" as const,
+			alignItems: "center" as const,
+		},
+
+		// Quick config container
+		quickConfig: {
+			border: true,
+			borderStyle: "single",
+			borderColor: "#565f89",
+			backgroundColor: "#1a1b26",
+			padding: 2,
+			flexDirection: "column" as const,
 		},
 	},
 

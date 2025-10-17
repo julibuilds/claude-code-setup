@@ -228,16 +228,17 @@ export function QuickConfig(_props: QuickConfigProps) {
 	return (
 		<box
 			style={{
-				flexDirection: "column",
+				...theme.components.quickConfig,
 				width: Math.min(120, width - 4),
 				height: height - 4,
-				padding: 2,
 			}}
 		>
 			<Header
 				icon="⚡"
 				title="Quick Config"
 				subtitle="Configure all router models • Tab to switch panels"
+				status={hasChanges ? "warning" : "info"}
+				statusText={hasChanges ? `${Object.keys(pendingChanges).length} pending changes` : "All changes saved"}
 			/>
 
 			<box
@@ -280,10 +281,9 @@ export function QuickConfig(_props: QuickConfigProps) {
 			{hasChanges && (
 				<box
 					style={{
-						...theme.components.statusBox,
+						...theme.components.statusBoxWarning,
 						marginTop: 2,
-						flexDirection: "column",
-						backgroundColor: theme.colors.bg.dark,
+						width: "100%",
 					}}
 				>
 					<text
@@ -297,8 +297,14 @@ export function QuickConfig(_props: QuickConfigProps) {
 					</text>
 					<box style={{ flexDirection: "column" }}>
 						{Object.entries(pendingChanges).map(([key, value]) => (
-							<text key={key} fg={theme.colors.success}>
-								✓ {key}: {value.split(",")[1]}
+							<text 
+								key={key} 
+								style={{
+									fg: theme.colors.success,
+									marginBottom: 0.5,
+								}}
+							>
+								✓ {key}: <span style={{ fg: theme.colors.text.primary }}>{value.split(",")[1]}</span>
 							</text>
 						))}
 					</box>
@@ -315,16 +321,17 @@ export function QuickConfig(_props: QuickConfigProps) {
 			)}
 
 			{/* Footer with shortcuts and pending changes warning */}
-			<box style={{ flexDirection: "column" }}>
+			<box style={{ flexDirection: "column", width: "100%" }}>
 				<Footer
 					shortcuts={[
-						{ keys: "Tab", description: "Switch panels" },
-						{ keys: "Enter", description: "Select" },
-						{ keys: "Ctrl+S", description: "Save" },
-						{ keys: "Ctrl+R", description: "Reset" },
-						{ keys: "Ctrl+F", description: "Refresh" },
-						{ keys: "ESC", description: "Back" },
+						{ keys: "Tab", description: "Switch panels", category: "Navigation" },
+						{ keys: "Enter", description: "Select", category: "Navigation" },
+						{ keys: "Ctrl+S", description: "Save", category: "Actions" },
+						{ keys: "Ctrl+R", description: "Reset", category: "Actions" },
+						{ keys: "Ctrl+F", description: "Refresh", category: "Actions" },
+						{ keys: "ESC", description: "Back", category: "General" },
 					]}
+					groupByCategory={true}
 				/>
 				<PendingChangesBox changes={pendingChanges} />
 			</box>

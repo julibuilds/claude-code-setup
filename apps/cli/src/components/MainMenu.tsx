@@ -1,10 +1,10 @@
-import { type SelectOption } from "@opentui/core";
+import type { SelectOption } from "@opentui/core";
+import { TextAttributes } from "@opentui/core";
 import { useKeyboard, useTerminalDimensions } from "@opentui/react";
 import { useState } from "react";
 import { useConfig } from "../context/ConfigContext";
 import { Header } from "./layout/Header";
 import { Footer } from "./layout/Footer";
-import { SelectList } from "./common/SelectList";
 import { theme } from "../design/theme";
 
 interface MainMenuProps {
@@ -59,10 +59,9 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 	return (
 		<box
 			style={{
-				flexDirection: "column",
+				...theme.components.mainMenu,
 				width: Math.min(90, width - 4),
 				height: height - 4,
-				padding: 2,
 			}}
 		>
 			{/* Header */}
@@ -70,20 +69,23 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 				icon="⚡"
 				title="Claude Code Router CLI"
 				subtitle="Manage your router configuration and deployments"
+				status={config ? "success" : "warning"}
+				statusText={config ? "Configuration loaded" : "No configuration found"}
 			/>
 
 			{/* Current Config Preview */}
 			{config && (
 				<box
 					style={{
-						...theme.components.header,
+						...theme.components.statusBoxSuccess,
 						marginBottom: 2,
+						width: "100%",
 					}}
 				>
 					<text
 						style={{
-							attributes: 1, // BOLD
-							fg: theme.colors.accent.purple,
+							attributes: TextAttributes.BOLD,
+							fg: theme.colors.success,
 							marginBottom: 1,
 						}}
 					>
@@ -101,9 +103,12 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 							return (
 								<text
 									key={label}
-									fg={isSet ? theme.colors.success : theme.colors.error}
+									style={{
+										fg: isSet ? theme.colors.success : theme.colors.error,
+										marginBottom: 0.5,
+									}}
 								>
-									{isSet ? "✓" : "✗"} {label}: {modelId || "Not configured"}
+									{isSet ? "✓" : "✗"} {label}: <span style={{ fg: theme.colors.text.primary }}>{modelId || "Not configured"}</span>
 								</text>
 							);
 						})}
@@ -114,13 +119,24 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 			{/* Menu Options */}
 			<box
 				style={{
-					...theme.components.selectContainer,
+					...theme.components.selectContainerFocused,
 					height: contentHeight,
 					marginBottom: 2,
+					width: "100%",
 				}}
 			>
 				<select
-					style={{ height: "100%" }}
+					style={{ 
+						height: "100%",
+						backgroundColor: theme.colors.bg.mid,
+						focusedBackgroundColor: theme.colors.bg.light,
+						textColor: theme.colors.text.primary,
+						focusedTextColor: theme.colors.accent.cyan,
+						selectedBackgroundColor: theme.colors.accent.cyan,
+						selectedTextColor: theme.colors.bg.dark,
+						descriptionColor: theme.colors.text.dim,
+						selectedDescriptionColor: theme.colors.text.primary,
+					}}
 					options={options}
 					focused={true}
 					onChange={(index) => {
@@ -133,10 +149,11 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 			{/* Footer */}
 			<Footer
 				shortcuts={[
-					{ keys: "↑↓", description: "Navigate" },
-					{ keys: "Enter", description: "Select" },
-					{ keys: "ESC", description: "Exit" },
+					{ keys: "↑↓", description: "Navigate", category: "Navigation" },
+					{ keys: "Enter", description: "Select", category: "Navigation" },
+					{ keys: "ESC", description: "Exit", category: "General" },
 				]}
+				groupByCategory={true}
 			/>
 		</box>
 	);
