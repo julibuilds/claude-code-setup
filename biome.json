@@ -1,72 +1,83 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true,
-		"defaultBranch": "main"
-	},
-	"files": {
-		"ignoreUnknown": true,
-		"includes": ["**/*"]
-	},
-	"formatter": {
-		"enabled": false,
-		"indentStyle": "tab",
-		"lineWidth": 100
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true,
-			"suspicious": {
-				"noArrayIndexKey": "warn",
-				"noExplicitAny": "warn",
-				"noAssignInExpressions": "warn"
-			},
-			"style": {
-				"useNodejsImportProtocol": "warn"
-			},
-			"a11y": {
-				"useKeyWithMouseEvents": "warn",
-				"noStaticElementInteractions": "warn",
-				"useSemanticElements": "warn"
-			},
-			"correctness": {
-				"useExhaustiveDependencies": "warn",
-				"useHookAtTopLevel": "warn"
-			}
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double",
-			"semicolons": "always",
-			"trailingCommas": "es5"
-		}
-	},
-	"json": {
-		"formatter": {
-			"enabled": true,
-			"indentStyle": "tab"
-		}
-	},
-	"assist": {
-		"enabled": false,
-		"actions": {
-			"source": {
-				"organizeImports": "off"
-			}
-		}
-	},
-	"overrides": [
-		{
-			"includes": ["package.json"],
-			"json": {
-				"formatter": {
-					"lineWidth": 1
-				}
-			}
-		}
-	]
+  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "!dist/",
+      ".cache/",
+      "apps/**/*",
+      "packages/**/*",
+      "dev/**/*",
+      "*.json",
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.jsx"
+    ]
+  },
+  "formatter": {
+    "enabled": false,
+    "indentStyle": "tab",
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noArrayIndexKey": "warn",
+        "noExplicitAny": "warn",
+        "noAssignInExpressions": "warn"
+      },
+      "style": {
+        "useNodejsImportProtocol": "warn"
+      },
+      "a11y": {
+        "useKeyWithMouseEvents": "warn",
+        "noStaticElementInteractions": "warn",
+        "useSemanticElements": "warn"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "warn"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "tab"
+    }
+  },
+  "assist": {
+    "enabled": false,
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["package.json"],
+      "json": {
+        "formatter": {
+          "lineWidth": 1
+        }
+      }
+    }
+  ]
 }

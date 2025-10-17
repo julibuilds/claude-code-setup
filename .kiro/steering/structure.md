@@ -57,10 +57,11 @@ apps/cli/
 │   │   └── SecretsManager.tsx
 │   ├── context/             # React context
 │   │   └── ConfigContext.tsx
+│   ├── hooks/               # Custom React hooks
 │   ├── types/               # TypeScript types
 │   │   └── config.ts
 │   ├── utils/               # Utilities
-│   │   ├── cache.ts         # Model list caching
+│   │   ├── cache.ts         # Model list caching (24h TTL)
 │   │   ├── config.ts        # Config loading/saving
 │   │   ├── deploy.ts        # Deployment with verification
 │   │   ├── env.ts           # Environment loading (import.meta.dir)
@@ -68,14 +69,17 @@ apps/cli/
 │   │   ├── secrets.ts       # Secrets with .dev.vars sync
 │   │   └── sync.ts          # File synchronization utilities
 │   └── index.tsx            # Entry point
+├── scripts/                 # Build scripts
+│   └── post-link.ts         # Post-link setup script
 ├── .cache/                  # Cached model data (gitignored)
-├── dist/                    # Compiled binary (router-workers-cli)
+│   └── openrouter-models.json
+├── dist/                    # Compiled binary (gitignored)
+│   └── router-workers-cli   # Standalone executable
 ├── .env                     # CLI secrets (gitignored)
 ├── package.json
+├── tsconfig.json
 ├── README.md                # Usage guide
-├── FILE-SYNC.md             # File synchronization documentation
-├── FIXES.md                 # Bug fixes and resolutions
-├── SOLUTION.md              # Technical implementation details
+├── PLAN.md                  # UI/UX renovation plan
 └── TODO.md                  # Planned features
 ```
 
@@ -86,9 +90,14 @@ apps/cli/
 - Automatically syncs `.dev.vars` when setting secrets
 - Verifies local files before/after deployment
 - Smart caching with 24-hour TTL for model lists
-- Built with OpenTUI (React-based TUI framework)
+- Built with OpenTUI v0.1.27 (React-based TUI framework)
+- Pending changes system for batch configuration updates
+- Multi-panel Quick Config interface
+- Keyboard shortcuts: Ctrl+S (save), Ctrl+R (reset), Ctrl+F (force refresh), Tab (navigate)
 
 **Global Command**: `ccr` (after running `bun run link`)
+
+**Current Version**: v2.0.2+ (file synchronization, path resolution fixes)
 
 #### apps/web (Next.js)
 

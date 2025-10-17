@@ -16,33 +16,38 @@
 
 ### CLI Stack (apps/cli)
 
-- **UI Framework**: OpenTUI (`@opentui/core` and `@opentui/react`)
-- **React**: 19.x for component architecture
-- **State Management**: Zustand + React Context
-- **Process Execution**: execa, zx for running wrangler commands
-- **HTTP Client**: undici for OpenRouter API calls
+- **UI Framework**: OpenTUI v0.1.27 (`@opentui/core` and `@opentui/react`)
+- **React**: 19.2.0 for component architecture
+- **State Management**: Zustand 5.0.8 + React Context
+- **Process Execution**: execa 9.6.0, zx 8.8.4 for running wrangler commands
+- **HTTP Client**: undici 7.16.0 for OpenRouter API calls
+- **Schema Validation**: Zod 4.1.12
+- **Query Management**: TanStack React Query 5.90.5 with persistence
 - **Compilation**: `bun build --compile` for standalone binary
 - **Path Resolution**: `import.meta.dir` for reliable file location in compiled binaries
 
 ### Frontend Stack (apps/web)
 
-- **Framework**: Next.js 15+ (App Router)
-- **UI Library**: React 19
-- **Styling**: Tailwind CSS v4+, @tailwindcss/postcss
+- **Framework**: Next.js 15.5.5 (App Router)
+- **UI Library**: React 19.2.0
+- **Styling**: Tailwind CSS v4.1.14, @tailwindcss/postcss 4.1.14
 - **Component Library**: Radix UI primitives, shadcn/ui patterns
-- **Utilities**: class-variance-authority, clsx, tailwind-merge
+- **Utilities**: class-variance-authority 0.7.1, clsx 2.1.1, tailwind-merge 3.3.1
+- **Icons**: lucide-react 0.545.0
+- **Animations**: tw-animate-css 1.4.0
 
 ### Code Quality
 
-- **Formatter/Linter**: Biome (replaces ESLint + Prettier)
-- **Security**: secretlint for detecting secrets in code
-- **Type Checking**: TypeScript strict mode
+- **Formatter/Linter**: Biome 2.2.6 (replaces ESLint + Prettier)
+- **Security**: secretlint 11.2.5 for detecting secrets in code
+- **Type Checking**: TypeScript 5.9.3 strict mode
 
 ### Deployment Targets
 
-- **Edge**: Cloudflare Workers (via Wrangler)
+- **Edge**: Cloudflare Workers (via Wrangler 4.43.0)
 - **Local**: Docker Compose, Bun dev server
 - **Web**: Next.js (Vercel-ready)
+- **CLI**: Standalone binary (works from any directory)
 
 ## Common Commands
 
@@ -99,32 +104,41 @@ cd apps/cli && bun run build
 # Link CLI globally (makes 'ccr' command available)
 cd apps/cli && bun run link
 
-# Run CLI from anywhere
+# Or do everything at once
+cd apps/cli && bun run setup
+
+# Run CLI from anywhere after linking
 ccr
 
 # Or run directly without building
 cd apps/cli && bun run dev
+
+# Clean and rebuild
+cd apps/cli && bun run fresh
 ```
 
 ### Deployment
 
 ```bash
-# Deploy using CLI (recommended)
+# Deploy using CLI (recommended - includes verification)
 ccr
 # Select "Deploy to Workers" → "Deploy Now"
 
 # Or deploy manually
 cd apps/router && bun run deploy:workers
 
-# Set secrets using CLI (recommended - syncs .dev.vars)
+# Set secrets using CLI (recommended - auto-syncs .dev.vars)
 ccr
 # Select "Manage Secrets" → "Set Secret"
 
-# Or set secrets manually
+# Or set secrets manually (won't sync .dev.vars)
 cd apps/router && bunx wrangler secret put OPENROUTER_API_KEY
 
 # View deployment logs
 cd apps/router && bunx wrangler tail
+
+# Check deployment status
+cd apps/router && bunx wrangler deployments list
 ```
 
 ### Testing
@@ -141,11 +155,11 @@ curl https://your-worker.workers.dev/v1/messages/count_tokens
 
 ### Path Resolution in Compiled Binaries
 
-The CLI uses `import.meta.dir` for reliable path resolution:
+The CLI uses `import.meta.dir` for reliable path resolution in compiled binaries:
 
 ```typescript
 // Problem: process.execPath points to binary, not source
-const binaryPath = process.execPath; // ❌ Unreliable
+const binaryPath = process.execPath; // ❌ Unreliable in compiled binaries
 
 // Solution: import.meta.dir is embedded at compile time
 const sourceDir = import.meta.dir; // ✅ Points to source directory
@@ -156,7 +170,7 @@ const sourceDir = import.meta.dir; // ✅ Points to source directory
 - `import.meta.dir` is embedded at compile time by Bun
 - Points to original source directory, not binary location
 - Works regardless of where binary is executed from
-- Allows CLI to be truly portable
+- Allows CLI to be truly portable (run from any directory)
 
 **Implementation**:
 
@@ -167,65 +181,95 @@ const srcDir = resolve(sourceDir, ".."); // apps/cli/src
 const cliDir = resolve(srcDir, ".."); // apps/cli
 const appsDir = resolve(cliDir, ".."); // apps
 const projectRoot = resolve(appsDir, ".."); // project root
+const routerDir = resolve(projectRoot, "apps", "router"); // apps/router
 ```
+
+**Note**: This approach was critical for fixing deployment and environment loading issues in v2.0.2.
 
 ### File Synchronization
 
-The CLI automatically syncs local files with Cloudflare Workers:
+The CLI automatically syncs local files with Cloudflare Workers to maintain consistency:
 
 **Setting Secrets**:
 
-1. Calls `wrangler secret put KEY` (remote)
-2. Updates `apps/router/.dev.vars` (local)
+1. Calls `wrangler secret put KEY` (remote - Cloudflare Workers)
+2. Updates `apps/router/.dev.vars` (local - development environment)
 3. Returns status with `localFileUpdated: boolean`
+4. Shows confirmation for both operations in UI
 
 **Deployment**:
 
 1. Pre-deployment: Verifies `config.json`, `wrangler.toml`, `.dev.vars` exist
-2. Runs `wrangler deploy`
-3. Post-deployment: Re-verifies files
+2. Runs `wrangler deploy` from correct directory
+3. Post-deployment: Re-verifies files are intact
 4. Returns status with `filesVerified: boolean` and warnings
+5. Shows detailed feedback in UI
+
+**Configuration Updates**:
+
+1. User makes changes in Quick Config
+2. Pending changes tracked in state
+3. On Ctrl+S: Updates `config.json` and provider models list
+4. Shows success/error feedback
 
 **Key Functions**:
 
 - `updateDevVars()`: Updates or appends key-value pairs in `.dev.vars`
 - `verifyLocalFiles()`: Checks required files exist
-- `backupFile()`: Creates timestamped backups (planned)
+- `saveConfig()`: Writes updated configuration to `config.json`
+- `syncProviderModels()`: Ensures provider models list includes selected models
 
 ### Caching Strategy
 
 **Model List Caching**:
 
 - Cache location: `apps/cli/.cache/openrouter-models.json`
-- TTL: 24 hours
-- Cache key: Based on timestamp
-- Force refresh: Ctrl+F in Quick Config
+- TTL: 24 hours (86400000 ms)
+- Cache key: Based on timestamp in cached file
+- Force refresh: Ctrl+F in Quick Config (bypasses cache)
+- Auto-refresh: Fetches new data if cache is stale
 
 **Benefits**:
 
-- Reduces API calls to OpenRouter
-- Faster startup time
-- Works offline (if cache exists)
+- Reduces API calls to OpenRouter (rate limiting, cost)
+- Faster startup time (no network delay)
+- Works offline (if cache exists and is valid)
 - Automatic cache invalidation after 24 hours
+- Manual refresh available for immediate updates
+
+**Implementation**:
+
+```typescript
+// In apps/cli/src/utils/cache.ts
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_FILE = join(cliDir, ".cache", "openrouter-models.json");
+
+// Check if cache is valid
+const isCacheValid = (timestamp: number) => Date.now() - timestamp < CACHE_TTL;
+```
 
 ### OpenTUI Framework
 
-The CLI uses OpenTUI for terminal UI:
+The CLI uses OpenTUI v0.1.27 for terminal UI (React-based TUI framework):
 
 **Key Components**:
 
-- `<box>`: Container with flexbox layout
-- `<text>`: Text display with styling
-- `<input>`: Text input with focus management
-- `<select>`: Dropdown selection with keyboard navigation
-- `<scrollbox>`: Scrollable content area
+- `<box>`: Container with flexbox layout, borders, padding
+- `<text>`: Text display with styling (colors, attributes)
+- `<input>`: Text input with focus management and callbacks
+- `<select>`: Dropdown selection with keyboard navigation and scroll indicators
+- `<scrollbox>`: Scrollable content area with customizable scrollbars
+- `<tab-select>`: Tab-based navigation component
+- `<ascii-font>`: ASCII art text rendering
 
 **Critical Patterns**:
 
 - Only ONE component can have `focused={true}` at a time
 - Use `useKeyboard()` hook for keyboard shortcuts
-- Tab key for focus cycling
-- ESC key for navigation back
+- Tab key for focus cycling between components
+- ESC key for navigation back/exit
+- `<select>` requires explicit height on both container and component
+- `import.meta.dir` for path resolution in compiled binaries
 
 **Example**:
 
@@ -236,11 +280,16 @@ useKeyboard((key) => {
   if (key.name === "tab") {
     setFocused(prev => prev === "input1" ? "input2" : "input1");
   }
+  if (key.name === "escape") {
+    process.exit(0);
+  }
 });
 
-<input focused={focused === "input1"} />
-<input focused={focused === "input2"} />
+<input focused={focused === "input1"} onInput={setValue1} />
+<input focused={focused === "input2"} onInput={setValue2} />
 ```
+
+**See `.kiro/steering/opentui.md` for comprehensive OpenTUI documentation and patterns.**
 
 ## Code Style Conventions
 
