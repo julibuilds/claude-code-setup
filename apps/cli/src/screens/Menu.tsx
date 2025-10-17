@@ -19,10 +19,10 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     key: "1",
-    screen: SCREENS.QUICK_CONFIG,
-    label: "Quick Config",
+    screen: SCREENS.ADVANCED_CONFIG,
+    label: "Advanced Config",
     description:
-      "Configure router models (default, background, think, longContext)",
+      "Configure models, providers, and router settings with advanced tools",
     icon: "⚙️",
   },
   {

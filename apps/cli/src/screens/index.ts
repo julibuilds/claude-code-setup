@@ -1,3 +1,4 @@
+export { AdvancedConfig } from "./AdvancedConfig";
 export { Deploy } from "./Deploy";
 export { Menu } from "./Menu";
 export { QuickConfig } from "./QuickConfig";

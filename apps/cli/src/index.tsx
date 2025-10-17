@@ -3,7 +3,7 @@ import { ThemeProvider, useThemeColors } from "@repo/tui";
 import { useState } from "react";
 import { SCREENS, type Screen } from "./constants";
 import { ConfigProvider } from "./context/ConfigContext";
-import { Deploy, Menu, QuickConfig, Secrets, ZaiProvider } from "./screens";
+import { AdvancedConfig, Deploy, Menu, QuickConfig, Secrets, ZaiProvider } from "./screens";
 import { loadEnv } from "./utils/env";
 
 function App() {
@@ -30,6 +30,9 @@ function App() {
       {currentScreen === SCREENS.MENU && <Menu onNavigate={handleNavigate} />}
       {currentScreen === SCREENS.QUICK_CONFIG && (
         <QuickConfig onBack={handleBack} />
+      )}
+      {currentScreen === SCREENS.ADVANCED_CONFIG && (
+        <AdvancedConfig onBack={handleBack} />
       )}
       {currentScreen === SCREENS.DEPLOY && <Deploy onBack={handleBack} />}
       {currentScreen === SCREENS.SECRETS && <Secrets onBack={handleBack} />}

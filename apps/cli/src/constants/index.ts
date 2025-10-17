@@ -47,6 +47,7 @@ export type FilterType = (typeof FILTER_TYPES)[keyof typeof FILTER_TYPES];
 export const SCREENS = {
   MENU: "menu",
   QUICK_CONFIG: "quick-config",
+  ADVANCED_CONFIG: "advanced-config",
   DEPLOY: "deploy",
   SECRETS: "secrets",
   ZAI_PROVIDER: "zai-provider",

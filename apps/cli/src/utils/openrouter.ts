@@ -3,6 +3,13 @@ import { getCachedModels, setCachedModels } from "./cache";
 
 const OPENROUTER_API_BASE = "https://openrouter.ai/api/v1";
 
+export interface ModelStats {
+  totalModels: number;
+  providerCounts: Record<string, number>;
+  averageContextLength: number;
+  costRange: { min: number; max: number };
+}
+
 export async function fetchOpenRouterModels(useCache = true): Promise<OpenRouterModel[]> {
 	const apiKey = process.env.OPENROUTER_API_KEY;
 
@@ -54,6 +61,29 @@ export async function fetchOpenRouterModels(useCache = true): Promise<OpenRouter
 	return models;
 }
 
+export async function fetchUserFilteredModels(): Promise<OpenRouterModel[]> {
+	const apiKey = process.env.OPENROUTER_API_KEY;
+	
+	if (!apiKey) {
+		// Fall back to regular models if no API key
+		return fetchOpenRouterModels();
+	}
+
+	const response = await fetch(`${OPENROUTER_API_BASE}/models/user`, {
+		headers: {
+			Authorization: `Bearer ${apiKey}`,
+		},
+	});
+
+	if (!response.ok) {
+		// Fall back to regular models if user endpoint fails
+		return fetchOpenRouterModels();
+	}
+
+	const data = (await response.json()) as { data: OpenRouterModel[] };
+	return data.data;
+}
+
 export function filterAnthropicModels(models: OpenRouterModel[]): OpenRouterModel[] {
 	return models.filter((model) => model.id.startsWith("anthropic/"));
 }
@@ -69,4 +99,89 @@ export function sortModelsByContextLength(models: OpenRouterModel[]): OpenRouter
 export function formatModelForDisplay(model: OpenRouterModel): string {
 	const contextK = Math.floor(model.context_length / 1000);
 	return `${model.id} (${contextK}K ctx)`;
+}
+
+export function getModelStats(models: OpenRouterModel[]): ModelStats {
+  const providerCounts: Record<string, number> = {};
+  let totalContextLength = 0;
+  let minCost = Infinity;
+  let maxCost = 0;
+
+  models.forEach(model => {
+    const provider = model.id.split('/')[0] || 'unknown';
+    providerCounts[provider] = (providerCounts[provider] || 0) + 1;
+    
+    totalContextLength += model.context_length || 0;
+    
+    const promptCost = parseFloat(model.pricing.prompt || "0");
+    const completionCost = parseFloat(model.pricing.completion || "0");
+    const cost = promptCost + completionCost;
+    
+    if (cost > 0) {
+      minCost = Math.min(minCost, cost);
+      maxCost = Math.max(maxCost, cost);
+    }
+  });
+
+  return {
+    totalModels: models.length,
+    providerCounts,
+    averageContextLength: models.length > 0 ? Math.round(totalContextLength / models.length) : 0,
+    costRange: { min: minCost === Infinity ? 0 : minCost, max: maxCost },
+  };
+}
+
+export function getRecommendedModels(models: OpenRouterModel[]): {
+  reasoning: OpenRouterModel[];
+  multimodal: OpenRouterModel[];
+  longContext: OpenRouterModel[];
+  costEffective: OpenRouterModel[];
+} {
+  const reasoning = models.filter(m => {
+    const description = (m.description || "").toLowerCase();
+    return (
+      m.id.includes('reasoning') || 
+      m.id.includes('think') || 
+      m.id.includes('o1') ||
+      description.includes('reasoning')
+    );
+  });
+
+  const multimodal = models.filter(m => {
+    const description = (m.description || "").toLowerCase();
+    return (
+      description.includes('vision') ||
+      description.includes('image') ||
+      m.id.includes('vision')
+    );
+  });
+
+  const longContext = models.filter(m => m.context_length >= 100000);
+
+  const costEffective = models
+    .map(m => ({
+      ...m,
+      costPerToken: parseFloat(m.pricing.prompt || "0") + parseFloat(m.pricing.completion || "0")
+    }))
+    .sort((a, b) => a.costPerToken - b.costPerToken)
+    .slice(0, 10);
+
+  return { reasoning, multimodal, longContext, costEffective };
+}
+
+export function searchModels(models: OpenRouterModel[], query: string): OpenRouterModel[] {
+  const lowerQuery = query.toLowerCase();
+  return models.filter(model => {
+    const name = (model.name || "").toLowerCase();
+    const id = (model.id || "").toLowerCase();
+    const description = (model.description || "").toLowerCase();
+    const provider = (model.id.split('/')[0] || "").toLowerCase();
+    
+    return (
+      name.includes(lowerQuery) ||
+      id.includes(lowerQuery) ||
+      description.includes(lowerQuery) ||
+      provider.includes(lowerQuery)
+    );
+  });
 }

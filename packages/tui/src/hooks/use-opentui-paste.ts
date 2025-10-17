@@ -17,27 +17,27 @@ export type PasteHandler = (event: PasteEvent) => void;
  * });
  * ```
  */
-export function useOpentuiPaste(
-  handler: PasteHandler | null | undefined
-): void {
-  const { keyHandler } = useAppContext();
-  const handlerRef = useRef<PasteHandler | null | undefined>(handler);
+export function useOpentuiPaste(handler: PasteHandler | null | undefined): void {
+	const { keyHandler } = useAppContext();
+	const handlerRef = useRef<PasteHandler | null | undefined>(handler);
 
-  useEffect(() => {
-    handlerRef.current = handler;
-  }, [handler]);
+	useEffect(() => {
+		handlerRef.current = handler;
+	}, [handler]);
 
-  useEffect(() => {
-    if (!keyHandler) return;
+	useEffect(() => {
+		if (!keyHandler) return;
 
-    const listener = (event: PasteEvent) => {
-      handlerRef.current?.(event);
-    };
+		const listener = (event: PasteEvent) => {
+			handlerRef.current?.(event);
+		};
 
-    keyHandler.on("paste", listener);
+		// @ts-expect-error - KeyHandler paste event API
+		keyHandler.on("paste", listener);
 
-    return () => {
-      keyHandler.off("paste", listener);
-    };
-  }, [keyHandler]);
+		return () => {
+			// @ts-expect-error - KeyHandler paste event API
+			keyHandler.off("paste", listener);
+		};
+	}, [keyHandler]);
 }
