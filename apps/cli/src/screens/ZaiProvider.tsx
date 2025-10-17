@@ -27,14 +27,13 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
   const [loading, setLoading] = useState(false);
   const [maskApiKey, setMaskApiKey] = useState(true);
 
-  // Load current provider status
   useEffect(() => {
     const loadStatus = async () => {
       try {
         const provider = await getCurrentProvider();
         setCurrentProvider(provider);
         setIsConfigured(await isZaiConfigured());
-      } catch (err) {
+      } catch {
         // Ignore errors on initial load
       }
     };
@@ -91,14 +90,12 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
 
   return (
     <box flexGrow={1} flexDirection="column" style={{ padding: 1 }}>
-      {/* Header */}
       <box style={{ paddingBottom: 1 }}>
         <text fg={colors.accent.primary} attributes={TextAttributes.BOLD}>
           🤖 ZAI Provider Configuration
         </text>
       </box>
 
-      {/* Description */}
       <box flexDirection="column" style={{ paddingBottom: 2 }}>
         <text fg={colors.text.primary}>
           Configure ZAI as your AI provider for Claude Code Router.
@@ -108,7 +105,6 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
         </text>
       </box>
 
-      {/* Current status */}
       <box
         border
         title="Current Status"
@@ -136,29 +132,26 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
         </box>
       </box>
 
-      {/* API Key input */}
       <box border title="ZAI API Key" style={{ height: 3, marginBottom: 1 }}>
         <TextInput
           value={displayApiKey}
           placeholder="Enter your ZAI API key..."
           focused={focusArea === "apiKey"}
           onChange={setApiKey}
-          onSubmit={handleConfigure}
         />
       </box>
 
-      {/* Configure button */}
       <box style={{ paddingBottom: 1 }}>
         <Button
-          label={loading ? "Configuring..." : "Configure ZAI Provider"}
           variant="primary"
           focused={focusArea === "configure"}
-          onPress={handleConfigure}
+          onClick={handleConfigure}
           disabled={loading || !apiKey.trim()}
-        />
+        >
+          {loading ? "Configuring..." : "Configure ZAI Provider"}
+        </Button>
       </box>
 
-      {/* Status message */}
       {statusMessage && (
         <box border title="Status" style={{ padding: 1, marginBottom: 1 }}>
           <text
@@ -175,7 +168,6 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
         </box>
       )}
 
-      {/* Info box */}
       <box
         border
         title="Information"
@@ -193,7 +185,6 @@ export function ZaiProvider({ onBack }: ZaiProviderProps) {
         </text>
       </box>
 
-      {/* Footer */}
       <box style={{ paddingTop: 1, flexDirection: "column" }}>
         <box style={{ gap: 2 }}>
           <text fg={colors.text.muted}>Tab: Switch field</text>
