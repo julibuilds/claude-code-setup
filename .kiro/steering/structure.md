@@ -206,19 +206,30 @@ All build outputs are gitignored and regenerated on build.
 
 ### Important Files for CLI
 
-- **apps/router/.dev.vars**: Local development secrets (synced by CLI)
-- **apps/router/config.json**: Router configuration (edited by CLI)
-- **apps/router/wrangler.toml**: Cloudflare Workers config (verified by CLI)
-- **apps/cli/.env**: CLI-specific secrets (OPENROUTER_API_KEY)
+- **apps/router/.dev.vars**: Local development secrets (synced by CLI when setting secrets)
+- **apps/router/config.json**: Router configuration (edited by CLI Quick Config)
+- **apps/router/wrangler.toml**: Cloudflare Workers config (verified by CLI during deployment)
+- **apps/cli/.env**: CLI-specific secrets (OPENROUTER_API_KEY for fetching models)
+- **apps/cli/.cache/openrouter-models.json**: Cached model list (24h TTL, auto-refreshed)
 
 ### Path Resolution in Compiled Binaries
 
-The CLI uses `import.meta.dir` for path resolution, which is embedded at compile time:
+The CLI uses `import.meta.dir` for path resolution, which is embedded at compile time by Bun:
 
 ```typescript
 // In apps/cli/src/utils/env.ts
 const sourceDir = import.meta.dir; // Points to apps/cli/src/utils
-const projectRoot = resolve(sourceDir, "..", "..", "..", ".."); // Navigate up to root
+const srcDir = resolve(sourceDir, ".."); // apps/cli/src
+const cliDir = resolve(srcDir, ".."); // apps/cli
+const appsDir = resolve(cliDir, ".."); // apps
+const projectRoot = resolve(appsDir, ".."); // project root
+const routerDir = resolve(projectRoot, "apps", "router"); // apps/router
 ```
 
-This allows the compiled binary to work from any directory on the system.
+This allows the compiled binary to:
+- Work from any directory on the system
+- Find project files reliably
+- Load environment variables correctly
+- Execute wrangler commands in the right directory
+
+**Critical for**: Environment loading, deployment, secrets management, config updates.
