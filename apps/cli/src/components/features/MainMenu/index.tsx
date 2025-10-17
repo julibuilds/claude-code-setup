@@ -2,13 +2,14 @@ import type { SelectOption } from "@opentui/core";
 import { TextAttributes } from "@opentui/core";
 import { useKeyboard, useTerminalDimensions } from "@opentui/react";
 import { useState } from "react";
-import { useConfig } from "../context/ConfigContext";
-import { Header } from "./layout/Header";
-import { Footer } from "./layout/Footer";
-import { theme } from "../design/theme";
+import { KEYS, SCREENS, type Screen } from "../../../constants";
+import { useConfig } from "../../../context/ConfigContext";
+import { theme } from "../../../design/theme";
+import { Footer } from "../../layout/Footer";
+import { Header } from "../../layout/Header";
 
 interface MainMenuProps {
-	onNavigate: (screen: "quick-config" | "deploy" | "secrets") => void;
+	onNavigate: (screen: Screen) => void;
 }
 
 /**
@@ -24,17 +25,17 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 		{
 			name: "⚡ Quick Config",
 			description: "Configure all router models in one place",
-			value: "quick-config",
+			value: SCREENS.QUICK_CONFIG,
 		},
 		{
 			name: "🚀 Deploy to Workers",
 			description: "Deploy configuration to Cloudflare Workers",
-			value: "deploy",
+			value: SCREENS.DEPLOY,
 		},
 		{
 			name: "🔐 Manage Secrets",
 			description: "Update Cloudflare Workers secrets",
-			value: "secrets",
+			value: SCREENS.SECRETS,
 		},
 		{
 			name: "❌ Exit",
@@ -44,12 +45,12 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 	];
 
 	useKeyboard((key) => {
-		if (key.name === "return") {
+		if (key.name === KEYS.RETURN) {
 			const selected = options[selectedIndex];
 			if (selected?.value === "exit") {
 				process.exit(0);
 			} else if (selected) {
-				onNavigate(selected.value as "quick-config" | "deploy" | "secrets");
+				onNavigate(selected.value as Screen);
 			}
 		}
 	});

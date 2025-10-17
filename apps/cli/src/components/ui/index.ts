@@ -3,7 +3,8 @@
  * Reusable components following the design system
  */
 
-export { Panel } from "./Panel";
-export { ProgressBar } from "./ProgressBar";
-export { Spinner } from "./Spinner";
-export { StatusBox } from "./StatusBox";
+// Re-export consolidated components from common
+// This maintains backward compatibility for existing imports
+export { ProgressBar } from "../common/ProgressBar";
+export { Spinner } from "../common/Spinner";
+export { StatusBox } from "../common/StatusBox";

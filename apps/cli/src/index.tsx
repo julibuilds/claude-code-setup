@@ -1,29 +1,33 @@
 import { render, useKeyboard } from "@opentui/react";
 import { useCallback, useState } from "react";
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { DeployManager } from "./components/features/DeployManager";
-import { MainMenu } from "./components/MainMenu";
+import { MainMenu } from "./components/features/MainMenu";
 import { QuickConfig } from "./components/features/QuickConfig";
-import { SecretsManager } from "./components/SecretsManager";
+import { SecretsManager } from "./components/features/SecretsManager";
+import { KEYS, SCREENS, type Screen } from "./constants";
 import { ConfigProvider } from "./context/ConfigContext";
 import { loadEnv } from "./utils/env";
 
-type Screen = "menu" | "quick-config" | "deploy" | "secrets";
-
 function App() {
-	const [screen, setScreen] = useState<Screen>("menu");
+	const [screen, setScreen] = useState<Screen>(SCREENS.MENU);
 
 	useKeyboard((key) => {
-		if (key.name === "escape") {
-			if (screen === "menu") {
+		if (key.name === KEYS.ESCAPE) {
+			if (screen === SCREENS.MENU) {
 				process.exit(0);
 			} else {
-				setScreen("menu");
+				setScreen(SCREENS.MENU);
 			}
 		}
 	});
 
 	const handleNavigate = useCallback((newScreen: Screen) => {
 		setScreen(newScreen);
+	}, []);
+
+	const handleBack = useCallback(() => {
+		setScreen(SCREENS.MENU);
 	}, []);
 
 	return (
@@ -35,10 +39,26 @@ function App() {
 				padding: 1,
 			}}
 		>
-			{screen === "menu" && <MainMenu onNavigate={handleNavigate} />}
-			{screen === "quick-config" && <QuickConfig onBack={() => setScreen("menu")} />}
-			{screen === "deploy" && <DeployManager onBack={() => setScreen("menu")} />}
-			{screen === "secrets" && <SecretsManager onBack={() => setScreen("menu")} />}
+			{screen === SCREENS.MENU && (
+				<ErrorBoundary screenName="MainMenu">
+					<MainMenu onNavigate={handleNavigate} />
+				</ErrorBoundary>
+			)}
+			{screen === SCREENS.QUICK_CONFIG && (
+				<ErrorBoundary screenName="QuickConfig">
+					<QuickConfig onBack={handleBack} />
+				</ErrorBoundary>
+			)}
+			{screen === SCREENS.DEPLOY && (
+				<ErrorBoundary screenName="DeployManager">
+					<DeployManager onBack={handleBack} />
+				</ErrorBoundary>
+			)}
+			{screen === SCREENS.SECRETS && (
+				<ErrorBoundary screenName="SecretsManager">
+					<SecretsManager onBack={handleBack} />
+				</ErrorBoundary>
+			)}
 		</box>
 	);
 }
