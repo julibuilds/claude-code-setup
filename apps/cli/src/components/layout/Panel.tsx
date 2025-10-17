@@ -41,10 +41,13 @@ export function Panel({
 	const componentStyles = useComponentStyles();
 
 	const getPanelStyle = () => {
+		// Increase padding for better breathing room
+		const effectivePadding = Math.max(padding, 1);
+		
 		const baseStyle = {
 			border: true,
 			borderStyle: componentStyles.panel.borderStyle,
-			padding,
+			padding: effectivePadding,
 			flexDirection: "column" as const,
 		};
 

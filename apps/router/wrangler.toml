@@ -16,45 +16,8 @@ LOG_LEVEL = "info"
 HOST = "0.0.0.0"
 PORT = "3456"
 
-# Production environment
-[env.production]
-name = "claude-code-router-1016-production"
-vars = { LOG_LEVEL = "info" }
-
-# Staging environment
-[env.staging]
-name = "claude-code-router-1016-staging"
-vars = { LOG_LEVEL = "debug" }
-
 [observability]
 [observability.logs]
 enabled = true
 head_sampling_rate = 1
 invocation_logs = true
-
-# Secrets (set via: wrangler secret put <KEY>)
-# - APIKEY: Optional API key for authentication
-# - OPENROUTER_API_KEY: API key for OpenRouter provider
-# - DEEPSEEK_API_KEY: API key for DeepSeek provider
-# - GEMINI_API_KEY: API key for Gemini provider
-# - CONFIG_JSON: JSON string containing the full configuration
-
-# KV Namespace bindings (optional, for configuration storage)
-# [[kv_namespaces]]
-# binding = "CONFIG_STORE"
-# id = "your-kv-namespace-id"
-# preview_id = "your-preview-kv-namespace-id"
-
-# Durable Objects bindings (optional, for session management)
-# [[durable_objects.bindings]]
-# name = "SESSIONS"
-# class_name = "SessionManager"
-# script_name = "claude-code-router"
-
-# Analytics Engine bindings (optional, for usage tracking)
-# [[analytics_engine_datasets]]
-# binding = "ANALYTICS"
-
-# Limits (CPU limits require a paid plan)
-# [limits]
-# cpu_ms = 50000  # 50 seconds max CPU time per request

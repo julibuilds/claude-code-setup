@@ -1,5 +1,5 @@
 import { type SelectOption, TextAttributes } from "@opentui/core";
-import { useKeyboard, useTerminalDimensions } from "@opentui/react";
+import { useKeyboard } from "@opentui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useConfig } from "../../../context/ConfigContext";
 import type { OpenRouterModel } from "../../../types/config";
@@ -11,6 +11,7 @@ import {
   sortModelsByContextLength,
 } from "../../../utils/openrouter";
 import { StatusBox, useComponentStyles, useThemeColors } from "@repo/tui";
+import { useResponsiveLayout } from "../../../hooks/useResponsiveLayout";
 import { Header } from "../../layout/Header";
 import { Footer } from "../../layout/Footer";
 import { RouterTypePanel } from "./RouterTypePanel";
@@ -32,7 +33,7 @@ interface PendingChanges {
 }
 
 export function QuickConfig(_props: QuickConfigProps) {
-  const { width, height } = useTerminalDimensions();
+  const { width, height, isNarrow } = useResponsiveLayout();
   const { config, updateConfig } = useConfig();
   const [models, setModels] = useState<OpenRouterModel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -231,7 +232,30 @@ export function QuickConfig(_props: QuickConfigProps) {
   }));
 
   const hasChanges = Object.keys(pendingChanges).length > 0;
-  const panelHeight = Math.floor((height - 12) / 3);
+  
+  // Calculate panel heights based on layout mode
+  const getPanelHeights = () => {
+    const availableHeight = height - 16; // Account for header, footer, padding
+    
+    if (isNarrow) {
+      // Narrow: stack vertically with equal heights
+      return {
+        routerType: Math.floor(availableHeight * 0.25),
+        filter: Math.floor(availableHeight * 0.25),
+        modelList: Math.floor(availableHeight * 0.5),
+      };
+    }
+    
+    // Wide/Medium: more space for model list
+    return {
+      routerType: Math.floor(availableHeight * 0.3),
+      filter: Math.floor(availableHeight * 0.3),
+      modelList: Math.floor(availableHeight * 0.4),
+    };
+  };
+
+  const panelHeights = getPanelHeights();
+  const containerPadding = isNarrow ? 1 : 2;
 
   return (
     <box
@@ -240,7 +264,7 @@ export function QuickConfig(_props: QuickConfigProps) {
         borderStyle: componentStyles.panel.borderStyle,
         borderColor: colors.border.default,
         backgroundColor: componentStyles.panel.backgroundColor,
-        padding: 2,
+        padding: containerPadding,
         flexDirection: "column",
         width: Math.min(120, width - 4),
         height: height - 4,
@@ -249,120 +273,125 @@ export function QuickConfig(_props: QuickConfigProps) {
       <Header
         icon="⚡"
         title="Quick Config"
-        subtitle="Configure all router models • Tab to switch panels"
-        status={hasChanges ? "warning" : "info"}
+        subtitle={isNarrow ? "Configure router models" : "Configure all router models • Tab to switch panels"}
+        status={hasChanges ? "warning" : "success"}
         statusText={
           hasChanges
-            ? `${Object.keys(pendingChanges).length} pending changes`
-            : "All changes saved"
+            ? `✓ ${Object.keys(pendingChanges).length} pending change${Object.keys(pendingChanges).length > 1 ? 's' : ''}`
+            : "✓ All changes saved"
         }
       />
 
+      {/* Vertical stacked layout for all screen sizes */}
       <box
         style={{
-          flexDirection: "row",
-          gap: 2,
-          height: height - 12,
+          flexDirection: "column",
+          gap: isNarrow ? 1 : 2,
+          flexGrow: 1,
         }}
       >
-        <box style={{ flexGrow: 1, flexDirection: "column" }}>
+        {/* Step 1: Router Type Selection */}
+        <box style={{ flexDirection: "column" }}>
+          <text
+            style={{
+              fg: colors.text.muted,
+              marginBottom: 0.5,
+              attributes: TextAttributes.BOLD,
+            }}
+          >
+            STEP 1: SELECT ROUTER TYPE
+          </text>
           <RouterTypePanel
             focused={focusedPanel === "router-type"}
             selectedRouterType={selectedRouterType}
             routerTypeOptions={routerTypeOptions}
             onSelect={(type) => setSelectedRouterType(type as RouterKey)}
-            height={panelHeight}
+            height={panelHeights.routerType}
           />
         </box>
-        <box style={{ flexGrow: 1, flexDirection: "column" }}>
+
+        {/* Step 2: Filter Models */}
+        <box style={{ flexDirection: "column" }}>
+          <text
+            style={{
+              fg: colors.text.muted,
+              marginBottom: 0.5,
+              attributes: TextAttributes.BOLD,
+            }}
+          >
+            STEP 2: FILTER MODELS
+          </text>
           <FilterPanel
             focused={focusedPanel === "filter"}
             filter={filter}
             filterOptions={filterOptions}
             onSelect={(f) => setFilter(f as FilterType)}
-            height={panelHeight}
+            height={panelHeights.filter}
           />
         </box>
-        <box style={{ flexGrow: 1, flexDirection: "column" }}>
+
+        {/* Step 3: Select Model */}
+        <box style={{ flexDirection: "column" }}>
+          <text
+            style={{
+              fg: colors.text.muted,
+              marginBottom: 0.5,
+              attributes: TextAttributes.BOLD,
+            }}
+          >
+            STEP 3: SELECT MODEL
+          </text>
           <ModelListPanel
             focused={focusedPanel === "model-list"}
             modelOptions={modelOptions}
             onSelect={handleModelSelect}
-            height={panelHeight}
+            height={panelHeights.modelList}
             modelCount={displayModels.length}
+            totalCount={filteredModels.length}
           />
         </box>
       </box>
 
-      {/* Pending Changes Display */}
-      {hasChanges && (
-        <box
-          style={{
-            padding: 2,
-            border: true,
-            borderStyle: componentStyles.panel.borderStyle,
-            borderColor: colors.status.warning,
-            backgroundColor: componentStyles.messageBox.warning.backgroundColor,
-            flexDirection: "column",
-            marginTop: 2,
-            width: "100%",
-          }}
-        >
-          <text
-            style={{
-              attributes: TextAttributes.BOLD,
-              fg: colors.status.warning,
-              marginBottom: 1,
-            }}
-          >
-            ⚠️ Pending Changes ({Object.keys(pendingChanges).length})
-          </text>
-          <box style={{ flexDirection: "column" }}>
-            {Object.entries(pendingChanges).map(([key, value]) => (
-              <text
-                key={key}
-                style={{
-                  fg: colors.status.success,
-                  marginBottom: 0.5,
-                }}
-              >
-                ✓ {key}:{" "}
-                <span style={{ fg: colors.text.primary }}>
-                  {value.split(",")[1]}
-                </span>
-              </text>
-            ))}
-          </box>
-        </box>
-      )}
-
-      {/* Error Display */}
+      {/* Error Display - Show prominently at top of footer area */}
       {error && (
-        <StatusBox
-          status="error"
-          message={error}
-          details="Failed to load or save configuration"
-        />
+        <box style={{ marginTop: 1 }}>
+          <StatusBox
+            status="error"
+            message={error}
+            details="Failed to load or save configuration"
+          />
+        </box>
       )}
 
       {/* Footer with shortcuts and pending changes warning */}
       <box style={{ flexDirection: "column", width: "100%" }}>
-        <Footer
-          shortcuts={[
-            {
-              keys: "Tab",
-              description: "Switch panels",
-              category: "Navigation",
-            },
-            { keys: "Enter", description: "Select", category: "Navigation" },
-            { keys: "Ctrl+S", description: "Save", category: "Actions" },
-            { keys: "Ctrl+R", description: "Reset", category: "Actions" },
-            { keys: "Ctrl+F", description: "Refresh", category: "Actions" },
-            { keys: "ESC", description: "Back", category: "General" },
-          ]}
-          groupByCategory={true}
-        />
         <PendingChangesBox changes={pendingChanges} />
+        <Footer
+          shortcuts={
+            isNarrow
+              ? [
+                  { keys: "Tab", description: "Switch", category: "Nav" },
+                  { keys: "↑/↓", description: "Navigate", category: "Nav" },
+                  { keys: "Enter", description: "Select", category: "Nav" },
+                  { keys: "Ctrl+S", description: "Save", category: "Actions" },
+                  { keys: "ESC", description: "Back", category: "Actions" },
+                ]
+              : [
+                  {
+                    keys: "Tab",
+                    description: "Switch panels",
+                    category: "Navigation",
+                  },
+                  { keys: "↑/↓", description: "Navigate list", category: "Navigation" },
+                  { keys: "Enter", description: "Select", category: "Navigation" },
+                  { keys: "Ctrl+S", description: "Save", category: "Actions" },
+                  { keys: "Ctrl+R", description: "Reset", category: "Actions" },
+                  { keys: "Ctrl+F", description: "Refresh", category: "Actions" },
+                  { keys: "ESC", description: "Back", category: "General" },
+                ]
+          }
+          groupByCategory={!isNarrow}
+        />
       </box>
     </box>
   );

@@ -17,9 +17,10 @@ export function PendingChangesBox({ changes }: PendingChangesBoxProps) {
 			style={{
 				border: true,
 				borderStyle: componentStyles.panel.borderStyle,
-				padding: 1,
+				borderColor: colors.status.warning,
+				padding: 2,
 				marginTop: 1,
-				backgroundColor: componentStyles.elevated.backgroundColor,
+				backgroundColor: componentStyles.messageBox.warning.backgroundColor,
 				flexDirection: "column",
 			}}
 		>
@@ -27,12 +28,34 @@ export function PendingChangesBox({ changes }: PendingChangesBoxProps) {
 				style={{
 					attributes: TextAttributes.BOLD,
 					fg: colors.status.warning,
+					marginBottom: 1,
 				}}
 			>
-				⚠ {changeCount} Pending Change{changeCount > 1 ? "s" : ""}
+				⚠️  {changeCount} Pending Change{changeCount > 1 ? "s" : ""} - Not Saved
 			</text>
-			<text fg={colors.text.muted} style={{ marginTop: 1 }}>
-				Press Ctrl+S to save, Ctrl+R to reset
+			
+			{/* Show what's changed */}
+			<box style={{ flexDirection: "column", marginBottom: 1 }}>
+				{Object.entries(changes).map(([key, value]) => (
+					<text
+						key={key}
+						style={{
+							fg: colors.text.primary,
+							marginBottom: 0.5,
+						}}
+					>
+						→ {key}: {value.split(",")[1]}
+					</text>
+				))}
+			</box>
+
+			<text 
+				style={{
+					fg: colors.accent.primary,
+					attributes: TextAttributes.BOLD,
+				}}
+			>
+				Press Ctrl+S to save • Ctrl+R to reset
 			</text>
 		</box>
 	);
