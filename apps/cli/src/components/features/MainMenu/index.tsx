@@ -41,6 +41,11 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
       value: SCREENS.SECRETS,
     },
     {
+      name: "🔄 Provider Setup",
+      description: "Switch between OpenRouter/Workers and Z.AI provider",
+      value: SCREENS.ZAI_PROVIDER,
+    },
+    {
       name: "❌ Exit",
       description: "Exit the application",
       value: "exit",

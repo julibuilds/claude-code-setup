@@ -5,6 +5,7 @@ import { DeployManager } from "./components/features/DeployManager";
 import { MainMenu } from "./components/features/MainMenu";
 import { QuickConfig } from "./components/features/QuickConfig";
 import { SecretsManager } from "./components/features/SecretsManager";
+import { ZaiProvider } from "./components/features/ZaiProvider";
 import { KEYS, SCREENS, type Screen } from "./constants";
 import { ConfigProvider } from "./context/ConfigContext";
 import { loadEnv } from "./utils/env";
@@ -44,6 +45,7 @@ function App() {
 				{screen === SCREENS.QUICK_CONFIG && <QuickConfig onBack={handleBack} />}
 				{screen === SCREENS.DEPLOY && <DeployManager onBack={handleBack} />}
 				{screen === SCREENS.SECRETS && <SecretsManager onBack={handleBack} />}
+				{screen === SCREENS.ZAI_PROVIDER && <ZaiProvider onBack={handleBack} />}
 			</box>
 		</MinimumSizeWarning>
 	);

@@ -84,6 +84,7 @@ export const SCREENS = {
 	QUICK_CONFIG: "quick-config",
 	DEPLOY: "deploy",
 	SECRETS: "secrets",
+	ZAI_PROVIDER: "zai-provider",
 } as const;
 
 export type Screen = (typeof SCREENS)[keyof typeof SCREENS];
