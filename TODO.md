@@ -15,4 +15,3 @@ Refer to example implementations in the `_examples/*` directory. Keep in mind th
 ### Ideas
 
 - Web app (in `apps/web`) using Next.js 15+ (App Router), React 19, Tailwind CSS v4+, etc. that's a custom version/port of `_examples/claude-code-router/claude-code-router/ui`.
-- Maybe we can design with focus on 2-3 major components: 1. A core/common/shared/utils type library as a new package 2. A web app 3. CLI app (bonus - future, out of scope for right now.)

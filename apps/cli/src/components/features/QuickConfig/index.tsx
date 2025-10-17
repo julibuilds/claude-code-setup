@@ -1,21 +1,24 @@
 import { type SelectOption, TextAttributes } from "@opentui/core";
 import { useKeyboard, useTerminalDimensions } from "@opentui/react";
 import { useCallback, useEffect, useState } from "react";
-import { useConfig } from "../context/ConfigContext";
-import type { OpenRouterModel } from "../types/config";
+import { useConfig } from "../../../context/ConfigContext";
+import type { OpenRouterModel } from "../../../types/config";
 import {
 	fetchOpenRouterModels,
 	filterAnthropicModels,
 	filterOpenAIModels,
 	formatModelForDisplay,
 	sortModelsByContextLength,
-} from "../utils/openrouter";
-import { Header } from "./layout/Header";
-import { Footer } from "./layout/Footer";
-import { Panel } from "./layout/Panel";
-import { StatusBox } from "./common/StatusBox";
-import { ErrorBox } from "./common/ErrorBox";
-import { theme } from "../design/theme";
+} from "../../../utils/openrouter";
+import { Header } from "../../layout/Header";
+import { Footer } from "../../layout/Footer";
+import { StatusBox } from "../../common/StatusBox";
+import { theme } from "../../../design/theme";
+import { RouterTypePanel } from "./RouterTypePanel";
+import { FilterPanel } from "./FilterPanel";
+import { ModelListPanel } from "./ModelListPanel";
+import { StatusOverlay } from "./StatusOverlay";
+import { PendingChangesBox } from "./PendingChangesBox";
 
 interface QuickConfigProps {
 	onBack: () => void;
@@ -53,7 +56,6 @@ export function QuickConfig(_props: QuickConfigProps) {
 			} catch (err) {
 				const errorMessage = err instanceof Error ? err.message : "Failed to load models";
 				setError(errorMessage);
-				// Keep any existing models if we have them
 				if (models.length === 0) {
 					setModels([]);
 				}
@@ -86,7 +88,6 @@ export function QuickConfig(_props: QuickConfigProps) {
 			setPendingChanges({});
 		}
 
-		// Ctrl+F to force refresh models (bypass cache)
 		if (key.ctrl && key.name === "f") {
 			loadModels(true);
 		}
@@ -134,81 +135,19 @@ export function QuickConfig(_props: QuickConfigProps) {
 		}
 	}, [config, pendingChanges, updateConfig]);
 
+	// Loading and saving overlays
 	if (loading) {
-		return (
-			<box
-				style={{
-					flexDirection: "column",
-					padding: 2,
-					width: Math.min(60, width - 4),
-					height: height - 4,
-					justifyContent: "center",
-					alignItems: "center",
-				}}
-			>
-				<box
-					style={{
-						border: true,
-						padding: 3,
-						backgroundColor: theme.colors.bg.dark,
-						flexDirection: "column",
-						alignItems: "center",
-					}}
-				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: theme.colors.accent.cyan,
-							marginBottom: 2,
-						}}
-					>
-						⏳ Loading OpenRouter Models
-					</text>
-					<text fg={theme.colors.text.primary}>Fetching model list from API...</text>
-					<text fg={theme.colors.text.dim} style={{ marginTop: 1 }}>
-						This may take a few seconds
-					</text>
-				</box>
-			</box>
-		);
+		return <StatusOverlay type="loading" width={width} height={height} />;
 	}
 
 	if (saving) {
 		return (
-			<box
-				style={{
-					flexDirection: "column",
-					padding: 2,
-					width: Math.min(60, width - 4),
-					height: height - 4,
-					justifyContent: "center",
-					alignItems: "center",
-				}}
-			>
-				<box
-					style={{
-						border: true,
-						padding: 3,
-						backgroundColor: theme.colors.bg.dark,
-						flexDirection: "column",
-						alignItems: "center",
-					}}
-				>
-					<text
-						style={{
-							attributes: TextAttributes.BOLD,
-							fg: theme.colors.success,
-							marginBottom: 2,
-						}}
-					>
-						💾 Saving Configuration
-					</text>
-					<text fg={theme.colors.text.primary}>Writing changes to config.json...</text>
-					<text fg={theme.colors.text.dim} style={{ marginTop: 1 }}>
-						{Object.keys(pendingChanges).length} router(s) being updated
-					</text>
-				</box>
-			</box>
+			<StatusOverlay
+				type="saving"
+				width={width}
+				height={height}
+				pendingChangesCount={Object.keys(pendingChanges).length}
+			/>
 		);
 	}
 
@@ -236,6 +175,14 @@ export function QuickConfig(_props: QuickConfigProps) {
 	filteredModels = sortModelsByContextLength(filteredModels);
 	const displayModels = filteredModels.slice(0, 100);
 
+	// Helper function to get current value for router type
+	function getCurrentValue(key: RouterKey): string {
+		if (pendingChanges[key]) {
+			return `→ ${pendingChanges[key].split(",")[1] || ""}`;
+		}
+		return config?.Router[key]?.split(",")[1] || "Not set";
+	}
+
 	// Router type options
 	const routerTypeOptions: SelectOption[] = [
 		{
@@ -259,13 +206,6 @@ export function QuickConfig(_props: QuickConfigProps) {
 			value: "longContext",
 		},
 	];
-
-	function getCurrentValue(key: RouterKey): string {
-		if (pendingChanges[key]) {
-			return `→ ${pendingChanges[key].split(",")[1] || ""}`;
-		}
-		return config?.Router[key]?.split(",")[1] || "Not set";
-	}
 
 	// Filter options
 	const filterOptions: SelectOption[] = [
@@ -294,77 +234,49 @@ export function QuickConfig(_props: QuickConfigProps) {
 				padding: 2,
 			}}
 		>
-			{/* Header */}
 			<Header
 				icon="⚡"
 				title="Quick Config"
 				subtitle="Configure all router models • Tab to switch panels"
 			/>
 
-			{/* Three-panel layout */}
-			<box style={{ flexDirection: "row", gap: 2, height: height - 12 }}>
-				{/* Left: Router Type */}
-				<Panel
-					title="Router Type"
-					focused={focusedPanel === "router-type"}
-					height={panelHeight}
-					width={30}
-				>
-					<select
-						style={{ height: "100%" }}
-						options={routerTypeOptions}
+			<box
+				style={{
+					flexDirection: "row",
+					gap: 2,
+					height: height - 12,
+				}}
+			>
+				<box style={{ flexGrow: 1, flexDirection: "column" }}>
+					<RouterTypePanel
 						focused={focusedPanel === "router-type"}
-						onChange={(index, option) => {
-							if (option) {
-								setSelectedRouterType(option.value as RouterKey);
-							}
-						}}
-						showScrollIndicator
+						selectedRouterType={selectedRouterType}
+						routerTypeOptions={routerTypeOptions}
+						onSelect={(type) => setSelectedRouterType(type as RouterKey)}
+						height={panelHeight}
 					/>
-				</Panel>
-
-				{/* Middle: Filter */}
-				<Panel
-					title="Filter"
-					focused={focusedPanel === "filter"}
-					height={panelHeight}
-					width={25}
-				>
-					<select
-						style={{ height: "100%" }}
-						options={filterOptions}
+				</box>
+				<box style={{ flexGrow: 1, flexDirection: "column" }}>
+					<FilterPanel
 						focused={focusedPanel === "filter"}
-						onChange={(index, option) => {
-							if (option) {
-								setFilter(option.value as FilterType);
-							}
-						}}
-						showScrollIndicator
+						filter={filter}
+						filterOptions={filterOptions}
+						onSelect={(f) => setFilter(f as FilterType)}
+						height={panelHeight}
 					/>
-				</Panel>
-
-				{/* Right: Models */}
-				<Panel
-					title={`Models (${displayModels.length})`}
-					focused={focusedPanel === "model-list"}
-					height={panelHeight}
-					width="auto"
-				>
-					<select
-						style={{ height: "100%" }}
-						options={modelOptions}
+				</box>
+				<box style={{ flexGrow: 1, flexDirection: "column" }}>
+					<ModelListPanel
 						focused={focusedPanel === "model-list"}
-						onChange={(index, option) => {
-							if (option) {
-								handleModelSelect(option.value);
-							}
-						}}
-						showScrollIndicator
+						modelOptions={modelOptions}
+						onSelect={handleModelSelect}
+						height={panelHeight}
+						modelCount={displayModels.length}
 					/>
-				</Panel>
+				</box>
 			</box>
 
-			{/* Pending Changes */}
+			{/* Pending Changes Display */}
 			{hasChanges && (
 				<box
 					style={{
@@ -393,12 +305,16 @@ export function QuickConfig(_props: QuickConfigProps) {
 				</box>
 			)}
 
-			{/* Error */}
+			{/* Error Display */}
 			{error && (
-				<StatusBox status="error" message={error} details="Failed to load or save configuration" />
+				<StatusBox
+					status="error"
+					message={error}
+					details="Failed to load or save configuration"
+				/>
 			)}
 
-			{/* Footer */}
+			{/* Footer with shortcuts and pending changes warning */}
 			<box style={{ flexDirection: "column" }}>
 				<Footer
 					shortcuts={[
@@ -410,25 +326,7 @@ export function QuickConfig(_props: QuickConfigProps) {
 						{ keys: "ESC", description: "Back" },
 					]}
 				/>
-				{hasChanges && (
-					<box
-						style={{
-							padding: 1,
-							marginTop: 1,
-							border: true,
-							backgroundColor: theme.colors.bg.dark,
-						}}
-					>
-						<text
-							style={{
-								attributes: TextAttributes.BOLD,
-								fg: theme.colors.warning,
-							}}
-						>
-							⚠️ {Object.keys(pendingChanges).length} unsaved change(s) - Press Ctrl+S to save
-						</text>
-					</box>
-				)}
+				<PendingChangesBox changes={pendingChanges} />
 			</box>
 		</box>
 	);

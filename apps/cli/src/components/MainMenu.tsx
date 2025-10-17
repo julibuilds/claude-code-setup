@@ -1,12 +1,20 @@
-import { type SelectOption, TextAttributes } from "@opentui/core";
+import { type SelectOption } from "@opentui/core";
 import { useKeyboard, useTerminalDimensions } from "@opentui/react";
 import { useState } from "react";
 import { useConfig } from "../context/ConfigContext";
+import { Header } from "./layout/Header";
+import { Footer } from "./layout/Footer";
+import { SelectList } from "./common/SelectList";
+import { theme } from "../design/theme";
 
 interface MainMenuProps {
 	onNavigate: (screen: "quick-config" | "deploy" | "secrets") => void;
 }
 
+/**
+ * Main menu screen - entry point for all CLI operations
+ * Shows current config status and navigation options
+ */
 export function MainMenu({ onNavigate }: MainMenuProps) {
 	const { width, height } = useTerminalDimensions();
 	const { config } = useConfig();
@@ -46,6 +54,8 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 		}
 	});
 
+	const contentHeight = Math.max(8, height - 16);
+
 	return (
 		<box
 			style={{
@@ -55,43 +65,31 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 				padding: 2,
 			}}
 		>
-			{/* Header with branding */}
-			<box
-				style={{
-					flexDirection: "column",
-					marginBottom: 2,
-					padding: 2,
-					border: true,
-					backgroundColor: "#1a1b26",
-				}}
-			>
-				<text
-					style={{
-						attributes: TextAttributes.BOLD,
-						fg: "#00D9FF",
-						marginBottom: 1,
-					}}
-				>
-					⚡ Claude Code Router CLI
-				</text>
-				<text fg="#7aa2f7">Manage your router configuration and deployments</text>
-			</box>
+			{/* Header */}
+			<Header
+				icon="⚡"
+				title="Claude Code Router CLI"
+				subtitle="Manage your router configuration and deployments"
+			/>
 
 			{/* Current Config Preview */}
 			{config && (
 				<box
 					style={{
-						border: true,
-						padding: 2,
+						...theme.components.header,
 						marginBottom: 2,
-						flexDirection: "column",
-						backgroundColor: "#1a1b26",
 					}}
 				>
-					<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
+					<text
+						style={{
+							attributes: 1, // BOLD
+							fg: theme.colors.accent.purple,
+							marginBottom: 1,
+						}}
+					>
 						📋 Current Configuration
 					</text>
-					<box style={{ flexDirection: "column", gap: 0 }}>
+					<box style={{ flexDirection: "column" }}>
 						{[
 							{ label: "Default", value: config.Router.default },
 							{ label: "Background", value: config.Router.background },
@@ -101,7 +99,10 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 							const modelId = value.split(",")[1];
 							const isSet = !!modelId;
 							return (
-								<text key={label} fg={isSet ? "#9ece6a" : "#f7768e"}>
+								<text
+									key={label}
+									fg={isSet ? theme.colors.success : theme.colors.error}
+								>
 									{isSet ? "✓" : "✗"} {label}: {modelId || "Not configured"}
 								</text>
 							);
@@ -113,14 +114,13 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 			{/* Menu Options */}
 			<box
 				style={{
-					border: true,
-					height: Math.min(20, height - 16),
-					flexDirection: "column",
-					backgroundColor: "#1f2335",
+					...theme.components.selectContainer,
+					height: contentHeight,
+					marginBottom: 2,
 				}}
 			>
 				<select
-					style={{ height: Math.min(18, height - 18) }}
+					style={{ height: "100%" }}
 					options={options}
 					focused={true}
 					onChange={(index) => {
@@ -130,21 +130,14 @@ export function MainMenu({ onNavigate }: MainMenuProps) {
 				/>
 			</box>
 
-			{/* Footer with keyboard shortcuts */}
-			<box
-				style={{
-					marginTop: 2,
-					padding: 2,
-					border: true,
-					flexDirection: "column",
-					backgroundColor: "#1a1b26",
-				}}
-			>
-				<text style={{ attributes: TextAttributes.BOLD, fg: "#bb9af7", marginBottom: 1 }}>
-					⌨️  Keyboard Shortcuts
-				</text>
-				<text fg="#7aa2f7">↑↓ Navigate  •  Enter Select  •  ESC Exit</text>
-			</box>
+			{/* Footer */}
+			<Footer
+				shortcuts={[
+					{ keys: "↑↓", description: "Navigate" },
+					{ keys: "Enter", description: "Select" },
+					{ keys: "ESC", description: "Exit" },
+				]}
+			/>
 		</box>
 	);
 }

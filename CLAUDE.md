@@ -6,14 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Turborepo monorepo containing a Claude Code Router system that intelligently routes Claude API requests to multiple LLM providers (OpenRouter, DeepSeek, Gemini) with automatic provider selection, request/response transformation, and usage tracking.
 
+**Current Status**: CLI tool (v2.0.2+) is fully functional with comprehensive configuration management, file synchronization, and deployment features. Router service is operational for local and edge deployment. Web UI is in development.
+
 ## Monorepo Structure
 
 - `apps/router` - Main router service (Hono-based HTTP server)
-- `apps/cli` - Terminal UI for router configuration and Cloudflare Workers deployment
-- `apps/web` - Next.js web application (frontend/dashboard)
+- `apps/cli` - Terminal UI for router configuration and Cloudflare Workers deployment (v2.0.2+)
+- `apps/web` - Next.js 15+ web application (frontend/dashboard, in development)
 - `packages/core` - Shared core library with types, transformers, and utilities
 - `packages/ui` - Shared UI components
 - `dev/` - Development tooling (TypeScript configs)
+- `_examples/` - Reference implementations and example projects
+  - `_examples/claude-code-router` - Reference implementation with Next.js UI
+  - `_examples/opentui` - OpenTUI terminal UI reference
 
 ## Build Commands
 
@@ -88,17 +93,30 @@ See `apps/router/README.workers.md` and `apps/router/DOCKER.md` for deployment g
 
 ### Overview
 
-Interactive Terminal User Interface (TUI) for managing router configurations and Cloudflare Workers deployments. Built with OpenTUI, React 19, and Zustand.
+Interactive Terminal User Interface (TUI) for managing router configurations and Cloudflare Workers deployments. Built with OpenTUI, React 19, and Zustand. **Version 2.0.2+ with complete feature parity and production-ready reliability**.
 
 ### Key Features
 
-- **View Configuration**: Display current router settings and model assignments
-- **Model Selection**: Browse and select from available OpenRouter models
-- **Configuration Management**: Update router types (default, background, think, longContext)
-- **Deploy Management**: Deploy to production or staging environments
-- **Secrets Management**: Set and list Cloudflare Workers secrets
+**Configuration Management** (v2.0.2+):
+- **Quick Config**: All-in-one interface to configure all router types simultaneously
+- **Model Selection**: Browse and select from available OpenRouter models with pricing and context length info
+- **Smart Filtering**: Browse models by Popular, Anthropic, OpenAI, or All categories
+- **Pending Changes System**: Review and batch-save multiple configuration changes
+- **Live Preview**: See current and pending configurations side-by-side
+- **Configuration Update**: Update router types (default, background, think, longContext)
+
+**Deployment & Operations**:
+- **Deploy Management**: Deploy to Cloudflare Workers with pre/post verification
+- **Secrets Management**: Set and list Cloudflare Workers secrets with automatic file sync
+- **File Synchronization**: Automatically updates `.dev.vars` and other config files
+- **Deployment Verification**: Checks required files exist before and after deployment
+
+**Performance & UX**:
 - **Smart Caching**: 24-hour model list cache to reduce API calls
-- **Filtered Views**: Browse by Popular, Anthropic, OpenAI, or All models
+- **Portable Binary**: Works from any directory using import metadata
+- **Keyboard Shortcuts**: Ctrl+S (save), Ctrl+R (reset), Ctrl+F (force refresh), Tab (navigate)
+- **Visual Feedback**: Status indicators, error messages, and success confirmations
+- **Multi-Panel Interface**: Three-panel layout for efficient navigation
 
 ### Local Development
 
@@ -197,6 +215,8 @@ When importing in the router:
 
 ## Web Application (`apps/web`)
 
+Next.js 15+ web interface for router management and configuration (in development).
+
 ```bash
 cd apps/web
 
@@ -213,6 +233,38 @@ bun run lint
 # Type checking
 bun run check-types
 ```
+
+### Planned Features
+
+- Visual configuration editor
+- Deployment monitoring dashboard
+- Usage analytics and metrics
+- Reference implementation in `_examples/claude-code-router/ui`
+
+## Reference Implementations (`_examples/`)
+
+The `_examples/` directory contains reference implementations that can be used as guides for development:
+
+- **`_examples/claude-code-router`** - Complete reference implementation with:
+  - Next.js UI (based on latest implementation)
+  - Router service configuration
+  - Deployment guides
+  - This serves as the source for web UI features
+
+- **`_examples/opentui`** - OpenTUI reference for terminal UI development
+
+These examples should be consulted when building new features or understanding best practices for the project.
+
+## Router Types and Configuration
+
+The router supports four main routing types, each optimized for different use cases:
+
+- **default**: Standard requests (general coding, chat, most tasks)
+- **background**: Background tasks (code analysis, refactoring, bulk operations)
+- **think**: Complex reasoning tasks (architecture design, debugging, problem solving)
+- **longContext**: Large context requests (threshold: 60,000 tokens by default)
+
+Each router type can be configured independently to use different providers and models based on requirements (cost, capabilities, speed, etc.).
 
 ## Architecture
 
@@ -338,6 +390,35 @@ After modifying `config.json` or provider settings:
    }
    ```
 
+## Development Workflow
+
+### Configuration via CLI
+
+1. **Start CLI**: Run `ccr` (after `bun run link` in `apps/cli`) or `cd apps/cli && bun run dev`
+2. **Configure Router**: Use Quick Config to set up routing rules and model selections
+   - Select router type (default, background, think, longContext)
+   - Filter models by category (Popular, Anthropic, OpenAI, All)
+   - Review pending changes before saving
+   - Save with Ctrl+S
+3. **Set Secrets**: Use Secrets Manager to configure API keys
+   - Automatically syncs to both Cloudflare Workers and `.dev.vars`
+4. **Test Locally**: Run router with `bun run dev` using `.dev.vars`
+5. **Deploy**: Use CLI to deploy to Cloudflare Workers with automatic verification
+
+### File Management
+
+The CLI automatically synchronizes local files with Cloudflare Workers:
+
+**Managed Files**:
+- `.dev.vars` - Updated when setting secrets (local development environment)
+- `config.json` - Updated when saving router configuration (Quick Config)
+- `wrangler.toml` - Verified before deployment (read-only)
+
+**Synchronization**:
+- Setting secrets updates both Cloudflare Workers and `.dev.vars`
+- Saving config updates `config.json` and provider model lists
+- Deployment verifies all required files exist before and after
+
 ## Important Development Notes
 
 - **Dual Builds**: The core package builds for both Node/Bun and browser environments. Use the correct import path.
@@ -345,3 +426,5 @@ After modifying `config.json` or provider settings:
 - **Streaming Responses**: Response transformers are skipped for streaming responses (handled by `transformStreamChunk`).
 - **Config Backups**: Configuration updates via API automatically create timestamped backups in `.backups/` directory.
 - **Authentication**: If `APIKEY` is set, all `/v1/*` and `/api/*` endpoints require bearer token or `x-api-key` header.
+- **CLI Portability**: CLI binary uses `import.meta.dir` for path resolution, works from any directory
+- **Model Caching**: Model list cached for 24 hours in CLI to reduce OpenRouter API calls

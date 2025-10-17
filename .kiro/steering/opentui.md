@@ -1,6 +1,5 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: "*.tsx"
+inclusion: always
 ---
 
 # OpenTUI Usage

@@ -1,8 +1,8 @@
 import { render, useKeyboard } from "@opentui/react";
 import { useCallback, useState } from "react";
-import { DeployManager } from "./components/DeployManager";
+import { DeployManager } from "./components/features/DeployManager";
 import { MainMenu } from "./components/MainMenu";
-import { QuickConfig } from "./components/QuickConfig";
+import { QuickConfig } from "./components/features/QuickConfig";
 import { SecretsManager } from "./components/SecretsManager";
 import { ConfigProvider } from "./context/ConfigContext";
 import { loadEnv } from "./utils/env";

@@ -1,11 +1,11 @@
 import { type SelectOption, TextAttributes } from "@opentui/core";
 import { useKeyboard, useTerminalDimensions } from "@opentui/react";
 import { useCallback, useState } from "react";
-import { deployToWorkers, getDeploymentStatus } from "../utils/deploy";
-import { Header } from "./layout/Header";
-import { Footer } from "./layout/Footer";
-import { SelectList } from "./common/SelectList";
-import { theme } from "../design/theme";
+import { deployToWorkers, getDeploymentStatus } from "../../../utils/deploy";
+import { Header } from "../../layout/Header";
+import { Footer } from "../../layout/Footer";
+import { DeploymentLog } from "./DeploymentLog";
+import { theme } from "../../../design/theme";
 
 interface DeployManagerProps {
 	onBack: () => void;
@@ -110,7 +110,6 @@ export function DeployManager(_props: DeployManagerProps) {
 					padding: 2,
 				}}
 			>
-				{/* Status Header */}
 				<box
 					style={{
 						...theme.components.header,
@@ -127,63 +126,8 @@ export function DeployManager(_props: DeployManagerProps) {
 					</text>
 				</box>
 
-				{/* Deployment Output */}
-				<scrollbox
-					style={{
-						rootOptions: {
-							height: height - 12,
-							border: true,
-							backgroundColor: theme.colors.bg.mid,
-						},
-						wrapperOptions: { backgroundColor: theme.colors.bg.mid },
-						viewportOptions: { backgroundColor: theme.colors.bg.dark },
-						scrollbarOptions: { showArrows: true },
-					}}
-					focused
-				>
-					<box style={{ flexDirection: "column", padding: 2 }}>
-						{output.map((item) => {
-							const isSuccess = item.text.startsWith("✓");
-							const isWarning = item.text.startsWith("⚠");
-							const isError = item.text.toLowerCase().includes("error");
-							const isEmpty = item.text.trim() === "";
-							const color = isSuccess
-								? theme.colors.success
-								: isWarning
-									? theme.colors.warning
-									: isError
-										? theme.colors.error
-										: theme.colors.info;
+				<DeploymentLog entries={output} error={error} height={height - 12} />
 
-							return (
-								<text key={item.id} fg={color}>
-									{isEmpty ? " " : item.text}
-								</text>
-							);
-						})}
-						{error && (
-							<box
-								style={{
-									marginTop: 1,
-									padding: 1,
-									border: true,
-									backgroundColor: theme.colors.bg.dark,
-								}}
-							>
-								<text
-									style={{
-										attributes: TextAttributes.BOLD,
-										fg: theme.colors.error,
-									}}
-								>
-									❌ Error: {error}
-								</text>
-							</box>
-						)}
-					</box>
-				</scrollbox>
-
-				{/* Footer */}
 				<Footer
 					shortcuts={[
 						{
@@ -220,14 +164,12 @@ export function DeployManager(_props: DeployManagerProps) {
 				padding: 2,
 			}}
 		>
-			{/* Header */}
 			<Header
 				icon="🚀"
 				title="Deploy to Cloudflare Workers"
 				subtitle="Deploy your router configuration to the edge"
 			/>
 
-			{/* Deploy Options */}
 			<box
 				style={{
 					...theme.components.selectContainer,
@@ -239,7 +181,7 @@ export function DeployManager(_props: DeployManagerProps) {
 					style={{ height: "100%" }}
 					options={options}
 					focused={true}
-					onChange={(index, option) => {
+					onChange={(_index, option) => {
 						if (option) {
 							if (option.value === "status") {
 								handleCheckStatus();
@@ -252,7 +194,6 @@ export function DeployManager(_props: DeployManagerProps) {
 				/>
 			</box>
 
-			{/* Footer */}
 			<Footer
 				shortcuts={[
 					{ keys: "↑↓", description: "Navigate" },
